@@ -34,7 +34,8 @@ library(ape)
 library(plotly)
 library(lemon)
 library(scone)
-library('edgeR')
+suppressPackageStartupMessages(library(escape))
+suppressPackageStartupMessages(library(dittoSeq))
 
 setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
 
@@ -110,6 +111,14 @@ seurat_object <- function(patient){
   table(results.fine$labels)
   
   
+  #############################################################################################################################################
+  ##### -- Enrichissement des gènes -- ##### 
+  ##########################################
+  GS <- getGeneSets(library = "H")
+  ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
+  singlet <- AddMetaData(singlet, ES)
+  singlet@tools$hallmarks <- names(ES)
+  singlet@tools$meta_variable <- c("seurat_clusters", "HTO_maxID", "SingleR.calls", "clonotype_id", "Phase")
   
   #############################################################################################################################################
   ##### --             VDJ             -- ##### 
@@ -159,7 +168,7 @@ postgreffe <- subset(singlet, idents = c("subtilisin", "actinomycin-D", "collage
 ######## Visualisation                                                                                                                 ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 visualitation <- function(singlet){
-  annotations <- read.csv("/home/boris/Documents/analyse/annotation_FindAllMarkers.csv")
+  annotations <- read.csv("/home/boris/Bureau/R_project/scShiny/annotation_FindAllMarkers.csv")
   
   ## -- ADD MITOCHONDRIAL ANALYSES -- ## 
   singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
@@ -203,7 +212,7 @@ visualitation <- function(singlet){
 }
 singlet <- visualitation(singlet)
 
-save(singlet, file = paste0("/home/boris/Documents/analyse/shiny/singlet_",patient,".RData"))
+save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
 write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
 
@@ -214,41 +223,27 @@ load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 #write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
 
 
-
-
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## To test                                                                                                                       ######## 
+######## ESCAPE - Enrichissement de gène                                                                                               ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-#annotations_finale <- singlet@meta.data[which(singlet@meta.data$gene_name %in% top10),] 
-#singlet <- BuildClusterTree(singlet)
-#Tool(singlet,'BuildClusterTree')
-#PlotClusterTree(singlet)
-
-#singlet <- SCTransform(singlet)
-#Stdev(singlet[["pca"]])
-
-library(escape)
-suppressPackageStartupMessages(library(escape))
-suppressPackageStartupMessages(library(Seurat))
-suppressPackageStartupMessages(library(dittoSeq))
-
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
-GS <- getGeneSets(library = "H")
-ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 8)
-singlet <- AddMetaData(singlet, ES)
-singlet@meta.data$active.idents <- singlet@active.ident
-dittoHeatmap(singlet, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
-             annot.by = c("Phase", "SingleR.calls"), cluster_cols = TRUE, fontsize = 7)
 
 #The Heatmap
+singlet@meta.data$active.idents <- singlet@active.ident
+dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
+             annot.by = singlet@tools$meta_variable, cluster_cols = TRUE, fontsize = 7)
+
+dittoHeatmap(singlet, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
+             annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
+
 dittoHeatmap(singlet, genes = NULL, metas = c("HALLMARK_APOPTOSIS", "HALLMARK_DNA_REPAIR", "HALLMARK_P53_PATHWAY"), 
-             heatmap.colors = rev(colorblind_vector(50)), annot.by = c("active.idents", "HTO_maxID"), cluster_cols = TRUE, fontsize = 7)
+             heatmap.colors = rev(colorblind_vector(50)), annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
 
 #The Violin Plot
 dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") + scale_fill_manual(values = colorblind_vector(5))
 
 #Hex Density Enrichment Plots
-dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) +             theme_classic() + 
+dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 
   scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
 
 dittoScatterHex(singlet, x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE, split.by = "SingleR.calls") + 
@@ -265,6 +260,7 @@ splitEnrichment(ES2, split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
 splitEnrichment(ES2, x.axis = "cluster", split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
 
 # Expanded Analysis
+ES2 <- data.frame(singlet[[]], Idents(singlet))
 PCA <- performPCA(enriched = ES2, groups = c("cluster", "SingleR.calls"))
 pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = TRUE)
 pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 
@@ -273,8 +269,22 @@ masterPCAPlot(ES2, PCx = "PC1", PCy = "PC2", top.contribution = 10)
 #Signficance
 output <- getSignificance(ES2, group = "cluster", fit = "linear.model")
 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+######## To test                                                                                                                       ######## 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+#annotations_finale <- singlet@meta.data[which(singlet@meta.data$gene_name %in% top10),] 
+#singlet <- BuildClusterTree(singlet)
+#Tool(singlet,'BuildClusterTree')
+#PlotClusterTree(singlet)
 
+#singlet <- SCTransform(singlet)
+#Stdev(singlet[["pca"]])
 
+sce.singlet <- as.SingleCellExperiment(singlet)
+colData(sce.singlet)
+
+sce.singlet@metadata <- singlet@meta.data
+metadata(sce.singlet)$which_qc
 
 fluidigm <- as.SingleCellExperiment(singlet)
 #Add QC for Mitochondrial genes
@@ -284,158 +294,6 @@ fluidigm <- addPerFeatureQC(fluidigm)
 rowData(fluidigm)
 
 View(fluidigm)
-
-
-
-keep=c("sum","detected",          
-       "percent_top_50","percent_top_100","percent_top_200","percent_top_500",      
-       "subsets_Mito_sum","subsets_Mito_detected","subsets_Mito_percent","total")
-
-
-sce <- fluidigm
-# Adaptive Filter using MAD method
-qc.lib2 <- isOutlier(sce$sum, log=TRUE, type="lower") #lib sizes
-#Gene Filtering step 1
-qc.nexprs2 <- isOutlier(sce$detected, log=TRUE, type="lower") #expressed genes
-qc.mito2 <- isOutlier(sce$sum, type="higher")
-attr(qc.lib2, "thresholds") #check cutoffs
-discard2 <- qc.lib2 | qc.nexprs2 | qc.mito2
-df2<-DataFrame(LibSize=sum(qc.lib2), NExprs=sum(qc.nexprs2),
-               MitoProp=sum(qc.mito2), Total=sum(discard2))
-
-
-plot(sce$sum, sce$sum, log="x", xlab="Total count", ylab='%')
-abline(h=attr(qc.mito2, "thresholds")["higher"], col="red")
-filtered <- sce[,!discard2]
-is.mito <-which(qc.mito2)
-lost <- calculateAverage(counts(sce)[,discard2])
-kept <- calculateAverage(counts(sce)[,!discard2])
-logged <- cpm(cbind(lost, kept), log=TRUE, prior.count=2)
-logFC <- logged[,1] - logged[,2]
-abundance <- rowMeans(logged)
-plot(abundance, logFC, xlab="Average count", ylab="Log-FC (lost/kept)", pch=16)
-points(abundance[is.mito], logFC[is.mito], col="dodgerblue", pch=16)
-
-library(scone)
-data(housekeeping)
-
-metadata(filtered)$which_qc <- colData(filtered)
-sce.matrix <- as.matrix(counts(filtered))
-rownames(sce.matrix) <- rowData(filtered)$Symbol
-dim(sce.matrix)
-
-#Gene Filtering step 2
-sce.matrix <- sce.matrix[rowSums(sce.matrix)>0,]
-dim(sce.matrix)
-[1] 21195  3514
-
-num_reads <- quantile(sce.matrix[sce.matrix > 0])[4]
-num_cells = 0.25*ncol(sce.matrix)
-is_common = rowSums(sce.matrix >= num_reads ) >= num_cells
-> table(is_common)
-is_common
-FALSE  TRUE 
-20405   790
-
-hk = intersect(housekeeping$V1,rownames(sce.matrix))
-> length(hk)
-[1] 503
-
-# Metric-based Filtering
-#ralign = colData(sce)$detected,
-mfilt = metric_sample_filter(sce.matrix,
-                             nreads = colSums(sce.matrix),
-                             gene_filter = is_common,
-                             pos_controls = hk,
-                             zcut = 3, mixture = FALSE,
-                             plot = TRUE,
-                             hard_nreads=2000)
-
-filter_cell <- !apply(simplify2array(mfilt[!is.na(mfilt)]),1,any)
-
-# Final Gene Filtering: Highly expressed in at least 5 cells
-num_reads <- quantile(sce.matrix[sce.matrix > 0])[4]
-num_cells = 5
-is_quality = rowSums(sce.matrix >= num_reads ) >= num_cells
-
-#Gene Filtering step 3
-filtered <- sce.matrix[is_quality, filter_cell]
-> dim(filtered)
-[1] 11105  3434
-
-qc <- colData(sce)[colnames(filtered),]
-
-posi<- c("CD8B",
-         "LEF1",
-         "OXNAD1",
-         "TRABD2A",
-         "CCR7",
-         "MAL",
-         "TCF7",
-         "PIK3IP1")
-
-#Making the positive and negative controls
-poscon = intersect(rownames(filtered),posi)
-negcon = intersect(rownames(filtered),hk)
-qc=qc[keep]
-ppq = scale(qc[,apply(qc,2,sd) > 0],center = TRUE, scale = TRUE)
-
-my_scone <- SconeExperiment(filtered,
-                            qc=ppq, 
-                            negcon_ruv = rownames(filtered) %in% negcon,
-                            poscon = rownames(filtered) %in% poscon
-)
-
-EFF_FN = function (ei)
-{
-  sums = colSums(ei > 0)
-  eo = t(t(ei)*sums/mean(sums))
-  return(eo)
-}
-
-SCRAN_FN3 = function (ei) 
-{
-  if (!requireNamespace("scran", quietly = TRUE)) {
-    stop("scran package needed for SCRAN_FN()")
-  }
-  scales = scran::calculateSumFactors(ei) #, sizes = ceiling(sqrt(ncol(ei))))
-  eo = t(t(ei) * mean(scales)/scales)
-  return(eo)
-}
-
-## ----- Scaling Argument -----
-
-scaling1=list(none=identity, # Identity - do nothing
-              uq = UQ_FN,
-              scran = SCRAN_FN3,
-              sum = SUM_FN) #, # SCONE library wrappers...
-#tmm = TMM_FN, 
-#uq = UQ_FN,
-#fq = FQT_FN,
-#deseq = DESEQ_FN
-#eff = EFF_FN, # User-defined function)
-
-my_scone1 <- scone(my_scone,
-                   scaling=scaling1,
-                   k_qc=3, k_ruv = 3,
-                   adjust_bio="no",
-                   run=FALSE)
-
-BiocParallel::register(
-  BiocParallel::SerialParam()
-) # Register BiocParallel Serial Execution
-
-my_scone <- scone(my_scone1,
-                  scaling=scaling1,
-                  run=TRUE,
-                  eval_kclust = 2:6,
-                  return_norm = "in_memory",
-                  zero = "postadjust")
-
-
-pc_obj = prcomp(apply(t(get_scores(my_scone)),1,rank),
-                center = TRUE,scale = FALSE)
-bp_obj = biplot_color(pc_obj,y = -get_score_ranks(my_scone),expand = .6)
 
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 

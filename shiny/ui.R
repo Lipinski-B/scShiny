@@ -12,6 +12,7 @@ shinyUI(dashboardPage(
       menuItem("Analyses PCA", tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
       menuItem("Analyses mitochondriales", tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
       menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+      menuItem("Enrichissement de gène", tabName = "hallmark", icon = icon("calendar")),
       menuItem("Lecture des données", tabName = "visualization", icon = icon("readme"))
     )
   ),
@@ -156,6 +157,44 @@ shinyUI(dashboardPage(
               navbarPage("Find Feature Variable: ",
                          tabPanel("Plot", plotOutput("top50", width = "100%",  height = "1000px")),
                          tabPanel("FeatureScatter", verbatimTextOutput("Variable_feature"))
-              ),)
+              ),
+      ),
+      
+      # hallmark
+      tabItem(tabName = "hallmark",
+              navbarPage("Analyses : ",
+                         tabPanel("Heatmap",
+                                  plotOutput("hallmark_Heatmap", width = "100%",  height = "1000px"),
+                                  
+                                  
+                                  fluidRow(),
+                                  column(1,align="right",checkboxGroupInput("Subsets", NULL, choices = list("Subsets" = "Subsets"), selected = 0)),
+                                  
+                                  fluidRow(),
+                                  conditionalPanel(
+                                    condition = "input.Subsets == 'Subsets' ",
+                                    wellPanel(h4("Group by :"),
+                                              useShinyjs(),
+                                              uiOutput("Dynamic_Hallmark"),
+                                              fluidRow(),
+                                    ),
+                                    
+                                    tags$br(),
+                                    div(actionButton(inputId = "actBtnVisualisation", label = "Apply",icon = icon("play") ), align = "center")
+                                  ),
+                                  
+                                  
+                                  
+                                  
+
+                                  ),
+                         tabPanel("VlnPlot", plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px")),
+                         tabPanel("Hex Density", plotOutput("hallmark_HD", width = "100%",  height = "1000px")),
+                         tabPanel("Ridge Plot", plotOutput("hallmark_RP", width = "100%",  height = "1000px"))
+                         #tabPanel("PCA", plotOutput("hallmark_PCA", width = "100%",  height = "1000px")),
+              ),
+      )
+      
+      
     ))
 ))

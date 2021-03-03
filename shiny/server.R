@@ -12,6 +12,13 @@ shinyServer(function(input, output, session) {
     return(fv)
   })
   
+  hm <- reactive({
+    v <- c()
+    for(i in 1:length(singlet@tools$hallmarks)){
+      v = c(v, as.character(input[[singlet@tools$hallmarks[i]]]))
+    }
+    return(v)
+  })
   group <- reactive({
     v <- c()
     for(i in 1:length(colnames(singlet@meta.data))){if(length(input[[colnames(singlet@meta.data)[i]]])== 1){v = c(v, as.character(input[[colnames(singlet@meta.data)[i]]]))}}
@@ -67,6 +74,13 @@ shinyServer(function(input, output, session) {
     return(plot.data)
   })
   
+  output$Dynamic_Hallmark <- renderUI({
+    List <- list()
+    for(i in 1:length(singlet@tools$hallmarks)){
+      List[[singlet@tools$hallmarks[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = singlet@tools$hallmarks[i], label = NULL, choices = singlet@tools$hallmarks[i]))) #, selected = singlet@tools$hallmarks[i] 
+    }
+    return(List)                     
+  })
   output$Dynamic_Group <- renderUI({
     List <- list()
     for(i in 1:length(colnames(singlet@meta.data))){
@@ -128,7 +142,6 @@ shinyServer(function(input, output, session) {
     plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
     plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
   })
-  
   output$D_PCA <- renderPlotly({
     plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3, 
             color = singlet@meta.data[[input$metadata]], 
@@ -147,7 +160,6 @@ shinyServer(function(input, output, session) {
     plots <- UMAPPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
     plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4))) 
   })
-  
   output$D_UMAP <- renderPlotly({
     plot_ly(data = D3plot(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,
             color = singlet@meta.data[[input$metadata]],
@@ -161,7 +173,6 @@ shinyServer(function(input, output, session) {
     plots <- TSNEPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
     plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4)))
   })
-  
   output$D_TSNE <- renderPlotly({
     data2 <- D3plot()
     plot_ly(data = data2, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
@@ -193,6 +204,40 @@ shinyServer(function(input, output, session) {
   output$DimHeatmap <- renderPlot({DimHeatmap(singlet, dims = 1:10, cells = 100, balanced = TRUE)})
   output$VizDimLoadings <- renderPlot({VizDimLoadings(singlet, dims = 1:5, reduction = "pca")})
   output$JackStrawPlot <- renderPlot({JackStrawPlot(singlet, dims = 1:15)})
+  
+  # -- Enrichissement de gène -- ##
+  rv <- reactiveValues(hallmark = singlet@tools$hallmarks)
+  observeEvent(input$actBtnVisualisation,{rv$hallmark <- hm()})
+  output$hallmark_Heatmap <- renderPlot({
+    singlet@meta.data$active.idents <- singlet@active.ident
+    dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
+                 annot.by = singlet@tools$meta_variable, cluster_cols = TRUE, fontsize = 14)
+
+  })
+  output$hallmark_VlnPlot <- renderPlot({
+    dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") + scale_fill_manual(values = colorblind_vector(5))
+  })
+  output$hallmark_HD <- renderPlot({
+    dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 
+      scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
+    
+    dittoScatterHex(singlet, x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE, split.by = "SingleR.calls") + 
+      theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2) 
+  })
+  output$hallmark_RP <- renderPlot({
+    ES2 <- data.frame(singlet[[]], Idents(singlet))
+    colnames(ES2)[ncol(ES2)] <- "cluster"
+    ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "SingleR.calls", add.rug = TRUE)
+    ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "cluster", facet = "SingleR.calls", add.rug = TRUE)
+  })
+  #output$hallmark_PCA <- renderPlot({
+  #ES2 <- data.frame(singlet[[]], Idents(singlet))
+  #PCA <- performPCA(enriched = ES2, groups = c("cluster", "SingleR.calls"))
+  #pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = TRUE)
+  #pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 
+  #masterPCAPlot(ES2, PCx = "PC1", PCy = "PC2", top.contribution = 10)
+  #})
+  
   
   output$dataTable = DT::renderDataTable(as.matrix(singlet[["RNA"]]@counts))
 })
