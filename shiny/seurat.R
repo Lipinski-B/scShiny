@@ -26,19 +26,15 @@ library(ggplot2)
 library(rowr)
 library(shiny)
 library(shinyjs)
-library(ggplot2)
+library(grid)
 library(gridExtra)
 library(shinydashboard)
 library(Signac)
 library(ape)
 library(plotly)
+library(lemon)
 
 setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
-#setwd(dir = "/")
-
-result=list()
-meta_variable = c("orig.ident", "HTO_maxID", "SingleR.calls", "clonotype_id","chain",
-                  "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "old.ident", "seurat_clusters")
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
@@ -156,6 +152,7 @@ postgreffe <- subset(singlet, idents = c("subtilisin", "actinomycin-D", "collage
 
 
 
+
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## Visualisation                                                                                                                 ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -204,52 +201,43 @@ visualitation <- function(singlet){
 }
 singlet <- visualitation(singlet)
 
-Stdev(singlet[["pca"]])
+save(singlet, file = paste0("/home/boris/Documents/analyse/shiny/singlet_",patient,".RData"))
+write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
+write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
+
+load(file = paste0("/home/boris/Documents/analyse/shiny/singlet_",patient,".RData"))
 
 #save(singlet, file = paste0(patient,"/R/singlet_",patient,".RData"))
 #write.csv(singlet@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))
 #write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
 
-save(singlet, file = paste0("/home/boris/Documents/analyse/shiny/singlet_",patient,".RData"))
-write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
-write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
 
-#singlet <- SCTransform(singlet)????????????????
-load(file = paste0("/home/boris/Documents/analyse/shiny/singlet_",patient,".RData"))
+
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## Test metadata                                                                                                                 ######## 
+######## To test                                                                                                                       ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-annotations_finale <- singlet@meta.data[which(singlet@meta.data$gene_name %in% top10),] 
+#annotations_finale <- singlet@meta.data[which(singlet@meta.data$gene_name %in% top10),] 
+#singlet <- BuildClusterTree(singlet)
+#Tool(singlet,'BuildClusterTree')
+#PlotClusterTree(singlet)
 
-singlet <- BuildClusterTree(singlet)
-Tool(singlet,'BuildClusterTree')
-PlotClusterTree(singlet)
-TSNEPlot(singlet)
-FeaturePlot(singlet, features.plot=c('nUMI'), pt.size=0.5)
-
-
+#singlet <- SCTransform(singlet)
+#Stdev(singlet[["pca"]])
 
 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ########
+
+
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+######## 3D Visualisation                                                                                                              ######## 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 # cell plotting : Embeddings(object = singlet, reduction = "umap") --> Visualize what headings are called so that you can extract them to form a dataframe
 singlet2 <- singlet
 singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
 singlet2 <- RunTSNE(singlet2, reduction = "pca", dims = 1:40, dim.embed = 3)
+meta_variable = c("orig.ident", "HTO_maxID", "SingleR.calls", "clonotype_id","chain","v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "old.ident", "seurat_clusters")
 plot.data <- FetchData(object = singlet2, vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
 plot.data$label <- paste(rownames(plot.data))
-
-fig <- plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,
-               color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
-               type = "scatter3d", mode = "markers", 
-               marker = list(size = 3, width=2),
-               text=~label, hoverinfo="text")
-
-plot_ly(data = plot.data, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
-        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
-        type = "scatter3d", mode = "markers", 
-        marker = list(size = 3, width=2),
-        text=~label, hoverinfo="text")
 
 plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, 
         color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
@@ -257,27 +245,22 @@ plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3,
         marker = list(size = 3, width=2),
         text=~label, hoverinfo="text")
 
+plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,
+        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
+        type = "scatter3d", mode = "markers", 
+        marker = list(size = 3, width=2),
+        text=~label, hoverinfo="text")
 
-ax <- list(nticks = 4,range = c(-10,10))
-fig %>% layout(scene = list(xaxis=ax, yaxis=ax, zaxis=ax, aspectmode='cube'))
+plot_ly(data = plot.data, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
+        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
+        type = "scatter3d", mode = "markers", 
+        marker = list(size = 3, width=2),
+        text=~label, hoverinfo="text")
 
 
-
-
-# Say you wanto make a gene-expression 3D plot, where you can plot gene expression against a color scale
-# Here using the same seurat object as above, we extract gene expression information for beta-actin 'ACTB'
-# Here we concentrate on SCT normalized data, or log normalized RNA NOT raw counts.
-# In addition if you want, you may look at normalised-RNA, SCT or integrated slots, to look at gene expression
-# Setting your DefaultAssay() will inform R which assay to pick up expression data from.
-DefaultAssay(object = yourseuratobject)
-DefaultAssay(object = yourseuratobject) <- "RNA"
-DefaultAssay(object = yourseuratobject) <- "integrated"
-DefaultAssay(object = yourseuratobject) <- "SCT"
-
-# create a dataframe
 gene_feature <- "CD19"
-all_feature <- rownames(as.matrix(singlet[["RNA"]]@counts))
-plot.data <- FetchData(object = singlet, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
+all_feature <- rownames(as.matrix(singlet2[["RNA"]]@counts))
+plot.data <- FetchData(object = singlet2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
 plot.data$changed <- ifelse(test = plot.data[[gene_feature]] <1, yes = plot.data[[gene_feature]], no = 1)
 plot.data$label <- paste(rownames(plot.data)," - ", plot.data[[gene_feature]], sep="")
 
@@ -304,18 +287,13 @@ plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3,
         marker = list(size = 3, width=2), 
         text=~label, hoverinfo="text"
 ) %>% layout(title=gene_feature)
+  
 
-
-########## #
-gene_feature <- "CD19"
-all_feature <- rownames(as.matrix(singlet[["RNA"]]@counts))
-plot.data <- FetchData(object = singlet, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
 Cutoff <- quantile(plot.data[,gene_feature], probs = .95)
 plot.data$"ExprCutoff" <- ifelse(test = plot.data[,gene_feature] < Cutoff, yes = plot.data[,gene_feature], no = Cutoff)
 plot.data$label <- paste(rownames(plot.data)," - ", plot.data[,gene_feature], sep="")
 
-# Plot your data, in this example my Seurat object had 21 clusters (0-20), and cells express a gene called ACTB
-plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, name = gene_feature,
+plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, name = gene_feature, # Plot your data, in this example my Seurat object had 21 clusters (0-20), and cells express a gene called ACTB
         color = ~ExprCutoff, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
         colors = c('darkgrey', 'red'), opacity = .5,
         type = "scatter3d", mode = "markers", marker = list(size = 1), 
@@ -325,14 +303,10 @@ plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, name = gene_fea
 
 
 
-
-
-
-
-
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## Summary metadata                                                                                                              ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+result=list()
 summary <- list(singlet@meta.data)
 names(summary) <- patient
 resume=list()
@@ -345,6 +319,8 @@ for (elm in 1:length(names(summary[[patient]]))) {
 result[[patient]] <- resume
 save(result, file = "/home/boris/Documents/analyse/shiny/result.RData")
 load(file = "/home/boris/Documents/analyse/shiny/result.RData")
+
+
 
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -406,30 +382,9 @@ annotations_finale <- annotations[which(annotations$gene_name %in% top10),]
 RidgePlot(singlet, features = c("PCNA", "TOP2A", "MCM6", "MKI67"), ncol = 2)
 
 # Verification Expression marqueurs B_T
-
-library(ggplot2)
-library(grid)
-library(gridExtra)
-
-library(lemon)
-
 feature <-c("MS4A1", "CD19", "CD79A", "CD79B")
 FeaturePlot(singlet, features = feature, cols = RColorBrewer::brewer.pal(6,"YlOrBr"), combine = TRUE, blend = TRUE) & NoAxes() & NoLegend()
-
-
-
-
-& ggplot2::theme(legend.position = "bottom")
-
-
-
 FeaturePlot(singlet, features = feature, split.by = "Phase")
-
-& scale_colour_gradientn(, limits=c(min(singlet[['RNA']]@data[feature,]), max(singlet[['RNA']]@data[feature,])))# Expression marqueurs B cells ## possible visualiser avec reduction = "tsne" ou "umap"
-
-
-& theme(legend.position = "bottom") 
-
 FeaturePlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='umap')
 FeaturePlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='tsne')
 VlnPlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), group.by = "HTO_classification")
@@ -438,8 +393,6 @@ VlnPlot(singlet, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD6
 
 
 
-
-AddGradientLegend
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## VDJ - Métadata                                                                                                                ######## 
