@@ -32,3 +32,5 @@ library(shinydashboard)
 library(Signac)
 library(ape)
 library(plotly)
+
+load(file = "/home/boris/Documents/analyse/singlet_hFL_180008B.RData")

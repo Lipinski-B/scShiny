@@ -1,9 +1,6 @@
 # server.R
 
 shinyServer(function(input, output, session) {
-
-  load(file = "/home/boris/Documents/analyse/singlet_hFL_180008B.RData")
-  
   #################################################################################################
   heatmap <- reactive({
     top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 25, wt = avg_log2FC)
