@@ -1,9 +1,7 @@
 # ui.R
-
 shinyUI(dashboardPage(
   # Titre de l'application
   dashboardHeader(title = "Seurat object"),
-  #test 2222
   
   # Menu
   dashboardSidebar(
