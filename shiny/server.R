@@ -7,7 +7,6 @@ shinyServer(function(input, output, session) {
     return(top10)
   })
   FeaturesVariable <- reactive({
-    annotations <- read.csv("/home/boris/Documents/analyse/annotation_FindAllMarkers.csv")
     fv <- annotations[which(annotations$gene_name %in% heatmap()$gene),] 
     fv <- fv[order(fv$gene_name),] 
     return(fv)
@@ -63,7 +62,6 @@ shinyServer(function(input, output, session) {
     singlet2 <- singlet
     singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
     singlet2 <- RunTSNE(singlet2, reduction = "pca", dims = 1:40, dim.embed = 3)
-    meta_variable <- c("seurat_clusters", "HTO_maxID", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
     plot.data <- FetchData(object = singlet2, vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
     plot.data$label <- paste(rownames(plot.data))
     return(plot.data)
