@@ -66,6 +66,10 @@ shinyServer(function(input, output, session) {
     plot.data$label <- paste(rownames(plot.data))
     return(plot.data)
   })
+  rv <- reactiveValues{(
+    hallmark = singlet@tools$hallmarks,
+    order = NULL
+  )}
 
   output$Dynamic_Group <- renderUI({
     List <- list()
@@ -192,9 +196,6 @@ shinyServer(function(input, output, session) {
   output$JackStrawPlot <- renderPlot({JackStrawPlot(singlet, dims = 1:15)})
   
   # -- Enrichissement de gène -- ##
-  rv <- reactiveValues(
-    hallmark = singlet@tools$hallmarks,
-    order = NULL)
   observeEvent(input$actBtnVisualisation,{
     if(input$numSelector == 'all'){rv$hallmark <- singlet@tools$hallmarks}
     else{rv$hallmark <- input$numSelector}
@@ -215,20 +216,15 @@ shinyServer(function(input, output, session) {
     }  
   })
   output$hallmark_VlnPlot <- renderPlot({
-    dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") + scale_fill_manual(values = colorblind_vector(5))
-  })
+    dittoPlot(singlet, input$hallmark_order_vln, group.by = input$metadata_order_vln) + scale_fill_manual(values = colorblind_vector(9))})
   output$hallmark_HD <- renderPlot({
-    dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 
-      scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
-    
-    dittoScatterHex(singlet, x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE, split.by = "SingleR.calls") + 
-      theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2) 
+    dittoScatterHex(singlet,x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + 
+      theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
   })
   output$hallmark_RP <- renderPlot({
     ES2 <- data.frame(singlet[[]], Idents(singlet))
     colnames(ES2)[ncol(ES2)] <- "cluster"
-    ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "SingleR.calls", add.rug = TRUE)
-    ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "cluster", facet = "SingleR.calls", add.rug = TRUE)
+    ridgeEnrichment(ES2, gene.set = input$hallmark_order_RP, group = input$metadata_group_RP, facet = input$metadata_facet_RP, add.rug = TRUE)
   })
   #output$hallmark_PCA <- renderPlot({
   #ES2 <- data.frame(singlet[[]], Idents(singlet))

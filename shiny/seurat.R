@@ -42,7 +42,7 @@ setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ########
-patient <- "hFL_130337"
+patient <- "hFL_180008B"
 
 seurat_object <- function(patient){
   ############################################################################################################################################# 
@@ -240,7 +240,7 @@ dittoHeatmap(singlet, genes = NULL, metas = c("HALLMARK_APOPTOSIS", "HALLMARK_DN
              heatmap.colors = rev(colorblind_vector(50)), annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
 
 #The Violin Plot
-dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") + scale_fill_manual(values = colorblind_vector(5))
+dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") #+ scale_fill_manual(values = colorblind_vector(5))
 
 #Hex Density Enrichment Plots
 dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 

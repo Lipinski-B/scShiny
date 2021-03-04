@@ -175,7 +175,7 @@ shinyUI(dashboardPage(
                                               radioGroupButtons(inputId = "hallmark_order", label = "To order :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
                                               fluidRow(),
                                               
-                                              pickerInput(inputId = "numSelector", label = "To subset :", choices = c(hallmark,'all'), multiple = TRUE, selected="all"),
+                                              pickerInput(inputId = "numSelector", label = "To subset :", choices = c(hallmark,'all'), multiple = TRUE, options = list(`actions-box` = TRUE)),
                                               fluidRow(),
                                     ),
 
@@ -183,13 +183,38 @@ shinyUI(dashboardPage(
                                     div(actionButton(inputId = "actBtnVisualisation", label = "Apply",icon = icon("play") ), align = "center")
                                   )
                                   ),
-                         tabPanel("VlnPlot", plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px")),
-                         tabPanel("Hex Density", plotOutput("hallmark_HD", width = "100%",  height = "1000px")),
-                         tabPanel("Ridge Plot", plotOutput("hallmark_RP", width = "100%",  height = "1000px"))
+                         tabPanel("VlnPlot",
+                                  plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px"),
+                                  fluidRow(),
+                                  wellPanel(h4("Group by :"),
+                                            pickerInput(inputId = "hallmark_order_vln",label = "Choices : ", choices = hallmark),
+                                            fluidRow(),
+                                            pickerInput(inputId = "metadata_order_vln",label = "Choices : ", choices = meta_variable)
+                                  )
+                                  ),
+                         tabPanel("Hex Density", 
+                                  plotOutput("hallmark_HD", width = "100%",  height = "1000px"),
+                                  
+                                  wellPanel(h4("Group by :"),
+                                            pickerInput(inputId = "hallmark_order_X",label = "X : ", choices = hallmark),
+                                            fluidRow(),
+                                            pickerInput(inputId = "hallmark_order_Y",label = "Y : ", choices = hallmark),
+                                            fluidRow(),
+                                            pickerInput(inputId = "metadata_order_density", label = "Metadata : ", choices = meta_variable)   
+                                  )
+                                  ),
+                         tabPanel("Ridge Plot", 
+                                  plotOutput("hallmark_RP", width = "100%",  height = "1000px"),
+                                  
+                                  wellPanel(h4("Group by :"),
+                                            pickerInput(inputId = "hallmark_order_RP", label = "Hallmark : ", choices = hallmark),
+                                            fluidRow(),
+                                            pickerInput(inputId = "metadata_group_RP", label = "Group by : ", choices = meta_variable),
+                                            fluidRow(),
+                                            pickerInput(inputId = "metadata_facet_RP", label = "Facet by : ", choices = meta_variable)  
+                                  ))
                          #tabPanel("PCA", plotOutput("hallmark_PCA", width = "100%",  height = "1000px")),
-              ),
-      )
-      
-      
+              )
+      )  
     ))
 ))
