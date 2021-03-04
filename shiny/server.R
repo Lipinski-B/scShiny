@@ -175,7 +175,7 @@ shinyServer(function(input, output, session) {
   ## -- Heatmap -- ##
   output$Heatmap <- renderPlot({DoHeatmap(singlet, features = heatmap()$gene, group.by = "HTO_maxID") + NoLegend()})
   output$Heatmap_feature <- renderPrint({print(singlet@commands[["FindAllMarkers"]])})
-  
+
   ## -- Mitochondrie Figure -- ##
   output$MT_VlnPlot <- renderPlot({VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)})
   output$MT_FeatureScatter <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")})

@@ -223,6 +223,210 @@ load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 #write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
 
 
+
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+######## MONOCLE                                                                                                                       ######## 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+#PROCESSING
+importCDS <- function (otherCDS, seurat_scale=F, import_all = FALSE) {
+  if (class(otherCDS)[1] == "Seurat") {
+    requireNamespace("Seurat")
+    if (!seurat_scale) {
+      data <- otherCDS@assays$RNA@counts
+    } else {
+      data <- otherCDS@assays$RNA@scale.data
+    }
+    if (class(data) == "data.frame") {
+      data <- as(as.matrix(data), "sparseMatrix")
+    }
+    pd <- tryCatch({
+      pd <- new("AnnotatedDataFrame", data = otherCDS@meta.data)
+      pd
+    }, error = function(e) {
+      pData <- data.frame(cell_id = colnames(data), row.names = colnames(data))
+      pd <- new("AnnotatedDataFrame", data = pData)
+      message("This Seurat object doesn't provide any meta data")
+      pd
+    })
+    if (length(setdiff(colnames(data), rownames(pd))) > 0) {
+      data <- data[, rownames(pd)]
+    }
+    fData <- data.frame(gene_short_name = row.names(data), 
+                        row.names = row.names(data))
+    fd <- new("AnnotatedDataFrame", data = fData)
+    #lowerDetectionLimit <- otherCDS@is.expr
+    if (all(data == floor(data))) {
+      expressionFamily <- negbinomial.size()
+      expr <- "negbinomial.size"
+    }
+    else if (any(data < 0)) {
+      expressionFamily <- uninormal()
+      expr <- "unimormal"
+    }
+    else {
+      expressionFamily <- tobit()
+      expr <- "tobit"
+    }
+    print(paste0("expressionFamily ",expr))
+    # valid_data <- data[, row.names(pd)]
+    monocle_cds <- newCellDataSet(data, phenoData = pd, featureData = fd, 
+                                  #lowerDetectionLimit = lowerDetectionLimit,
+                                  expressionFamily = expressionFamily)
+    if (import_all) {
+      if ("Monocle" %in% names(otherCDS@misc)) {
+        otherCDS@misc$Monocle@auxClusteringData$seurat <- NULL
+        otherCDS@misc$Monocle@auxClusteringData$scran <- NULL
+        monocle_cds <- otherCDS@misc$Monocle
+        mist_list <- otherCDS
+      }
+      else {
+        mist_list <- otherCDS
+      }
+    }
+    else {
+      mist_list <- list()
+    }
+    if ("var.genes" %in% slotNames(otherCDS)) {
+      var.genes <- setOrderingFilter(monocle_cds, otherCDS@var.genes)
+    }
+    monocle_cds@auxClusteringData$seurat <- mist_list
+  }
+  else if (class(otherCDS)[1] == "SCESet") {
+    requireNamespace("scater")
+    message("Converting the exprs data in log scale back to original scale ...")
+    data <- 2^otherCDS@assayData$exprs - otherCDS@logExprsOffset
+    fd <- otherCDS@featureData
+    pd <- otherCDS@phenoData
+    experimentData = otherCDS@experimentData
+    if ("is.expr" %in% slotNames(otherCDS)) 
+      lowerDetectionLimit <- otherCDS@is.expr
+    else lowerDetectionLimit <- 1
+    if (all(data == floor(data))) {
+      expressionFamily <- negbinomial.size()
+    }
+    else if (any(data < 0)) {
+      expressionFamily <- uninormal()
+    }
+    else {
+      expressionFamily <- tobit()
+    }
+    if (import_all) {
+      mist_list <- otherCDS
+    }
+    else {
+      mist_list <- list()
+    }
+    monocle_cds <- newCellDataSet(data, phenoData = pd, featureData = fd, 
+                                  lowerDetectionLimit = lowerDetectionLimit, expressionFamily = expressionFamily)
+    monocle_cds@auxOrderingData$scran <- mist_list
+  }
+  else {
+    stop("the object type you want to export to is not supported yet")
+  }
+  return(monocle_cds)
+} # Importer object seurat (sous forme de matrix) dans monocle: CellDataSet (CDS)
+
+data <- importCDS(singlet)
+data <- estimateSizeFactors(data)         # Normalization 
+data <- estimateDispersions(data)
+data <- detectGenes(data, min_expr = 0.1) 
+pData(data)$UMI <- Matrix::colSums(exprs(data)) # add UMI
+
+unsup_clustering_genes <- subset(disp_table, mean_expression >= 0.1)
+data <- setOrderingFilter(data, unsup_clustering_genes$gene_id)
+
+data <- reduceDimension(data, max_components = 2, reduction_method = 'tSNE', verbose = TRUE)
+data <- clusterCells(data)
+
+my_vector <- rep('no', nrow(pData(data))) ## Create vector of no's
+my_vector[pData(data)$Cluster == 1] <- rep('yes', sum(pData(data)$Cluster == 1)) ## Change status to yes if the cell was in cluster 1
+pData(data)$test <- my_vector ## Add vector to phenoData
+
+## Add another column to the phenotypic data where TRUE means cluster membership in clusters 1, 2, 7 or 10
+pData(data)$my_colour <- pData(data)$Cluster == 1 | pData(data)$Cluster == 2 | pData(data)$Cluster == 7 | pData(data)$Cluster == 10
+
+
+############################## Classifying cells by type ##############################
+## Identifier gênes intérêt
+MS4A1_id <- row.names(subset(fData(data), gene_short_name == "MS4A1"))
+CXCR4_id <- row.names(subset(fData(data),gene_short_name == "CXCR4"))
+CD83_id <- row.names(subset(fData(data),gene_short_name == "CD83"))
+
+cth <- newCellTypeHierarchy() ## Ajouter type cellulaire en fonction expression gênes intéret 
+cth <- addCellType(cth, "LZ cells", classify_func =function(x) { x[MS4A1_id,] >= 1 & x[CXCR4_id,] < 1 & x[CD83_id,] > 1})
+cth <- addCellType(cth, "DZ cells", classify_func = function(x){ x[MS4A1_id,] >= 1 & x[CXCR4_id,] > 1 & x[CD83_id,] < 1})
+
+data <- classifyCells(data, cth, 0.1) ## Classification des cellules
+
+
+############################## Constructing Single Cell Trajectories ##############################
+expressed_genes <- row.names(subset(fData(data), num_cells_expressed >= 10))
+diff_test_res <- differentialGeneTest(data[expressed_genes,],fullModelFormulaStr = "~CellType")
+ordering_genes <- row.names (subset(diff_test_res, qval < 0.01))
+data <- setOrderingFilter(data, ordering_genes)
+data <- reduceDimension(data, max_components = 2,method = 'DDRTree')
+data <- orderCells(data)
+
+
+
+
+
+
+
+
+
+
+#FIGURE
+#First
+x <- pData(data)$num_genes_expressed
+ggplot(data.frame(x = (x - mean(x)) / sd(x)), aes(x)) +geom_histogram(bins = 50) +geom_vline(xintercept = c(-2, 2), linetype = "dotted", color = 'red')
+ggplot(pData(data), aes(num_genes_expressed, UMI)) + geom_point() #UMI / gene
+
+#Clustering cells WITHOUT markers genes
+plot_ordering_genes(data)
+plot_pc_variance_explained(data, max_components = 50, return_all = FALSE) # Elbow Plot (long)
+
+plot_cell_clusters(data)
+my_cluster_dim <- pData(data)$Cluster
+
+
+## Differential expression analysis on the subset of genes where the mean expression (across cells) was >= 0.1
+length(unsup_clustering_genes$gene_id)
+de_cluster_one <- differentialGeneTest(data[unsup_clustering_genes$gene_id,],fullModelFormulaStr = '~test',cores = 8)
+dim(de_cluster_one)
+
+de_cluster_one %>% arrange(qval) %>% head() ## Order by q-value
+plot_genes_jitter(data['SERTAD1',], grouping = "Cluster")
+
+plot_cell_clusters(data, color_by = 'my_colour')
+
+
+## Camembert types cellulaires
+pie <- ggplot(pData(data),aes(x = factor(1), fill = factor(CellType))) + geom_bar(width = 1)
+pie + coord_polar(theta = "y") + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
+
+plot_cell_clusters(data, 1, 2, color = "CellType") ## Représentation tSNE fonction type cellulaire
+plot_cell_clusters(data, 1, 2, color = "CellType", markers = "CD19") ## Représentation tSNE fonction gênes types
+plot_cell_clusters(data, 1, 2, color = "Cluster") +facet_wrap(~CellType) ## Représentation tSNE fonction types cellulaires + clusters
+plot_ordering_genes(data)
+plot_cell_trajectory(data, color_by = "CellType")
+plot_cell_trajectory(data, color_by = "State")
+
+plot_cell_trajectory(data, color_by = "Pseudotime")
+plot_cell_trajectory(data, color_by = "State") + facet_wrap(~State, nrow = 1)
+
+
+data_filtered <- data[expressed_genes,]
+my_genes <- row.names(subset(fData(data_filtered),gene_short_name %in% "CD3E"))
+cds_subset <- data_filtered[my_genes,]
+
+plot_genes_in_pseudotime(cds_subset, color_by = "CellType")
+
+
+
+
+
+
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## ESCAPE - Enrichissement de gène                                                                                               ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
