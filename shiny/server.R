@@ -12,13 +12,6 @@ shinyServer(function(input, output, session) {
     return(fv)
   })
   
-  hm <- reactive({
-    v <- c()
-    for(i in 1:length(singlet@tools$hallmarks)){
-      v = c(v, as.character(input[[singlet@tools$hallmarks[i]]]))
-    }
-    return(v)
-  })
   group <- reactive({
     v <- c()
     for(i in 1:length(colnames(singlet@meta.data))){if(length(input[[colnames(singlet@meta.data)[i]]])== 1){v = c(v, as.character(input[[colnames(singlet@meta.data)[i]]]))}}
@@ -73,14 +66,7 @@ shinyServer(function(input, output, session) {
     plot.data$label <- paste(rownames(plot.data))
     return(plot.data)
   })
-  
-  output$Dynamic_Hallmark <- renderUI({
-    List <- list()
-    for(i in 1:length(singlet@tools$hallmarks)){
-      List[[singlet@tools$hallmarks[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = singlet@tools$hallmarks[i], label = NULL, choices = singlet@tools$hallmarks[i]))) #, selected = singlet@tools$hallmarks[i] 
-    }
-    return(List)                     
-  })
+
   output$Dynamic_Group <- renderUI({
     List <- list()
     for(i in 1:length(colnames(singlet@meta.data))){
@@ -206,13 +192,27 @@ shinyServer(function(input, output, session) {
   output$JackStrawPlot <- renderPlot({JackStrawPlot(singlet, dims = 1:15)})
   
   # -- Enrichissement de gène -- ##
-  rv <- reactiveValues(hallmark = singlet@tools$hallmarks)
-  observeEvent(input$actBtnVisualisation,{rv$hallmark <- hm()})
+  rv <- reactiveValues(
+    hallmark = singlet@tools$hallmarks,
+    order = NULL)
+  observeEvent(input$actBtnVisualisation,{
+    if(input$numSelector == 'all'){rv$hallmark <- singlet@tools$hallmarks}
+    else{rv$hallmark <- input$numSelector}
+    rv$order <- input$hallmark_order
+  })
+  observeEvent(input$Subsets,{
+    rv$hallmark <- singlet@tools$hallmarks
+    order = NULL}, ignoreNULL = FALSE)
   output$hallmark_Heatmap <- renderPlot({
     singlet@meta.data$active.idents <- singlet@active.ident
-    dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
-                 annot.by = singlet@tools$meta_variable, cluster_cols = TRUE, fontsize = 14)
-
+    
+    if(is.null(rv$order)){
+      dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
+                   annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 14)
+    } else{
+      dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
+                   annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 14, order.by = rv$order)
+    }  
   })
   output$hallmark_VlnPlot <- renderPlot({
     dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") + scale_fill_manual(values = colorblind_vector(5))

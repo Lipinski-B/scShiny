@@ -8,11 +8,11 @@ shinyUI(dashboardPage(
     sidebarMenu(
       menuItem("Réduction des données", tabName = "readData", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("3D Visualisation", tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
-      menuItem("Heatmap d'expression", tabName = "heatmap", icon = icon("calendar")),
       menuItem("Analyses PCA", tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
-      menuItem("Analyses mitochondriales", tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
-      menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+      menuItem("Heatmap d'expression", tabName = "heatmap", icon = icon("calendar")),
       menuItem("Enrichissement de gène", tabName = "hallmark", icon = icon("calendar")),
+      menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+      menuItem("Analyses mitochondriales", tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
       menuItem("Lecture des données", tabName = "visualization", icon = icon("readme"))
     )
   ),
@@ -126,8 +126,8 @@ shinyUI(dashboardPage(
               #h1("Visualisation des données"),
               #h2("Exploration du tableau"),
               #dataTableOutput('dataTable1'),
-              navbarPage("PCA paramètres : ",
-                         tabPanel("Heatmap", plotOutput("Heatmap", width = "100%",  height = "1700px")),
+              navbarPage("Heatmap tools : ",
+                         tabPanel("Heatmap", plotOutput("Heatmap", width = "100%",  height = "1400px")),
                          tabPanel("Information", verbatimTextOutput("Heatmap_feature"))
               ),
       ),
@@ -165,8 +165,6 @@ shinyUI(dashboardPage(
               navbarPage("Analyses : ",
                          tabPanel("Heatmap",
                                   plotOutput("hallmark_Heatmap", width = "100%",  height = "1000px"),
-                                  
-                                  
                                   fluidRow(),
                                   column(1,align="right",checkboxGroupInput("Subsets", NULL, choices = list("Subsets" = "Subsets"), selected = 0)),
                                   
@@ -174,19 +172,16 @@ shinyUI(dashboardPage(
                                   conditionalPanel(
                                     condition = "input.Subsets == 'Subsets' ",
                                     wellPanel(h4("Group by :"),
-                                              useShinyjs(),
-                                              uiOutput("Dynamic_Hallmark"),
+                                              radioGroupButtons(inputId = "hallmark_order", label = "To order :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
+                                              fluidRow(),
+                                              
+                                              pickerInput(inputId = "numSelector", label = "To subset :", choices = c(hallmark,'all'), multiple = TRUE, selected="all"),
                                               fluidRow(),
                                     ),
-                                    
+
                                     tags$br(),
                                     div(actionButton(inputId = "actBtnVisualisation", label = "Apply",icon = icon("play") ), align = "center")
-                                  ),
-                                  
-                                  
-                                  
-                                  
-
+                                  )
                                   ),
                          tabPanel("VlnPlot", plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px")),
                          tabPanel("Hex Density", plotOutput("hallmark_HD", width = "100%",  height = "1000px")),

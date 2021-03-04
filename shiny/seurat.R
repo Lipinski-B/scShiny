@@ -42,7 +42,7 @@ setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ########
-patient <- "hFL_180008B"
+patient <- "hFL_130337"
 
 seurat_object <- function(patient){
   ############################################################################################################################################# 
@@ -231,7 +231,7 @@ colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5F
 #The Heatmap
 singlet@meta.data$active.idents <- singlet@active.ident
 dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
-             annot.by = singlet@tools$meta_variable, cluster_cols = TRUE, fontsize = 7)
+             annot.by = "HTO_maxID", cluster_cols = F, fontsize = 7, order.by = "HTO_maxID")
 
 dittoHeatmap(singlet, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
              annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
