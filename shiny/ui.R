@@ -9,9 +9,8 @@ shinyUI(dashboardPage(
       menuItem("Réduction des données", tabName = "readData", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("3D Visualisation", tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("Analyses PCA", tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
-      menuItem("Heatmap d'expression", tabName = "heatmap", icon = icon("calendar")),
-      menuItem("Enrichissement de gène", tabName = "hallmark", icon = icon("calendar")),
-      menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+      menuItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
+      #menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
       menuItem("Analyses mitochondriales", tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
       menuItem("Lecture des données", tabName = "visualization", icon = icon("readme"))
     )
@@ -121,17 +120,6 @@ shinyUI(dashboardPage(
               ),
       ),
       
-      # visualization
-      tabItem(tabName = "heatmap",
-              #h1("Visualisation des données"),
-              #h2("Exploration du tableau"),
-              #dataTableOutput('dataTable1'),
-              navbarPage("Heatmap tools : ",
-                         tabPanel("Heatmap", plotOutput("Heatmap", width = "100%",  height = "1400px")),
-                         tabPanel("Information", verbatimTextOutput("Heatmap_feature"))
-              ),
-      ),
-      
       # 10 PCA dimensions
       tabItem(tabName = "PCA_facteurs",
               navbarPage("PCA paramètres : ",
@@ -152,68 +140,77 @@ shinyUI(dashboardPage(
               ),
       ),
       
-      # the 50 most highly variable genes
-      tabItem(tabName = "top50",
-              navbarPage("Find Feature Variable: ",
-                         tabPanel("Plot", plotOutput("top50", width = "100%",  height = "1000px")),
-                         tabPanel("FeatureScatter", verbatimTextOutput("Variable_feature"))
-              ),
-      ),
+
       
       # hallmark
       tabItem(tabName = "hallmark",
               navbarPage("Analyses : ",
-                         tabPanel("Heatmap",
-                                  plotOutput("hallmark_Heatmap", width = "100%",  height = "1000px"),
-                                  fluidRow(),
-                                  column(1,align="right",checkboxGroupInput("Subsets", NULL, choices = list("Subsets" = "Subsets"), selected = 0)),
-                                  
-                                  fluidRow(),
-                                  conditionalPanel(
-                                    condition = "input.Subsets == 'Subsets' ",
-                                    wellPanel(h4("Group by :"),
-                                              radioGroupButtons(inputId = "hallmark_order", label = "To order :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
-                                              fluidRow(),
-                                              
-                                              pickerInput(inputId = "numSelector", label = "To subset :", choices = hallmark, multiple = TRUE, options = list(`actions-box` = TRUE)),
-                                              fluidRow(),
-                                    ),
-
-                                    tags$br(),
-                                    div(actionButton(inputId = "actBtnVisualisation", label = "Apply",icon = icon("play") ), align = "center")
-                                  )
-                                  ),
-                         tabPanel("VlnPlot",
-                                  plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px"),
-                                  fluidRow(),
-                                  wellPanel(h4("Group by :"),
-                                            pickerInput(inputId = "hallmark_order_vln",label = "Choices : ", choices = hallmark),
+                         tabPanel("Expression",
+                                  tabsetPanel(
+                                  tabPanel("Heatmap", plotOutput("Heatmap", width = "100%",  height = "1400px")),
+                                  tabPanel("Info ", verbatimTextOutput("Heatmap_feature")))
+                         ),
+                         
+                         tabPanel("Enrichissement Fonctionnel",
+                                  tabsetPanel(
+                                  tabPanel("Heatmap",
+                                            plotOutput("hallmark_Heatmap", width = "100%",  height = "1000px"),
                                             fluidRow(),
-                                            pickerInput(inputId = "metadata_order_vln",label = "Choices : ", choices = meta_variable)
-                                  )
-                                  ),
-                         tabPanel("Hex Density", 
-                                  plotOutput("hallmark_HD", width = "100%",  height = "1000px"),
-                                  
-                                  wellPanel(h4("Group by :"),
-                                            pickerInput(inputId = "hallmark_order_X",label = "X : ", choices = hallmark),
+                                            column(1,align="right",checkboxGroupInput("Subsets", NULL, choices = list("Subsets" = "Subsets"), selected = 0)),
+                                            
                                             fluidRow(),
-                                            pickerInput(inputId = "hallmark_order_Y",label = "Y : ", choices = hallmark),
+                                            conditionalPanel(
+                                              condition = "input.Subsets == 'Subsets' ",
+                                              wellPanel(h4("Group by :"),
+                                                        radioGroupButtons(inputId = "hallmark_order", label = "To order :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
+                                                        fluidRow(),
+                                                        
+                                                        pickerInput(inputId = "numSelector", label = "To subset :", choices = hallmark, multiple = TRUE, options = list(`actions-box` = TRUE)),
+                                                        fluidRow(),
+                                              ),
+          
+                                              tags$br(),
+                                              div(actionButton(inputId = "actBtnVisualisation", label = "Apply",icon = icon("play") ), align = "center")
+                                            )
+                                            ),
+                                  tabPanel("VlnPlot",
+                                            plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px"),
                                             fluidRow(),
-                                            pickerInput(inputId = "metadata_order_density", label = "Metadata : ", choices = meta_variable)   
-                                  )
-                                  ),
-                         tabPanel("Ridge Plot", 
-                                  plotOutput("hallmark_RP", width = "100%",  height = "1000px"),
-                                  
-                                  wellPanel(h4("Group by :"),
-                                            pickerInput(inputId = "hallmark_order_RP", label = "Hallmark : ", choices = hallmark),
-                                            fluidRow(),
-                                            pickerInput(inputId = "metadata_group_RP", label = "Group by : ", choices = meta_variable),
-                                            fluidRow(),
-                                            pickerInput(inputId = "metadata_facet_RP", label = "Facet by : ", choices = meta_variable)  
-                                  ))
-                         #tabPanel("PCA", plotOutput("hallmark_PCA", width = "100%",  height = "1000px")),
+                                            wellPanel(h4("Group by :"),
+                                                      pickerInput(inputId = "hallmark_order_vln",label = "Choices : ", choices = hallmark),
+                                                      fluidRow(),
+                                                      pickerInput(inputId = "metadata_order_vln",label = "Choices : ", choices = meta_variable)
+                                            )
+                                            ),
+                                  tabPanel("Hex Density", 
+                                            plotOutput("hallmark_HD", width = "100%",  height = "1000px"),
+                                            
+                                            wellPanel(h4("Group by :"),
+                                                      pickerInput(inputId = "hallmark_order_X",label = "X : ", choices = hallmark),
+                                                      fluidRow(),
+                                                      pickerInput(inputId = "hallmark_order_Y",label = "Y : ", choices = hallmark),
+                                                      fluidRow(),
+                                                      pickerInput(inputId = "metadata_order_density", label = "Metadata : ", choices = meta_variable)   
+                                            )
+                                            ),
+                                  tabPanel("Ridge Plot", 
+                                            plotOutput("hallmark_RP", width = "100%",  height = "1000px"),
+                                            
+                                            wellPanel(h4("Group by :"),
+                                                      pickerInput(inputId = "hallmark_order_RP", label = "Hallmark : ", choices = hallmark),
+                                                      fluidRow(),
+                                                      pickerInput(inputId = "metadata_group_RP", label = "Group by : ", choices = meta_variable),
+                                                      fluidRow(),
+                                                      pickerInput(inputId = "metadata_facet_RP", label = "Facet by : ", choices = meta_variable)  
+                                            )))
+                                 #tabPanel("PCA", plotOutput("hallmark_PCA", width = "100%",  height = "1000px")),
+                         ),
+                         
+                         tabPanel("Feature Variable",
+                                  tabsetPanel(
+                                  tabPanel("ScatterPlot", plotOutput("top50", width = "100%",  height = "1000px")),
+                                  tabPanel("Top", verbatimTextOutput("Variable_feature")))
+                         )
               )
       )  
     ))

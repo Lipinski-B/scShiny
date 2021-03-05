@@ -116,9 +116,11 @@ seurat_object <- function(patient){
   ##########################################
   GS <- getGeneSets(library = "H")
   ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
+  names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
   singlet <- AddMetaData(singlet, ES)
   singlet@tools$hallmarks <- names(ES)
   singlet@tools$meta_variable <- c("seurat_clusters", "HTO_maxID", "SingleR.calls", "clonotype_id", "Phase")
+  
   
   #############################################################################################################################################
   ##### --             VDJ             -- ##### 
