@@ -36,14 +36,24 @@ library(lemon)
 library(scone)
 suppressPackageStartupMessages(library(escape))
 suppressPackageStartupMessages(library(dittoSeq))
+library(shinyWidgets)
+library(monocle)
+library(cowplot)
+library(clues)
+library(dplyr)
 
 setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
+patient <- "hFL_180008B"
+load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+
+
+#pregreffe vs post greff (rchop placebo)
+#pregreffe vs placebo
+#placebo rchop 
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ########
-patient <- "hFL_180008B"
-
 seurat_object <- function(patient){
   ############################################################################################################################################# 
   ##### --        Préprocessing         -- #####
@@ -218,7 +228,7 @@ save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".R
 write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
 write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
 
-load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+
 
 #save(singlet, file = paste0(patient,"/R/singlet_",patient,".RData"))
 #write.csv(singlet@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))
@@ -334,7 +344,7 @@ data <- estimateDispersions(data)
 data <- detectGenes(data, min_expr = 0.1) 
 pData(data)$UMI <- Matrix::colSums(exprs(data)) # add UMI
 
-unsup_clustering_genes <- subset(disp_table, mean_expression >= 0.1)
+unsup_clustering_genes <- subset(dispersionTable(data), mean_expression >= 0.1)
 data <- setOrderingFilter(data, unsup_clustering_genes$gene_id)
 
 data <- reduceDimension(data, max_components = 2, reduction_method = 'tSNE', verbose = TRUE)
@@ -355,7 +365,7 @@ CXCR4_id <- row.names(subset(fData(data),gene_short_name == "CXCR4"))
 CD83_id <- row.names(subset(fData(data),gene_short_name == "CD83"))
 
 cth <- newCellTypeHierarchy() ## Ajouter type cellulaire en fonction expression gênes intéret 
-cth <- addCellType(cth, "LZ cells", classify_func =function(x) { x[MS4A1_id,] >= 1 & x[CXCR4_id,] < 1 & x[CD83_id,] > 1})
+cth <- addCellType(cth, "LZ cells", classify_func = function(x){ x[MS4A1_id,] >= 1 & x[CXCR4_id,] < 1 & x[CD83_id,] > 1})
 cth <- addCellType(cth, "DZ cells", classify_func = function(x){ x[MS4A1_id,] >= 1 & x[CXCR4_id,] > 1 & x[CD83_id,] < 1})
 
 data <- classifyCells(data, cth, 0.1) ## Classification des cellules
@@ -416,7 +426,6 @@ plot_cell_trajectory(data, color_by = "State")
 
 plot_cell_trajectory(data, color_by = "Pseudotime")
 plot_cell_trajectory(data, color_by = "State") + facet_wrap(~State, nrow = 1)
-
 
 data_filtered <- data[expressed_genes,]
 my_genes <- row.names(subset(fData(data_filtered),gene_short_name %in% "CD3E"))

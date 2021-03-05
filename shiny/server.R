@@ -58,11 +58,16 @@ shinyServer(function(input, output, session) {
     
     return(singlet2)
   })
-  D3plot <- reactive({
+  
+  singlet2 <- reactive({
     singlet2 <- singlet
     singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
     singlet2 <- RunTSNE(singlet2, reduction = "pca", dims = 1:40, dim.embed = 3)
-    plot.data <- FetchData(object = singlet2, vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
+    return(singlet2)
+  })
+  
+  D3plot <- reactive({
+    plot.data <- FetchData(object = singlet2(), vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
     plot.data$label <- paste(rownames(plot.data))
     return(plot.data)
   })
@@ -114,8 +119,52 @@ shinyServer(function(input, output, session) {
     return(List)
   })
   
+  
+  D3feature <- reactive({
+    gene_feature <- input$in7
+    singlet2 <- singlet2()
+    all_feature <- rownames(as.matrix(singlet2[["RNA"]]@counts))
+    plot.data <- FetchData(object = singlet2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
+    plot.data$changed <- ifelse(test = plot.data[[gene_feature]] <1, yes = plot.data[[gene_feature]], no = 1)
+    plot.data$label <- paste(rownames(plot.data)," - ", plot.data[[gene_feature]], sep="")
+    return(plot.data)
+  })
+  output$Dfeature_pca = renderUI({if(length(input$in7)>0){plotlyOutput("DFeaturePlot_PCA", width = "100%",  height = "800px")}})
+  output$Dfeature_umap = renderUI({if(length(input$in7)>0){plotlyOutput("DFeaturePlot_UMAP", width = "100%",  height = "800px")}})
+  output$Dfeature_tsne = renderUI({if(length(input$in7)>0){plotlyOutput("DFeaturePlot_TSNE", width = "100%",  height = "800px")}})
+  
+  output$DFeaturePlot_PCA <- renderPlotly({
+    plot_ly(data = D3feature(), x = ~PC_1, y = ~PC_2, z = ~PC_3, 
+            color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+            colors = c('darkgreen', 'red'), opacity = .5,
+            type = "scatter3d", mode = "markers",
+            marker = list(size = 3, width=2), 
+            text=~label, hoverinfo="text"
+    )# %>% layout(title=gene_feature)
+  })
+  output$DFeaturePlot_UMAP<- renderPlotly({
+    plot_ly(data = D3feature(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, 
+            color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+            colors = c('darkgreen', 'red'), opacity = .5,
+            type = "scatter3d", mode = "markers",
+            marker = list(size = 3, width=2), 
+            text=~label, hoverinfo="text"
+    )# %>% layout(title=gene_feature)
+  })
+  output$DFeaturePlot_TSNE<- renderPlotly({
+    plot_ly(data = D3feature(), x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
+            color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+            colors = c('darkgreen', 'red'), opacity = .5,
+            type = "scatter3d", mode = "markers",
+            marker = list(size = 3, width=2), 
+            text=~label, hoverinfo="text"
+    ) #%>% layout(title=gene_feature)
+  })
+  
+  
   feature <- reactive({row.names(as.matrix(singlet[["RNA"]]@counts))})
   output$variables = renderUI({selectInput('in6', 'Choices', feature(), multiple=TRUE, selectize=TRUE)})
+  output$Dvariables = renderUI({selectInput('in7', 'Choices', feature(), selectize=TRUE, selected = NULL)})
   output$feature_pca = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_PCA", width = "100%",  height = "650px")}})
   output$feature_umap = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_UMAP", width = "100%",  height = "650px")}})
   output$feature_tsne = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_TSNE", width = "100%",  height = "650px")}})
@@ -216,7 +265,7 @@ shinyServer(function(input, output, session) {
     }  
   })
   output$hallmark_VlnPlot <- renderPlot({
-    dittoPlot(singlet, input$hallmark_order_vln, group.by = input$metadata_order_vln) + scale_fill_manual(values = colorblind_vector(9))})
+    dittoPlot(singlet, input$hallmark_order_vln, group.by = input$metadata_order_vln) + scale_fill_manual(values = colorblind_vector(20))})
   output$hallmark_HD <- renderPlot({
     dittoScatterHex(singlet,x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + 
       theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  

@@ -6,7 +6,7 @@ shinyUI(dashboardPage(
   # Menu
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Réduction des données", tabName = "readData", icon = icon("indent-right", lib = "glyphicon")),
+      menuItem("Réduction de dimension", tabName = "readData", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("3D Visualisation", tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("Analyses PCA", tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
       menuItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
@@ -105,9 +105,18 @@ shinyUI(dashboardPage(
               
               
               navbarPage("Reduction dimention",
-                         tabPanel("PCA",plotlyOutput("D_PCA", width = "100%",  height = "1000px"),),
-                         tabPanel("UMAP",plotlyOutput("D_UMAP", width = "100%",  height = "1000px"),),
-                         tabPanel("TSNE",plotlyOutput("D_TSNE", width = "100%",  height = "1000px"),)
+                         tabPanel("PCA",
+                                  plotlyOutput("D_PCA", width = "100%",  height = "800px"),
+                                  uiOutput("Dfeature_pca")
+                                ),
+                         tabPanel("UMAP",
+                                  plotlyOutput("D_UMAP", width = "100%",  height = "800px"),
+                                  uiOutput("Dfeature_umap")
+                                  ),
+                         tabPanel("TSNE",
+                                  plotlyOutput("D_TSNE", width = "100%",  height = "800px"),
+                                  uiOutput("Dfeature_tsne")
+                                  )
               ),
               
               fluidRow(),
@@ -115,7 +124,7 @@ shinyUI(dashboardPage(
               
               fluidRow(),
               conditionalPanel(
-                condition = "input.DFeatures == 'Features' ",
+                condition = "input.DFeatures == 'Features'",
                 fluidRow(column(6,uiOutput('Dvariables'))),
               ),
       ),
