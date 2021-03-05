@@ -46,6 +46,15 @@ setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
 patient <- "hFL_180008B"
 load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 
+manon <- singlet@meta.data[which(singlet@meta.data$SingleR.calls==c('T cells, CD8+','T cells, CD4+')),]
+manon2 <- as.matrix(singlet[["RNA"]]@counts)
+manon2 <- manon2[,which(colnames(manon2) %in% rownames(manon))]
+mean(colSums(manon2))
+
+manon <- singlet@meta.data[which(singlet@meta.data$SingleR.calls=='B cells'),]
+manon2 <- as.matrix(singlet[["RNA"]]@counts)
+manon2 <- manon2[,which(colnames(manon2) %in% rownames(manon))]
+mean(colSums(manon2))
 
 #pregreffe vs post greff (rchop placebo)
 #pregreffe vs placebo
@@ -90,7 +99,11 @@ seurat_object <- function(patient){
   Idents(hashtag)<- 'HTO_classification.global'
   singlet <- subset(hashtag, idents = "Singlet")
   
-  
+  # Dissociation Pré/Post greffe
+  singlet@meta.data$Greffe <- as.character(singlet@meta.data$HTO_maxID)
+  singlet@meta.data[singlet@meta.data$HTO_maxID == "actinomycin-D", "Greffe" ] <- "postgreffe"
+  singlet@meta.data[singlet@meta.data$HTO_maxID == "subtilisin", "Greffe" ] <- "postgreffe"
+  singlet@meta.data[singlet@meta.data$HTO_maxID == "collagenase", "Greffe" ] <- "postgreffe"
   
   
   #############################################################################################################################################
@@ -129,7 +142,7 @@ seurat_object <- function(patient){
   names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
   singlet <- AddMetaData(singlet, ES)
   singlet@tools$hallmarks <- names(ES)
-  singlet@tools$meta_variable <- c("seurat_clusters", "HTO_maxID", "SingleR.calls", "clonotype_id", "Phase")
+  singlet@tools$meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
   
   
   #############################################################################################################################################
@@ -161,6 +174,7 @@ seurat_object <- function(patient){
   # Add BCR to metadata
   singlet <- AddMetaData(object=singlet, metadata = bcr)                        #, col.name = colnames(as.data.frame(bcr)))   # Add to the Seurat object's metadata.
   
+
   return(singlet)
 }
 singlet <- seurat_object(patient)
@@ -172,6 +186,7 @@ actinomycin <- subset(singlet, idents = "actinomycin-D")
 collagenase <- subset(singlet, idents = "collagenase")
 subtilisin <- subset(singlet, idents = "subtilisin")
 postgreffe <- subset(singlet, idents = c("subtilisin", "actinomycin-D", "collagenase"))
+
 
 
 
@@ -214,6 +229,7 @@ visualitation <- function(singlet){
   #singlet@commands[["FindAllMarkers"]] <- merge(singlet@commands[["FindAllMarkers"]], annotations, by.x="gene", by.y="gene_name")
   #singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
   
+  ## -- Ohter -- ## 
   singlet@meta.data$nFeature_HTO <- NULL
   singlet@meta.data$HTO_secondID <- NULL
   singlet@meta.data$HTO_classification <- NULL
@@ -227,8 +243,6 @@ singlet <- visualitation(singlet)
 save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
 write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
-
-
 
 #save(singlet, file = paste0(patient,"/R/singlet_",patient,".RData"))
 #write.csv(singlet@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))

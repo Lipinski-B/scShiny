@@ -100,7 +100,7 @@ shinyUI(dashboardPage(
       # 3D Reduction dimention 
       tabItem(tabName = "3D_RD",
               radioButtons("metadata", "Metadata:",inline=T,
-                           c("seurat_clusters", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "HTO_maxID")
+                           c("seurat_clusters", "SingleR.calls", "Greffe", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "HTO_maxID")
                            ),
               
               
