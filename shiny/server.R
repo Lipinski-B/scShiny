@@ -66,10 +66,10 @@ shinyServer(function(input, output, session) {
     plot.data$label <- paste(rownames(plot.data))
     return(plot.data)
   })
-  rv <- reactiveValues{(
+  rv <- reactiveValues(
     hallmark = singlet@tools$hallmarks,
     order = NULL
-  )}
+  )
 
   output$Dynamic_Group <- renderUI({
     List <- list()
@@ -197,22 +197,22 @@ shinyServer(function(input, output, session) {
   
   # -- Enrichissement de gène -- ##
   observeEvent(input$actBtnVisualisation,{
-    if(input$numSelector == 'all'){rv$hallmark <- singlet@tools$hallmarks}
+    if(length(input$numSelector)==0){rv$hallmark <- singlet@tools$hallmarks}
     else{rv$hallmark <- input$numSelector}
     rv$order <- input$hallmark_order
   })
   observeEvent(input$Subsets,{
     rv$hallmark <- singlet@tools$hallmarks
-    order = NULL}, ignoreNULL = FALSE)
+    rv$order <-NULL}, ignoreNULL = FALSE)
   output$hallmark_Heatmap <- renderPlot({
     singlet@meta.data$active.idents <- singlet@active.ident
     
     if(is.null(rv$order)){
       dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
-                   annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 14)
+                   annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
     } else{
       dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
-                   annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 14, order.by = rv$order)
+                   annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)
     }  
   })
   output$hallmark_VlnPlot <- renderPlot({

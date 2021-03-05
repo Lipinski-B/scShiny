@@ -175,7 +175,7 @@ shinyUI(dashboardPage(
                                               radioGroupButtons(inputId = "hallmark_order", label = "To order :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
                                               fluidRow(),
                                               
-                                              pickerInput(inputId = "numSelector", label = "To subset :", choices = c(hallmark,'all'), multiple = TRUE, options = list(`actions-box` = TRUE)),
+                                              pickerInput(inputId = "numSelector", label = "To subset :", choices = hallmark, multiple = TRUE, options = list(`actions-box` = TRUE)),
                                               fluidRow(),
                                     ),
 
