@@ -42,19 +42,12 @@ library(cowplot)
 library(clues)
 library(dplyr)
 
+library(cellrangerRkit)
+
+
 setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
-patient <- "hFL_180008B"
+patient <- "hFL_130337"
 load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
-
-manon <- singlet@meta.data[which(singlet@meta.data$SingleR.calls==c('T cells, CD8+','T cells, CD4+')),]
-manon2 <- as.matrix(singlet[["RNA"]]@counts)
-manon2 <- manon2[,which(colnames(manon2) %in% rownames(manon))]
-mean(colSums(manon2))
-
-manon <- singlet@meta.data[which(singlet@meta.data$SingleR.calls=='B cells'),]
-manon2 <- as.matrix(singlet[["RNA"]]@counts)
-manon2 <- manon2[,which(colnames(manon2) %in% rownames(manon))]
-mean(colSums(manon2))
 
 #pregreffe vs post greff (rchop placebo)
 #pregreffe vs placebo
@@ -240,7 +233,169 @@ visualitation <- function(singlet){
 }
 singlet <- visualitation(singlet)
 
-save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+
+
+
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+######## MONOCLE                                                                                                                       ######## 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+## 1 -- Store Data in a CellDataSet Object & Filtering low-quality cells
+monocle <- function(singlet){
+  importCDS <- function (otherCDS, seurat_scale=F, import_all = FALSE) {
+    if (class(otherCDS)[1] == "Seurat") {
+      requireNamespace("Seurat")
+      if (!seurat_scale) {
+        data <- otherCDS@assays$RNA@counts
+      } else {
+        data <- otherCDS@assays$RNA@scale.data
+      }
+      if (class(data) == "data.frame") {
+        data <- as(as.matrix(data), "sparseMatrix")
+      }
+      pd <- tryCatch({
+        pd <- new("AnnotatedDataFrame", data = otherCDS@meta.data)
+        pd
+      }, error = function(e) {
+        pData <- data.frame(cell_id = colnames(data), row.names = colnames(data))
+        pd <- new("AnnotatedDataFrame", data = pData)
+        message("This Seurat object doesn't provide any meta data")
+        pd
+      })
+      if (length(setdiff(colnames(data), rownames(pd))) > 0) {
+        data <- data[, rownames(pd)]
+      }
+      fData <- data.frame(gene_short_name = row.names(data), 
+                          row.names = row.names(data))
+      fd <- new("AnnotatedDataFrame", data = fData)
+      #lowerDetectionLimit <- otherCDS@is.expr
+      if (all(data == floor(data))) {
+        expressionFamily <- negbinomial.size()
+        expr <- "negbinomial.size"
+      }
+      else if (any(data < 0)) {
+        expressionFamily <- uninormal()
+        expr <- "unimormal"
+      }
+      else {
+        expressionFamily <- tobit()
+        expr <- "tobit"
+      }
+      print(paste0("expressionFamily ",expr))
+      # valid_data <- data[, row.names(pd)]
+      monocle_cds <- newCellDataSet(data, phenoData = pd, featureData = fd, 
+                                    #lowerDetectionLimit = lowerDetectionLimit,
+                                    expressionFamily = expressionFamily)
+      if (import_all) {
+        if ("Monocle" %in% names(otherCDS@misc)) {
+          otherCDS@misc$Monocle@auxClusteringData$seurat <- NULL
+          otherCDS@misc$Monocle@auxClusteringData$scran <- NULL
+          monocle_cds <- otherCDS@misc$Monocle
+          mist_list <- otherCDS
+        }
+        else {
+          mist_list <- otherCDS
+        }
+      }
+      else {
+        mist_list <- list()
+      }
+      if ("var.genes" %in% slotNames(otherCDS)) {
+        var.genes <- setOrderingFilter(monocle_cds, otherCDS@var.genes)
+      }
+      monocle_cds@auxClusteringData$seurat <- mist_list
+    }
+    else if (class(otherCDS)[1] == "SCESet") {
+      requireNamespace("scater")
+      message("Converting the exprs data in log scale back to original scale ...")
+      data <- 2^otherCDS@assayData$exprs - otherCDS@logExprsOffset
+      fd <- otherCDS@featureData
+      pd <- otherCDS@phenoData
+      experimentData = otherCDS@experimentData
+      if ("is.expr" %in% slotNames(otherCDS)) 
+        lowerDetectionLimit <- otherCDS@is.expr
+      else lowerDetectionLimit <- 1
+      if (all(data == floor(data))) {
+        expressionFamily <- negbinomial.size()
+      }
+      else if (any(data < 0)) {
+        expressionFamily <- uninormal()
+      }
+      else {
+        expressionFamily <- tobit()
+      }
+      if (import_all) {
+        mist_list <- otherCDS
+      }
+      else {
+        mist_list <- list()
+      }
+      monocle_cds <- newCellDataSet(data, phenoData = pd, featureData = fd, 
+                                    lowerDetectionLimit = lowerDetectionLimit, expressionFamily = expressionFamily)
+      monocle_cds@auxOrderingData$scran <- mist_list
+    }
+    else {
+      stop("the object type you want to export to is not supported yet")
+    }
+    return(monocle_cds)
+  } # Importer object seurat (sous forme de matrix) dans monocle: CellDataSet (CDS)
+  data <- importCDS(singlet, import_all = TRUE)
+  data <- estimateSizeFactors(data)         # Estimate size factors 
+  data <- estimateDispersions(data)         # and dispersions 
+  
+  #valid_cells <- row.names(subset(pData(data), Cells.in.Well == 1, Control == FALSE & Clump == FALSE & Debris == FALSE & Mapped.Fragments > 1000000))
+  #data <- data[,valid_cells]
+  pData(data)$Total_mRNAs <- Matrix::colSums(exprs(data))
+  data <- data[,pData(data)$Total_mRNAs < 1e6]
+  upper_bound <- 10^(mean(log10(pData(data)$Total_mRNAs)) + 2*sd(log10(pData(data)$Total_mRNAs)))
+  lower_bound <- 10^(mean(log10(pData(data)$Total_mRNAs)) - 2*sd(log10(pData(data)$Total_mRNAs)))
+  #qplot(Total_mRNAs, data = pData(data),  geom = "density") + geom_vline(xintercept = lower_bound) + geom_vline(xintercept = upper_bound)
+  
+  data <- data[,pData(data)$Total_mRNAs > lower_bound & pData(data)$Total_mRNAs < upper_bound]
+  data <- detectGenes(data, min_expr = 0.1)
+  
+  ## 2 -- Classify and Counting Cells cells with known marker genes (Done by seurat)
+  ## 3 -- Cluster your cells (Done by seurat)
+  
+  ## 4 -- Workflow to order cells in pseudotime along Single Cell Trajectories
+  # a - choosing genes that define progress
+  expressed_genes <- row.names(subset(fData(data), num_cells_expressed >= 10))
+  diff_test_res <- differentialGeneTest(data[expressed_genes,], fullModelFormulaStr = "~HTO_maxID") #find all genes that are differentially expressed in response to the switch from the model
+  ordering_genes <- row.names(subset(diff_test_res, qval < 0.01))
+  data <- setOrderingFilter(data, ordering_genes) # methods to select genes that require no knowledge of the design of the experiment at all
+  
+  # b - reducing the dimensionality of the data 
+  data <- reduceDimension(data, max_components = 2, method = 'DDRTree')
+  
+  # c - ordering the cells in pseudotime 
+  data <- orderCells(data)
+  
+  return(data)
+}
+data <- monocle(singlet)
+
+ plot_ordering_genes(data)
+
+# Trajectories visualisations
+plot_cell_trajectory(data, color_by = "HTO_maxID")
+plot_cell_trajectory(data, color_by = "SingleR.calls")
+plot_cell_trajectory(data, color_by = "State") + facet_wrap(~State, nrow = 1)
+plot_cell_trajectory(data, color_by = "Pseudotime")
+plot_cell_trajectory(data, color_by = "Cluster")
+
+#jitter plot to pick figure out which state corresponds to rapid proliferation
+blast_genes <- row.names(subset(fData(data), gene_short_name %in% c("CD19", "MS4A1")))
+plot_genes_jitter(data[blast_genes,], grouping = "State", min_expr = 0.1)
+
+#confirm that the ordering is correct 
+data_expressed_genes <-  row.names(subset(fData(data), num_cells_expressed >= 10))
+data_filtered <- data[data_expressed_genes,]
+my_genes <- row.names(subset(fData(data_filtered), gene_short_name %in% c("CD3E","MS4A1", "CD19")))
+cds_subset <- data_filtered[my_genes,]
+p <- plot_genes_in_pseudotime(cds_subset, color_by = "SingleR.calls")
+
+
+
+save(singlet, data, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
 write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
 
@@ -250,253 +405,6 @@ write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documen
 
 
 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## MONOCLE                                                                                                                       ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-#PROCESSING
-importCDS <- function (otherCDS, seurat_scale=F, import_all = FALSE) {
-  if (class(otherCDS)[1] == "Seurat") {
-    requireNamespace("Seurat")
-    if (!seurat_scale) {
-      data <- otherCDS@assays$RNA@counts
-    } else {
-      data <- otherCDS@assays$RNA@scale.data
-    }
-    if (class(data) == "data.frame") {
-      data <- as(as.matrix(data), "sparseMatrix")
-    }
-    pd <- tryCatch({
-      pd <- new("AnnotatedDataFrame", data = otherCDS@meta.data)
-      pd
-    }, error = function(e) {
-      pData <- data.frame(cell_id = colnames(data), row.names = colnames(data))
-      pd <- new("AnnotatedDataFrame", data = pData)
-      message("This Seurat object doesn't provide any meta data")
-      pd
-    })
-    if (length(setdiff(colnames(data), rownames(pd))) > 0) {
-      data <- data[, rownames(pd)]
-    }
-    fData <- data.frame(gene_short_name = row.names(data), 
-                        row.names = row.names(data))
-    fd <- new("AnnotatedDataFrame", data = fData)
-    #lowerDetectionLimit <- otherCDS@is.expr
-    if (all(data == floor(data))) {
-      expressionFamily <- negbinomial.size()
-      expr <- "negbinomial.size"
-    }
-    else if (any(data < 0)) {
-      expressionFamily <- uninormal()
-      expr <- "unimormal"
-    }
-    else {
-      expressionFamily <- tobit()
-      expr <- "tobit"
-    }
-    print(paste0("expressionFamily ",expr))
-    # valid_data <- data[, row.names(pd)]
-    monocle_cds <- newCellDataSet(data, phenoData = pd, featureData = fd, 
-                                  #lowerDetectionLimit = lowerDetectionLimit,
-                                  expressionFamily = expressionFamily)
-    if (import_all) {
-      if ("Monocle" %in% names(otherCDS@misc)) {
-        otherCDS@misc$Monocle@auxClusteringData$seurat <- NULL
-        otherCDS@misc$Monocle@auxClusteringData$scran <- NULL
-        monocle_cds <- otherCDS@misc$Monocle
-        mist_list <- otherCDS
-      }
-      else {
-        mist_list <- otherCDS
-      }
-    }
-    else {
-      mist_list <- list()
-    }
-    if ("var.genes" %in% slotNames(otherCDS)) {
-      var.genes <- setOrderingFilter(monocle_cds, otherCDS@var.genes)
-    }
-    monocle_cds@auxClusteringData$seurat <- mist_list
-  }
-  else if (class(otherCDS)[1] == "SCESet") {
-    requireNamespace("scater")
-    message("Converting the exprs data in log scale back to original scale ...")
-    data <- 2^otherCDS@assayData$exprs - otherCDS@logExprsOffset
-    fd <- otherCDS@featureData
-    pd <- otherCDS@phenoData
-    experimentData = otherCDS@experimentData
-    if ("is.expr" %in% slotNames(otherCDS)) 
-      lowerDetectionLimit <- otherCDS@is.expr
-    else lowerDetectionLimit <- 1
-    if (all(data == floor(data))) {
-      expressionFamily <- negbinomial.size()
-    }
-    else if (any(data < 0)) {
-      expressionFamily <- uninormal()
-    }
-    else {
-      expressionFamily <- tobit()
-    }
-    if (import_all) {
-      mist_list <- otherCDS
-    }
-    else {
-      mist_list <- list()
-    }
-    monocle_cds <- newCellDataSet(data, phenoData = pd, featureData = fd, 
-                                  lowerDetectionLimit = lowerDetectionLimit, expressionFamily = expressionFamily)
-    monocle_cds@auxOrderingData$scran <- mist_list
-  }
-  else {
-    stop("the object type you want to export to is not supported yet")
-  }
-  return(monocle_cds)
-} # Importer object seurat (sous forme de matrix) dans monocle: CellDataSet (CDS)
-
-data <- importCDS(singlet)
-data <- estimateSizeFactors(data)         # Normalization 
-data <- estimateDispersions(data)
-data <- detectGenes(data, min_expr = 0.1) 
-pData(data)$UMI <- Matrix::colSums(exprs(data)) # add UMI
-
-unsup_clustering_genes <- subset(dispersionTable(data), mean_expression >= 0.1)
-data <- setOrderingFilter(data, unsup_clustering_genes$gene_id)
-
-data <- reduceDimension(data, max_components = 2, reduction_method = 'tSNE', verbose = TRUE)
-data <- clusterCells(data)
-
-my_vector <- rep('no', nrow(pData(data))) ## Create vector of no's
-my_vector[pData(data)$Cluster == 1] <- rep('yes', sum(pData(data)$Cluster == 1)) ## Change status to yes if the cell was in cluster 1
-pData(data)$test <- my_vector ## Add vector to phenoData
-
-## Add another column to the phenotypic data where TRUE means cluster membership in clusters 1, 2, 7 or 10
-pData(data)$my_colour <- pData(data)$Cluster == 1 | pData(data)$Cluster == 2 | pData(data)$Cluster == 7 | pData(data)$Cluster == 10
-
-
-############################## Classifying cells by type ##############################
-## Identifier gênes intérêt
-MS4A1_id <- row.names(subset(fData(data), gene_short_name == "MS4A1"))
-CXCR4_id <- row.names(subset(fData(data),gene_short_name == "CXCR4"))
-CD83_id <- row.names(subset(fData(data),gene_short_name == "CD83"))
-
-cth <- newCellTypeHierarchy() ## Ajouter type cellulaire en fonction expression gênes intéret 
-cth <- addCellType(cth, "LZ cells", classify_func = function(x){ x[MS4A1_id,] >= 1 & x[CXCR4_id,] < 1 & x[CD83_id,] > 1})
-cth <- addCellType(cth, "DZ cells", classify_func = function(x){ x[MS4A1_id,] >= 1 & x[CXCR4_id,] > 1 & x[CD83_id,] < 1})
-
-data <- classifyCells(data, cth, 0.1) ## Classification des cellules
-
-
-############################## Constructing Single Cell Trajectories ##############################
-expressed_genes <- row.names(subset(fData(data), num_cells_expressed >= 10))
-diff_test_res <- differentialGeneTest(data[expressed_genes,],fullModelFormulaStr = "~CellType")
-ordering_genes <- row.names (subset(diff_test_res, qval < 0.01))
-data <- setOrderingFilter(data, ordering_genes)
-data <- reduceDimension(data, max_components = 2,method = 'DDRTree')
-data <- orderCells(data)
-
-
-
-
-
-
-
-
-
-
-#FIGURE
-#First
-x <- pData(data)$num_genes_expressed
-ggplot(data.frame(x = (x - mean(x)) / sd(x)), aes(x)) +geom_histogram(bins = 50) +geom_vline(xintercept = c(-2, 2), linetype = "dotted", color = 'red')
-ggplot(pData(data), aes(num_genes_expressed, UMI)) + geom_point() #UMI / gene
-
-#Clustering cells WITHOUT markers genes
-plot_ordering_genes(data)
-plot_pc_variance_explained(data, max_components = 50, return_all = FALSE) # Elbow Plot (long)
-
-plot_cell_clusters(data)
-my_cluster_dim <- pData(data)$Cluster
-
-
-## Differential expression analysis on the subset of genes where the mean expression (across cells) was >= 0.1
-length(unsup_clustering_genes$gene_id)
-de_cluster_one <- differentialGeneTest(data[unsup_clustering_genes$gene_id,],fullModelFormulaStr = '~test',cores = 8)
-dim(de_cluster_one)
-
-de_cluster_one %>% arrange(qval) %>% head() ## Order by q-value
-plot_genes_jitter(data['SERTAD1',], grouping = "Cluster")
-
-plot_cell_clusters(data, color_by = 'my_colour')
-
-
-## Camembert types cellulaires
-pie <- ggplot(pData(data),aes(x = factor(1), fill = factor(CellType))) + geom_bar(width = 1)
-pie + coord_polar(theta = "y") + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
-
-plot_cell_clusters(data, 1, 2, color = "CellType") ## Représentation tSNE fonction type cellulaire
-plot_cell_clusters(data, 1, 2, color = "CellType", markers = "CD19") ## Représentation tSNE fonction gênes types
-plot_cell_clusters(data, 1, 2, color = "Cluster") +facet_wrap(~CellType) ## Représentation tSNE fonction types cellulaires + clusters
-plot_ordering_genes(data)
-plot_cell_trajectory(data, color_by = "CellType")
-plot_cell_trajectory(data, color_by = "State")
-
-plot_cell_trajectory(data, color_by = "Pseudotime")
-plot_cell_trajectory(data, color_by = "State") + facet_wrap(~State, nrow = 1)
-
-data_filtered <- data[expressed_genes,]
-my_genes <- row.names(subset(fData(data_filtered),gene_short_name %in% "CD3E"))
-cds_subset <- data_filtered[my_genes,]
-
-plot_genes_in_pseudotime(cds_subset, color_by = "CellType")
-
-
-
-
-
-
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## ESCAPE - Enrichissement de gène                                                                                               ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
-
-#The Heatmap
-singlet@meta.data$active.idents <- singlet@active.ident
-dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
-             annot.by = "HTO_maxID", cluster_cols = F, fontsize = 7, order.by = "HTO_maxID")
-
-dittoHeatmap(singlet, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
-             annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
-
-dittoHeatmap(singlet, genes = NULL, metas = c("HALLMARK_APOPTOSIS", "HALLMARK_DNA_REPAIR", "HALLMARK_P53_PATHWAY"), 
-             heatmap.colors = rev(colorblind_vector(50)), annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
-
-#The Violin Plot
-dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") #+ scale_fill_manual(values = colorblind_vector(5))
-
-#Hex Density Enrichment Plots
-dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 
-  scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
-
-dittoScatterHex(singlet, x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE, split.by = "SingleR.calls") + 
-  theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2) 
-
-# Enrichment along a Ridge Plot
-ES2 <- data.frame(singlet[[]], Idents(singlet))
-colnames(ES2)[ncol(ES2)] <- "cluster"
-ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "SingleR.calls", add.rug = TRUE)
-ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "cluster", facet = "SingleR.calls", add.rug = TRUE)
-
-# The Split Violin Plot
-splitEnrichment(ES2, split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
-splitEnrichment(ES2, x.axis = "cluster", split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
-
-# Expanded Analysis
-ES2 <- data.frame(singlet[[]], Idents(singlet))
-PCA <- performPCA(enriched = ES2, groups = c("cluster", "SingleR.calls"))
-pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = TRUE)
-pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 
-masterPCAPlot(ES2, PCx = "PC1", PCy = "PC2", top.contribution = 10)
-
-#Signficance
-output <- getSignificance(ES2, group = "cluster", fit = "linear.model")
 
 
 
@@ -528,77 +436,7 @@ rowData(fluidigm)
 View(fluidigm)
 
 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## 3D Visualisation                                                                                                              ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-# cell plotting : Embeddings(object = singlet, reduction = "umap") --> Visualize what headings are called so that you can extract them to form a dataframe
-singlet2 <- singlet
-singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
-singlet2 <- RunTSNE(singlet2, reduction = "pca", dims = 1:40, dim.embed = 3)
-meta_variable = c("orig.ident", "HTO_maxID", "SingleR.calls", "clonotype_id","chain","v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "old.ident", "seurat_clusters")
-plot.data <- FetchData(object = singlet2, vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
-plot.data$label <- paste(rownames(plot.data))
 
-plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, 
-        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
-        type = "scatter3d", mode = "markers", 
-        marker = list(size = 3, width=2),
-        text=~label, hoverinfo="text")
-
-plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,
-        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
-        type = "scatter3d", mode = "markers", 
-        marker = list(size = 3, width=2),
-        text=~label, hoverinfo="text")
-
-plot_ly(data = plot.data, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
-        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
-        type = "scatter3d", mode = "markers", 
-        marker = list(size = 3, width=2),
-        text=~label, hoverinfo="text")
-
-
-gene_feature <- "CD19"
-all_feature <- rownames(as.matrix(singlet2[["RNA"]]@counts))
-plot.data <- FetchData(object = singlet2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
-plot.data$changed <- ifelse(test = plot.data[[gene_feature]] <1, yes = plot.data[[gene_feature]], no = 1)
-plot.data$label <- paste(rownames(plot.data)," - ", plot.data[[gene_feature]], sep="")
-
-plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, 
-        color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-        colors = c('darkgreen', 'red'), opacity = .5,
-        type = "scatter3d", mode = "markers",
-        marker = list(size = 3, width=2), 
-        text=~label, hoverinfo="text"
-) %>% layout(title=gene_feature)
-
-plot_ly(data = plot.data, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
-        color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-        colors = c('darkgreen', 'red'), opacity = .5,
-        type = "scatter3d", mode = "markers",
-        marker = list(size = 3, width=2), 
-        text=~label, hoverinfo="text"
-) %>% layout(title=gene_feature)
-
-plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, 
-        color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-        colors = c('darkgreen', 'red'), opacity = .5,
-        type = "scatter3d", mode = "markers",
-        marker = list(size = 3, width=2), 
-        text=~label, hoverinfo="text"
-) %>% layout(title=gene_feature)
-
-
-Cutoff <- quantile(plot.data[,gene_feature], probs = .95)
-plot.data$"ExprCutoff" <- ifelse(test = plot.data[,gene_feature] < Cutoff, yes = plot.data[,gene_feature], no = Cutoff)
-plot.data$label <- paste(rownames(plot.data)," - ", plot.data[,gene_feature], sep="")
-
-plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, name = gene_feature, # Plot your data, in this example my Seurat object had 21 clusters (0-20), and cells express a gene called ACTB
-        color = ~ExprCutoff, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-        colors = c('darkgrey', 'red'), opacity = .5,
-        type = "scatter3d", mode = "markers", marker = list(size = 1), 
-        text=~label,hoverinfo="text"
-) %>% layout(title=gene_feature)
 
 
 
@@ -690,6 +528,107 @@ FeaturePlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction=
 VlnPlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), group.by = "HTO_classification")
 FeaturePlot(singlet, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197")) # Expression marqueurs T cells
 VlnPlot(singlet, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197"), group.by = "HTO_classification")
+
+
+
+
+
+
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+######## 3D Visualisation                                                                                                              ######## 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+# cell plotting : Embeddings(object = singlet, reduction = "umap") --> Visualize what headings are called so that you can extract them to form a dataframe
+singlet2 <- singlet
+singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
+singlet2 <- RunTSNE(singlet2, reduction = "pca", dims = 1:40, dim.embed = 3)
+meta_variable = c("orig.ident", "HTO_maxID", "SingleR.calls", "clonotype_id","chain","v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "old.ident", "seurat_clusters")
+plot.data <- FetchData(object = singlet2, vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
+plot.data$label <- paste(rownames(plot.data))
+
+plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, # ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, or ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
+        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
+        type = "scatter3d", mode = "markers", 
+        marker = list(size = 3, width=2),
+        text=~label, hoverinfo="text")
+
+
+gene_feature <- "CD19"
+all_feature <- rownames(as.matrix(singlet2[["RNA"]]@counts))
+plot.data <- FetchData(object = singlet2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
+plot.data$changed <- ifelse(test = plot.data[[gene_feature]] <1, yes = plot.data[[gene_feature]], no = 1)
+plot.data$label <- paste(rownames(plot.data)," - ", plot.data[[gene_feature]], sep="")
+
+
+plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, # ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, or ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
+        color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+        colors = c('darkgreen', 'red'), opacity = .5,
+        type = "scatter3d", mode = "markers",
+        marker = list(size = 3, width=2), 
+        text=~label, hoverinfo="text"
+) %>% layout(title=gene_feature)
+
+
+Cutoff <- quantile(plot.data[,gene_feature], probs = .95)
+plot.data$"ExprCutoff" <- ifelse(test = plot.data[,gene_feature] < Cutoff, yes = plot.data[,gene_feature], no = Cutoff)
+plot.data$label <- paste(rownames(plot.data)," - ", plot.data[,gene_feature], sep="")
+
+plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, name = gene_feature, # Plot your data, in this example my Seurat object had 21 clusters (0-20), and cells express a gene called ACTB
+        color = ~ExprCutoff, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+        colors = c('darkgrey', 'red'), opacity = .5,
+        type = "scatter3d", mode = "markers", marker = list(size = 1), 
+        text=~label,hoverinfo="text"
+) %>% layout(title=gene_feature)
+
+
+
+
+
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+######## ESCAPE - Enrichissement de gène                                                                                               ######## 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
+
+#The Heatmap
+singlet@meta.data$active.idents <- singlet@active.ident
+dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
+             annot.by = "HTO_maxID", cluster_cols = F, fontsize = 7, order.by = "HTO_maxID")
+
+dittoHeatmap(singlet, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
+             annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
+
+dittoHeatmap(singlet, genes = NULL, metas = c("HALLMARK_APOPTOSIS", "HALLMARK_DNA_REPAIR", "HALLMARK_P53_PATHWAY"), 
+             heatmap.colors = rev(colorblind_vector(50)), annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
+
+#The Violin Plot
+dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") #+ scale_fill_manual(values = colorblind_vector(5))
+
+#Hex Density Enrichment Plots
+dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 
+  scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
+
+dittoScatterHex(singlet, x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE, split.by = "SingleR.calls") + 
+  theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2) 
+
+# Enrichment along a Ridge Plot
+ES2 <- data.frame(singlet[[]], Idents(singlet))
+colnames(ES2)[ncol(ES2)] <- "cluster"
+ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "SingleR.calls", add.rug = TRUE)
+ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "cluster", facet = "SingleR.calls", add.rug = TRUE)
+
+# The Split Violin Plot
+splitEnrichment(ES2, split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
+splitEnrichment(ES2, x.axis = "cluster", split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
+
+# Expanded Analysis
+ES2 <- data.frame(singlet[[]], Idents(singlet))
+PCA <- performPCA(enriched = ES2, groups = c("cluster", "SingleR.calls"))
+pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = TRUE)
+pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 
+masterPCAPlot(ES2, PCx = "PC1", PCy = "PC2", top.contribution = 10)
+
+#Signficance
+output <- getSignificance(ES2, group = "cluster", fit = "linear.model")
+
 
 
 

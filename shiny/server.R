@@ -1,5 +1,4 @@
 # server.R
-
 shinyServer(function(input, output, session) {
   #################################################################################################
   heatmap <- reactive({
@@ -75,6 +74,7 @@ shinyServer(function(input, output, session) {
     hallmark = singlet@tools$hallmarks,
     order = NULL
   )
+
 
   output$Dynamic_Group <- renderUI({
     List <- list()
@@ -168,6 +168,9 @@ shinyServer(function(input, output, session) {
   output$feature_pca = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_PCA", width = "100%",  height = "650px")}})
   output$feature_umap = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_UMAP", width = "100%",  height = "650px")}})
   output$feature_tsne = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_TSNE", width = "100%",  height = "650px")}})
+  
+  output$DDvariables = renderUI({selectInput('in8', 'Choices', feature(), selectize=TRUE, multiple=TRUE, selected = NULL)})
+  output$DDorder_trajectory = renderUI({if(length(input$in8)>0){plotOutput("order_trajectory", width = "100%",  height = "1000px")}})
   
   #################################################################################################
   ## -- FeaturePlot -- ## 
@@ -282,6 +285,26 @@ shinyServer(function(input, output, session) {
   #pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 
   #masterPCAPlot(ES2, PCx = "PC1", PCy = "PC2", top.contribution = 10)
   #})
+  
+  ## -- Monocle -- ##
+  output$cell_trajectory <- renderPlot({
+    plot_cell_trajectory(data, color_by = input$color_trajectory)
+  })
+
+  output$order_trajectory <- renderPlot({
+    data_expressed_genes <-  row.names(subset(fData(data), num_cells_expressed >= 10))
+    data_filtered <- data[data_expressed_genes,]
+    my_genes <- row.names(subset(fData(data_filtered), gene_short_name %in% input$in8))
+    cds_subset <- data_filtered[my_genes,]
+    p <- plot_genes_in_pseudotime(cds_subset, color_by = input$color_order)
+    p + theme(
+      text = element_text(size=20),
+      legend.title = element_text(color = "black", size = 14),
+      legend.text = element_text(color = "black", size = 14),
+      axis.text=element_text(size=14),
+      axis.title=element_text(size=14)
+    ) 
+  })
   
   
   output$dataTable = DT::renderDataTable(as.matrix(singlet[["RNA"]]@counts))

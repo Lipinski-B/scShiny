@@ -10,6 +10,7 @@ shinyUI(dashboardPage(
       menuItem("3D Visualisation", tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("Analyses PCA", tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
       menuItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
+      menuItem("Trajectoires évolutives", tabName = "monocle", icon = icon("calendar")),
       #menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
       menuItem("Analyses mitochondriales", tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
       menuItem("Lecture des données", tabName = "visualization", icon = icon("readme"))
@@ -149,7 +150,24 @@ shinyUI(dashboardPage(
               ),
       ),
       
-
+      # monocle
+      tabItem(tabName = "monocle",
+              navbarPage("Analyses: ",
+                         tabPanel("Trajectory", 
+                                  radioGroupButtons(inputId = "color_trajectory", label = "Color by :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
+                                  fluidRow(),
+                                  plotOutput("cell_trajectory", width = "100%",  height = "600px")
+                         ),
+                         tabPanel("Ordering", 
+                                  radioGroupButtons(inputId = "color_order", label = "Color by :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
+                                  fluidRow(),
+                                  uiOutput("DDvariables"),
+                                  uiOutput("DDorder_trajectory")
+                         )
+                         
+              ),
+      ),
+      
       
       # hallmark
       tabItem(tabName = "hallmark",

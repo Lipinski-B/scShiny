@@ -41,7 +41,7 @@ library(cowplot)
 library(clues)
 library(dplyr)
 
-load(file = "/home/boris/Documents/analyse/singlet_hFL_180008B.RData")
+load(file = "/home/boris/Documents/analyse/singlet_hFL_130337.RData")
 meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
 #meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
 annotations <- read.csv("/home/boris/Bureau/R_project/scShiny/annotation_FindAllMarkers.csv")
