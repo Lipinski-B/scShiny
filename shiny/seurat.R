@@ -46,8 +46,8 @@ library(cellrangerRkit)
 
 
 setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
-patient <- "hFL_130337"
-load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+patient <- "hFL_180008B"
+load(file = paste0("/home/boris/Documents/analyse/singlet_namnam.RData"))
 
 #pregreffe vs post greff (rchop placebo)
 #pregreffe vs placebo
@@ -83,13 +83,14 @@ seurat_object <- function(patient){
   hashtag <- ScaleData(hashtag,features = VariableFeatures(hashtag))
   
   hashtag[["HTO"]] <- CreateAssayObject(counts = hto)                           # Ajoute des données HTO comme un nouvel assay indépendant du mRNA
-  hashtag <- NormalizeData(hashtag, assay = "HTO",normalization.method = "CLR")
+  hashtag <- NormalizeData(hashtag, assay = "HTO", normalization.method = "CLR")
   
   # Association : cellules / échantillons
   hashtag <- HTODemux(hashtag, assay = "HTO", positive.quantile = 0.99)
   table(hashtag$HTO_classification.global)                                      # Result
   
   Idents(hashtag)<- 'HTO_classification.global'
+  
   singlet <- subset(hashtag, idents = "Singlet")
   
   # Dissociation Pré/Post greffe
@@ -97,7 +98,6 @@ seurat_object <- function(patient){
   singlet@meta.data[singlet@meta.data$HTO_maxID == "actinomycin-D", "Greffe" ] <- "postgreffe"
   singlet@meta.data[singlet@meta.data$HTO_maxID == "subtilisin", "Greffe" ] <- "postgreffe"
   singlet@meta.data[singlet@meta.data$HTO_maxID == "collagenase", "Greffe" ] <- "postgreffe"
-  
   
   #############################################################################################################################################
   ##### -- identification des cellules -- ##### 
@@ -233,7 +233,7 @@ visualitation <- function(singlet){
 }
 singlet <- visualitation(singlet)
 
-
+save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_namnam.RData"))
 
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -373,7 +373,7 @@ monocle <- function(singlet){
 }
 data <- monocle(singlet)
 
- plot_ordering_genes(data)
+plot_ordering_genes(data)
 
 # Trajectories visualisations
 plot_cell_trajectory(data, color_by = "HTO_maxID")
@@ -503,7 +503,7 @@ TSNEPlot(object = singlet, group.by = "clonotype_id", label.size = 0.0, pt.size 
 
 # Mitochondrie 
 VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
-VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3) # Visualize QC metrics as a violin plot
+VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident") # Visualize QC metrics as a violin plot
 FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 <- FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification")
 plot2 <- FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")
