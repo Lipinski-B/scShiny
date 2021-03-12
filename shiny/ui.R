@@ -6,6 +6,7 @@ shinyUI(dashboardPage(
   # Menu
   dashboardSidebar(
     sidebarMenu(
+      menuItem("Visualisation des données", tabName = "visualization", icon = icon("poll")),
       menuItem("Réduction de dimension", tabName = "readData", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("3D Visualisation", tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
       menuItem("Analyses PCA", tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
@@ -13,7 +14,7 @@ shinyUI(dashboardPage(
       menuItem("Trajectoires évolutives", tabName = "monocle", icon = icon("calendar")),
       #menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
       menuItem("Analyses mitochondriales", tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
-      menuItem("Lecture des données", tabName = "visualization", icon = icon("readme"))
+      menuItem("Lecture des données", tabName = "readData", icon = icon("readme"))
     )
   ),
   
@@ -26,6 +27,10 @@ shinyUI(dashboardPage(
               
               h1("Lecture des données"),
               fileInput("dataFile",label = NULL,buttonLabel = "Browse...", placeholder = "No file selected"),
+              fluidRow(),
+              
+              h1("Visualisation des données"),
+              h2("Exploration du tableau"),
               dataTableOutput('dataTable')
       ),
       # Read data

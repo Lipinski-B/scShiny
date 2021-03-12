@@ -41,13 +41,11 @@ library(monocle)
 library(cowplot)
 library(clues)
 library(dplyr)
-
 library(cellrangerRkit)
 
-
-setwd(dir = "/home/boris/Documents/lipinskib/boris/Cellranger/result/")
-patient <- "hFL_180008B"
-load(file = paste0("/home/boris/Documents/analyse/singlet_namnam.RData"))
+setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
+patient <- "test"
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
 #pregreffe vs post greff (rchop placebo)
 #pregreffe vs placebo
@@ -56,6 +54,7 @@ load(file = paste0("/home/boris/Documents/analyse/singlet_namnam.RData"))
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ########
+## -- Préprocesing -- ##
 seurat_object <- function(patient){
   ############################################################################################################################################# 
   ##### --        Préprocessing         -- #####
@@ -110,7 +109,7 @@ seurat_object <- function(patient){
   #singlet$SingleR.pruned.calls <- results$pruned.labels
   singlet$SingleR.calls <- results$labels
   #singlet$SingleR.pruned.calls.fine <- results.fine$pruned.labels
-  singlet$SingleR.calls.fine <- results.fine$labels
+  #singlet$SingleR.calls.fine <- results.fine$labels
   
   # DB: BlueprintEncodeData()
   #BD <- celldex::BlueprintEncodeData()
@@ -180,15 +179,9 @@ collagenase <- subset(singlet, idents = "collagenase")
 subtilisin <- subset(singlet, idents = "subtilisin")
 postgreffe <- subset(singlet, idents = c("subtilisin", "actinomycin-D", "collagenase"))
 
-
-
-
-
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## Visualisation                                                                                                                 ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+## -- Visualisation -- ##
 visualitation <- function(singlet){
-  annotations <- read.csv("/home/boris/Bureau/R_project/scShiny/annotation_FindAllMarkers.csv")
+  #annotations <- read.csv("/home/boris/Bureau//scShiny/annotation_FindAllMarkers.csv")
   
   ## -- ADD MITOCHONDRIAL ANALYSES -- ## 
   singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
@@ -233,13 +226,7 @@ visualitation <- function(singlet){
 }
 singlet <- visualitation(singlet)
 
-save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_namnam.RData"))
-
-
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## MONOCLE                                                                                                                       ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-## 1 -- Store Data in a CellDataSet Object & Filtering low-quality cells
+## -- Monocle -- ##
 monocle <- function(singlet){
   importCDS <- function (otherCDS, seurat_scale=F, import_all = FALSE) {
     if (class(otherCDS)[1] == "Seurat") {
@@ -338,6 +325,7 @@ monocle <- function(singlet){
     }
     return(monocle_cds)
   } # Importer object seurat (sous forme de matrix) dans monocle: CellDataSet (CDS)
+  ## 1 -- Store Data in a CellDataSet Object & Filtering low-quality cells
   data <- importCDS(singlet, import_all = TRUE)
   data <- estimateSizeFactors(data)         # Estimate size factors 
   data <- estimateDispersions(data)         # and dispersions 
@@ -373,28 +361,7 @@ monocle <- function(singlet){
 }
 data <- monocle(singlet)
 
-plot_ordering_genes(data)
-
-# Trajectories visualisations
-plot_cell_trajectory(data, color_by = "HTO_maxID")
-plot_cell_trajectory(data, color_by = "SingleR.calls")
-plot_cell_trajectory(data, color_by = "State") + facet_wrap(~State, nrow = 1)
-plot_cell_trajectory(data, color_by = "Pseudotime")
-plot_cell_trajectory(data, color_by = "Cluster")
-
-#jitter plot to pick figure out which state corresponds to rapid proliferation
-blast_genes <- row.names(subset(fData(data), gene_short_name %in% c("CD19", "MS4A1")))
-plot_genes_jitter(data[blast_genes,], grouping = "State", min_expr = 0.1)
-
-#confirm that the ordering is correct 
-data_expressed_genes <-  row.names(subset(fData(data), num_cells_expressed >= 10))
-data_filtered <- data[data_expressed_genes,]
-my_genes <- row.names(subset(fData(data_filtered), gene_short_name %in% c("CD3E","MS4A1", "CD19")))
-cds_subset <- data_filtered[my_genes,]
-p <- plot_genes_in_pseudotime(cds_subset, color_by = "SingleR.calls")
-
-
-
+## -- Save -- ##
 save(singlet, data, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
 write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
@@ -403,10 +370,20 @@ write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documen
 #write.csv(singlet@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))
 #write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
 
-
-
-
-
+## -- Summary metadata -- ## 
+result=list()
+summary <- list(singlet@meta.data)
+names(summary) <- patient
+resume=list()
+for (elm in 1:length(names(summary[[patient]]))) {
+  if (names(summary[[patient]])[elm] %in% meta_variable) {
+    resume[[names(summary[[1]])[elm]]] = as.list(as.vector(table(summary[[1]][[elm]])))
+    names(resume[[names(summary[[1]])[elm]]]) = rownames(as.matrix(table(summary[[1]][[elm]])))
+  }
+}
+result[[patient]] <- resume
+save(result, file = "/home/boris/Documents/analyse/shiny/result.RData")
+load(file = "/home/boris/Documents/analyse/shiny/result.RData")
 
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -435,46 +412,21 @@ rowData(fluidigm)
 
 View(fluidigm)
 
-
-
-
-
-
-
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## Summary metadata                                                                                                              ######## 
+######## ANALYSES                                                                                                                      ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-result=list()
-summary <- list(singlet@meta.data)
-names(summary) <- patient
-resume=list()
-for (elm in 1:length(names(summary[[patient]]))) {
-  if (names(summary[[patient]])[elm] %in% meta_variable) {
-    resume[[names(summary[[1]])[elm]]] = as.list(as.vector(table(summary[[1]][[elm]])))
-    names(resume[[names(summary[[1]])[elm]]]) = rownames(as.matrix(table(summary[[1]][[elm]])))
-  }
-}
-result[[patient]] <- resume
-save(result, file = "/home/boris/Documents/analyse/shiny/result.RData")
-load(file = "/home/boris/Documents/analyse/shiny/result.RData")
-
-
-
-
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## Analyses                                                                                                                      ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-# Main visualisation : TSNE single and multi label
+###############################################################################################################################################
+## -- Main visualisation -- ##
+##############################
+#  TSNE single and multi label
 DimPlot(singlet, reduction = "tsne", label = TRUE)
 BD <- "SingleR.calls" #"SingleR.calls.fine", "SingleR.calls.blueprint", "SingleR.calls.blueprint.fine"
-
 
 Idents(singlet)<-"HTO_maxID"
 tokeep <- levels(Idents(singlet))
 tokeep <- tokeep[tokeep %in% "pregreffe"]
 singlet2 <- subset(singlet, idents = tokeep)
 Idents(singlet2)<-"seurat_clusters"
-
 
 plots <- TSNEPlot(object = singlet2, group.by = c("HTO_maxID", BD), split.by = "Phase", label.size = 0.0, pt.size = 1)
 plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 1)))
@@ -530,13 +482,33 @@ FeaturePlot(singlet, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", 
 VlnPlot(singlet, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197"), group.by = "HTO_classification")
 
 
+###############################################################################################################################################
+## -- Monocle -- ##
+###################
+# Trajectories visualisations
+plot_ordering_genes(data)
+plot_cell_trajectory(data, color_by = "HTO_maxID")
+plot_cell_trajectory(data, color_by = "SingleR.calls")
+plot_cell_trajectory(data, color_by = "State") + facet_wrap(~State, nrow = 1)
+plot_cell_trajectory(data, color_by = "Pseudotime")
+plot_cell_trajectory(data, color_by = "Cluster")
+
+#jitter plot to pick figure out which state corresponds to rapid proliferation
+blast_genes <- row.names(subset(fData(data), gene_short_name %in% c("CD19", "MS4A1")))
+plot_genes_jitter(data[blast_genes,], grouping = "State", min_expr = 0.1)
+
+#confirm that the ordering is correct 
+data_expressed_genes <-  row.names(subset(fData(data), num_cells_expressed >= 10))
+data_filtered <- data[data_expressed_genes,]
+my_genes <- row.names(subset(fData(data_filtered), gene_short_name %in% c("CD3E","MS4A1", "CD19")))
+cds_subset <- data_filtered[my_genes,]
+p <- plot_genes_in_pseudotime(cds_subset, color_by = "SingleR.calls")
 
 
-
-
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## 3D Visualisation                                                                                                              ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+###############################################################################################################################################
+## -- 3D Visualisation -- ##
+############################
+# Main visualitation
 # cell plotting : Embeddings(object = singlet, reduction = "umap") --> Visualize what headings are called so that you can extract them to form a dataframe
 singlet2 <- singlet
 singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
@@ -551,7 +523,7 @@ plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, # ~UMAP_1, y = ~UMAP_
         marker = list(size = 3, width=2),
         text=~label, hoverinfo="text")
 
-
+# Feature plot
 gene_feature <- "CD19"
 all_feature <- rownames(as.matrix(singlet2[["RNA"]]@counts))
 plot.data <- FetchData(object = singlet2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
@@ -567,7 +539,7 @@ plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, # ~UMAP_1, y = ~UMAP_
         text=~label, hoverinfo="text"
 ) %>% layout(title=gene_feature)
 
-
+# Feature plot aleternatif
 Cutoff <- quantile(plot.data[,gene_feature], probs = .95)
 plot.data$"ExprCutoff" <- ifelse(test = plot.data[,gene_feature] < Cutoff, yes = plot.data[,gene_feature], no = Cutoff)
 plot.data$label <- paste(rownames(plot.data)," - ", plot.data[,gene_feature], sep="")
@@ -581,13 +553,9 @@ plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, name = gene_fea
 
 
 
-
-
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## ESCAPE - Enrichissement de gène                                                                                               ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
-
+###############################################################################################################################################
+## -- ESCAPE : Enrichissement de gène -- ##
+###########################################
 #The Heatmap
 singlet@meta.data$active.idents <- singlet@active.ident
 dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
@@ -596,6 +564,7 @@ dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.col
 dittoHeatmap(singlet, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
              annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
 
+colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
 dittoHeatmap(singlet, genes = NULL, metas = c("HALLMARK_APOPTOSIS", "HALLMARK_DNA_REPAIR", "HALLMARK_P53_PATHWAY"), 
              heatmap.colors = rev(colorblind_vector(50)), annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
 

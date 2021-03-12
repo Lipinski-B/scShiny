@@ -1,6 +1,3 @@
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## LIBRARY                                                                                                                       ########
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 library("tidyverse") # for data manipulation & plots
 library("lubridate") # right color
 library("BUSpaRse")
@@ -40,11 +37,11 @@ library(monocle)
 library(cowplot)
 library(clues)
 library(dplyr)
+library(DT)
 
-#load(file = "/home/boris/Documents/analyse/singlet_hFL_180008B.RData")
-load(file = "/home/boris/Bureau/Nam1.Rdata")
+load(file = "/home/boris/Documents/analyse/singlet_hFL_180008B.RData")
 meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
 #meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
-annotations <- read.csv("/home/boris/Bureau/R_project/scShiny/annotation_FindAllMarkers.csv")
+annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
 hallmark = singlet@tools$hallmarks

@@ -307,5 +307,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-  output$dataTable = DT::renderDataTable(as.matrix(singlet[["RNA"]]@counts))
+  output$dataTable = DT::renderDataTable({singlet@meta.data}, options = list(
+    scrollY = '700px', paging = FALSE
+  ))
 })
