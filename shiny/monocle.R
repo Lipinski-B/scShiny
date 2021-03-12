@@ -3,9 +3,16 @@ library(ggplot2)
 library(cowplot)
 library(clues)
 library(dplyr)
+library(reshape2)
+library(tidyr)
+library(cellrangerRkit)
 
-############################ Conversion entre Seurat V3 object et Monocle 2.0 ############################
-importCDS <- function (otherCDS, seurat_scale=F, import_all = FALSE) {
+# monocle workflow
+# 1 - Store Data in a CellDataSet Object
+patient <- "hFL_130337"
+load(file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+
+importCDS <- function(otherCDS, seurat_scale=F, import_all = FALSE){
   if (class(otherCDS)[1] == "Seurat") {
     requireNamespace("Seurat")
     if (!seurat_scale) {
@@ -102,155 +109,167 @@ importCDS <- function (otherCDS, seurat_scale=F, import_all = FALSE) {
   }
   return(monocle_cds)
 } # Importer object seurat (sous forme de matrix) dans monocle: CellDataSet (CDS)
-data <- importCDS(singlet)
-dim(pData(data))                          # Check out the phenotypic data (nombre de cells + nombre metadatas de l'object CDS)
-head(pData(data))
-
-data <- estimateSizeFactors(data)         # Normalization 
-data <- estimateDispersions(data)
-data <- detectGenes(data, min_expr = 0.1) # Filtering low-quality cells (gêne exprimé si min 1 compte: min_expr = 0.1 ) 
-
-head(fData(data))                         # Visualisation: nombre de cells qui expriment un gêne spé: dans fData
-summary(fData(data)$num_cells_expressed)
-sum((exprs(data['CD19',])))               # Si on veut regarder expr d'un gene de façon individuelle
-
-head(pData(data))                         # Visualisation: nombre de gênes exprimés dans une cell: dans pData (stored in phenoData)
-summary(pData(data)$num_genes_expressed)
-
-############################ Standardise to Z-distribution ############################
-x <- pData(data)$num_genes_expressed
-x_1 <- (x - mean(x)) / sd(x)
-summary(x_1)
-ggplot(data.frame(x = x_1), aes(x)) +geom_histogram(bins = 50) +geom_vline(xintercept = c(-2, 2), linetype = "dotted", color = 'red')
-
-pData(data)$UMI <- Matrix::colSums(exprs(data)) # add UMI
-head(pData(data))
-ggplot(pData(data), aes(num_genes_expressed, UMI)) + geom_point() #UMI / gene
+data <- importCDS(singlet, import_all = TRUE)
+data <- estimateSizeFactors(data)         # Estimate size factors 
+data <- estimateDispersions(data)         # and dispersions 
 
 
-############################ Clustering cells WITHOUT markers genes############################
-######### 1ere façon #########
-disp_table <- dispersionTable(data)     # dispersionTable() function calculates the mean and dispersion values 
-head(disp_table, n= 10)
-table(disp_table$mean_expression>=0.1)  # Select genes, which have a mean expression >= 0.1, to use in the clustering step
+## -- Filtering low-quality cells -- ##
+#valid_cells <- row.names(subset(pData(data), Cells.in.Well == 1, Control == FALSE & Clump == FALSE & Debris == FALSE & Mapped.Fragments > 1000000))
+#data <- data[,valid_cells]
+pData(data)$Total_mRNAs <- Matrix::colSums(exprs(data))
+data <- data[,pData(data)$Total_mRNAs < 1e6]
+upper_bound <- 10^(mean(log10(pData(data)$Total_mRNAs)) + 2*sd(log10(pData(data)$Total_mRNAs)))
+lower_bound <- 10^(mean(log10(pData(data)$Total_mRNAs)) - 2*sd(log10(pData(data)$Total_mRNAs)))
+qplot(Total_mRNAs, data = pData(data),  geom = "density") + geom_vline(xintercept = lower_bound) + geom_vline(xintercept = upper_bound)
 
+data <- data[,pData(data)$Total_mRNAs > lower_bound & pData(data)$Total_mRNAs < upper_bound]
+data <- detectGenes(data, min_expr = 0.1)
+
+
+# 2 - Classify cells with known marker genes ; ## -- Classifying and Counting Cells -- ##
+#by type
+#marqueur des B
+#CD19_id <- row.names(subset(fData(data), gene_short_name == "CD19"))
+#MS4A1_id <- row.names(subset(fData(data), gene_short_name == "MS4A1"))
+#CD79A_id <- row.names(subset(fData(data), gene_short_name == "CD79A"))
+#CD79B_id <- row.names(subset(fData(data), gene_short_name == "CD79B"))
+
+#cth <- newCellTypeHierarchy()
+#cth <- addCellType(cth, "T cells", classify_func = function(x){ x[MS4A1_id,] < 1 & x[CD19_id,] < 1 & x[CD79A_id,] < 1 & x[CD79B_id,] < 1})
+#cth <- addCellType(cth, "B cells", classify_func = function(x){ x[MS4A1_id,] > 1 & x[CD19_id,] > 1})# & x[CD79A_id,] > 1 & x[CD79B_id,] > 1})
+#data <- classifyCells(data, cth, 0.1)
+#table(pData(data)$CellType)
+
+#pie <- ggplot(pData(data), aes(x = factor(1), fill = factor(CellType))) + geom_bar(width = 1)
+#pie + coord_polar(theta = "y") + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
+
+
+# 3 - Cluster your cells
+#without marker gene
+disp_table <- dispersionTable(data)
 unsup_clustering_genes <- subset(disp_table, mean_expression >= 0.1)
 data <- setOrderingFilter(data, unsup_clustering_genes$gene_id)
 plot_ordering_genes(data)
 
-######### 2eme façon #########
-plot_pc_variance_explained(data, max_components = 50, return_all = FALSE) # Elbow Plot (long)
+# data@auxClusteringData[["tSNE"]]$variance_explained <- NULL
+plot_pc_variance_explained(data, return_all = F) # norm_method='log'
 
-## Include X dimensions: tSNE
-data <- reduceDimension(data, max_components = 2, reduction_method = 'tSNE', verbose = TRUE)
-data <- clusterCells(data)
-plot_cell_clusters(data)
-my_cluster_dim <- pData(data)$Cluster
+data <- reduceDimension(data, max_components = 2, num_dim = 6, reduction_method = 'tSNE', verbose = T)
+data <- clusterCells(data, num_clusters = 2)
+plot_cell_clusters(data, 1, 2, color = "CellType", markers = c("CD19", "MS4A1"))
 
+data <- reduceDimension(data, max_components = 2, num_dim = 2, reduction_method = 'tSNE', residualModelFormulaStr = "~num_genes_expressed", verbose = T)
+data <- clusterCells(data, num_clusters = 2)
+plot_cell_clusters(data, 1, 2, color = "CellType")
 
-data <- reduceDimension(data, max_components = 2, num_dim = 10, reduction_method = 'tSNE', verbose = TRUE)
-data <- clusterCells(data, num_clusters = 15)
-plot_cell_clusters(data)
-my_cluster_dim_10 <- pData(data)$Cluster
-
-adjustedRand(as.numeric(my_cluster_dim_10), as.numeric(my_cluster_dim))
+data <- clusterCells(data, num_clusters = 2)
+plot_cell_clusters(data, 1, 2, color = "Cluster") + facet_wrap(~CellType)
 
 
-############################## Expression differentielle ##############################
-## I’ll create a vector that indicates whether a single was clustered in “Cluster 1” or not to identify genes differentially expressed in cluster 1 versus the other clusters.
-my_vector <- rep('no', nrow(pData(data))) ## Create vector of no's
-my_vector[pData(data)$Cluster == 1] <- rep('yes', sum(pData(data)$Cluster == 1)) ## Change status to yes if the cell was in cluster 1
-pData(data)$test <- my_vector ## Add vector to phenoData
-head(pData(data))
-
-## Differential expression analysis on the subset of genes where the mean expression (across cells) was >= 0.1
-length(unsup_clustering_genes$gene_id)
-de_cluster_one <- differentialGeneTest(data[unsup_clustering_genes$gene_id,],fullModelFormulaStr = '~test',cores = 8)
-dim(de_cluster_one)
-
-de_cluster_one %>% arrange(qval) %>% head() ## Order by q-value
-plot_genes_jitter(data['SERTAD1',], grouping = "Cluster")
-
-## Add another column to the phenotypic data where TRUE means cluster membership in clusters 1, 2, 7 or 10
-pData(data)$my_colour <- pData(data)$Cluster == 1 | pData(data)$Cluster == 2 | pData(data)$Cluster == 7 | pData(data)$Cluster == 10
-plot_cell_clusters(data, color_by = 'my_colour')
-
-
-############################## Classifying cells by type ##############################
-## Identifier gênes intérêt
-MS4A1_id <- row.names(subset(fData(data), gene_short_name == "MS4A1"))
-CXCR4_id <- row.names(subset(fData(data),gene_short_name == "CXCR4"))
-CD83_id <- row.names(subset(fData(data),gene_short_name == "CD83"))
-
-cth <- newCellTypeHierarchy() ## Ajouter type cellulaire en fonction expression gênes intéret 
-cth <- addCellType(cth, "LZ cells", classify_func =function(x) { x[MS4A1_id,] >= 1 & x[CXCR4_id,] < 1 & x[CD83_id,] > 1})
-cth <- addCellType(cth, "DZ cells", classify_func = function(x){ x[MS4A1_id,] >= 1 & x[CXCR4_id,] > 1 & x[CD83_id,] < 1})
-
-data <- classifyCells(data, cth, 0.1) ## Classification des cellules
-table(pData(data)$CellType)
-
-## Camembert types cellulaires
-pie <- ggplot(pData(data),aes(x = factor(1), fill = factor(CellType))) + geom_bar(width = 1)
-pie + coord_polar(theta = "y") + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
-
-plot_cell_clusters(data, 1, 2, color = "CellType") ## Représentation tSNE fonction type cellulaire
-plot_cell_clusters(data, 1, 2, color = "CellType", markers = "CD19") ## Représentation tSNE fonction gênes types
-plot_cell_clusters(data, 1, 2, color = "Cluster") +facet_wrap(~CellType) ## Représentation tSNE fonction types cellulaires + clusters
-
-
-############################## Constructing Single Cell Trajectories ##############################
-## Trajectory step 1: choose genes that define a cell's progress
+#using marker genes
 expressed_genes <- row.names(subset(fData(data), num_cells_expressed >= 10))
+marker_diff <- markerDiffTable(data[expressed_genes,], cth, residualModelFormulaStr = "~CellType + num_genes_expressed", cores = 1)
 
-diff_test_res <- differentialGeneTest(data[expressed_genes,],fullModelFormulaStr = "~CellType")
-ordering_genes <- row.names (subset(diff_test_res, qval < 0.01))
-data <- setOrderingFilter(data, ordering_genes)
+candidate_clustering_genes <- row.names(subset(marker_diff, qval < 0.01))
+marker_spec <- calculateMarkerSpecificity(data[candidate_clustering_genes,], cth)
+head(selectTopMarkers(marker_spec, 3))
+
+semisup_clustering_genes <- unique(selectTopMarkers(marker_spec, 500)$gene_id)
+data <- setOrderingFilter(data, semisup_clustering_genes)
 plot_ordering_genes(data)
 
-## Trajectory step 2: reduce data dimensionality (Long)
-data <- reduceDimension(data, max_components = 2,method = 'DDRTree')
+plot_pc_variance_explained(data, return_all = F)
 
-## Trajectory step 3: order cells along the trajectory
+data <- reduceDimension(data, max_components = 2, num_dim = 3, norm_method = 'log', reduction_method = 'tSNE', residualModelFormulaStr = "~CellType + num_genes_expressed", verbose = T)
+data <- clusterCells(data, num_clusters = 2)
+plot_cell_clusters(data, 1, 2, color = "CellType")
+
+
+#Imputing cell type
+data <- clusterCells(data, num_clusters = 2, frequency_thresh = 0.1, cell_type_hierarchy = cth)
+plot_cell_clusters(data, 1, 2, color = "CellType", markers = c("MS4A1", "CXCR4", "CD83"))
+
+pie <- ggplot(pData(data), aes(x = factor(1), fill = factor(CellType))) + geom_bar(width = 1)
+pie + coord_polar(theta = "y") + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
+
+
+
+
+
+
+# 4 - Order cells in pseudotime along a trajectory ; ## -- Constructing Single Cell Trajectories -- ##
+# The ordering workflow : a - choosing genes that define progress
+head(fData(data))
+head(pData(data))
+
+expressed_genes <- row.names(subset(fData(data), num_cells_expressed >= 10))
+diff_test_res <- differentialGeneTest(data[expressed_genes,], fullModelFormulaStr = "~HTO_maxID") #find all genes that are differentially expressed in response to the switch from the model
+ordering_genes <- row.names(subset(diff_test_res, qval < 0.01))
+
+data <- setOrderingFilter(data, ordering_genes) # methods to select genes that require no knowledge of the design of the experiment at all
+plot_ordering_genes(data)
+
+# b - reducing the dimensionality of the data 
+data <- reduceDimension(data, max_components = 2, method = 'DDRTree')
+
+# c - ordering the cells in pseudotime 
 data <- orderCells(data)
-plot_cell_trajectory(data, color_by = "CellType")
-plot_cell_trajectory(data, color_by = "State")
-
-### Ne fonctionne pas ??? 
-GM_state <- function(cds){
-  if (length(unique(pData(cds)$State)) > 1){
-    T0_counts <- table(pData(cds)$State, pData(cds)$CellType)[,"0"]
-    return(as.numeric(names(T0_counts)[which(T0_counts == max(T0_counts))]))}
-  else{return(1)}
-}
-
-### Ne fonctionne pas 
-data <- orderCells(data, root_state = GM_state(data))
-
-### (Suite)
-plot_cell_trajectory(data, color_by = "Pseudotime")
+plot_cell_trajectory(data, color_by = "HTO_maxID")
+plot_cell_trajectory(data, color_by = "SingleR.calls")
 plot_cell_trajectory(data, color_by = "State") + facet_wrap(~State, nrow = 1)
+plot_cell_trajectory(data, color_by = "Pseudotime")
+plot_cell_trajectory(data, color_by = "Cluster")
 
-data_filtered <- data[expressed_genes,]
-my_genes <- row.names(subset(fData(data_filtered),gene_short_name %in% "CD3E"))
+
+
+
+#jitter plot to pick figure out which state corresponds to rapid proliferation
+blast_genes <- row.names(subset(fData(data), gene_short_name %in% c("CD19", "MS4A1")))
+plot_genes_jitter(data[blast_genes,], grouping = "State", min_expr = 0.1)
+
+
+#confirm that the ordering is correct 
+data_expressed_genes <-  row.names(subset(fData(data), num_cells_expressed >= 10))
+data_filtered <- data[data_expressed_genes,]
+my_genes <- row.names(subset(fData(data_filtered), gene_short_name %in% c("CD3E","MS4A1", "CD19")))
 cds_subset <- data_filtered[my_genes,]
-
-plot_genes_in_pseudotime(cds_subset, color_by = "CellType")
-
+plot_genes_in_pseudotime(cds_subset, color_by = "SingleR.calls")
 
 
+# 5 - Perform differential expression analysis
+# 6 - Analyse of branch : The branches occur because cells execute alternative gene expression programs. 
+plot_cell_trajectory(data, color_by = "HTO_maxID")
+BEAM_res <- BEAM(data, branch_point = 1, cores = 1)
+BEAM_res <- BEAM_res[order(BEAM_res$qval),]
+BEAM_res <- BEAM_res[,c("gene_short_name", "pval", "qval")]
 
 
-
-
-
-
-
-
-
-
+#visualize modules of genes that have similar lineage-dependent expression patterns. 
+plot_genes_branched_heatmap(lung[row.names(subset(BEAM_res, qval < 1e-4)),], branch_point = 1, num_clusters = 4, cores = 1, use_gene_short_name = T, show_rownames = T)
 
 
 
+lung_genes <- row.names(subset(fData(lung), gene_short_name %in% c("CD3E","MS4A1", "CD19")))
+plot_genes_branched_pseudotime(lung[lung_genes,], branch_point = 1, color_by = "HTO_maxID", ncol = 1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###########################
 
 
 ### A partir de là c'est plus la partie du blog où il clusterise lui en fontion de cluster
