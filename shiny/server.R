@@ -1,6 +1,12 @@
 # server.R
 shinyServer(function(input, output, session) {
   #################################################################################################
+  observeEvent(input$actBtnPatient,{
+    cat(str(input$patient))
+    load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
+  })
+  
+  
   heatmap <- reactive({
     top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 25, wt = avg_log2FC)
     return(top10)
@@ -179,6 +185,7 @@ shinyServer(function(input, output, session) {
   output$FeaturePlot_TSNE <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "tsne", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
   output$feature_other <- renderPlotly({FeaturePlot(singlet, features = "CD19", interactive = T)})
   
+  
   ## -- PCA -- ##
   output$PCA <- renderPlot({
     plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
@@ -197,6 +204,7 @@ shinyServer(function(input, output, session) {
                                                       ))
   })
   
+  
   ## -- UMAP -- ##
   output$UMAP <- renderPlot({
     plots <- UMAPPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
@@ -209,6 +217,7 @@ shinyServer(function(input, output, session) {
             marker = list(size = 3, width=2),
             text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata) 
   })
+  
   
   ## -- TSNE -- ##
   output$TSNE <- renderPlot({
@@ -228,10 +237,12 @@ shinyServer(function(input, output, session) {
   output$Heatmap <- renderPlot({DoHeatmap(singlet, features = heatmap()$gene, group.by = "HTO_maxID") + NoLegend()})
   output$Heatmap_feature <- renderPrint({print(singlet@commands[["FindAllMarkers"]])})
 
+  
   ## -- Mitochondrie Figure -- ##
   output$MT_VlnPlot <- renderPlot({VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)})
   output$MT_FeatureScatter <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")})
   output$MT_FeatureScatter2 <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")})
+  
   
   ## -- The 50 most highly variable genes -- ##
   output$top50 <- renderPlot({
@@ -240,12 +251,14 @@ shinyServer(function(input, output, session) {
   })
   output$Variable_feature <- renderPrint({print(FeaturesVariable())})
   
+  
   # -- PCA Figure -- ##
   output$PCA10 <- renderPrint({print(singlet[["pca"]], dims = 1:10, nfeatures = 10)})
   output$ElbowPlot <- renderPlot({ElbowPlot(singlet, ndims = 50, reduction = "pca")})
   output$DimHeatmap <- renderPlot({DimHeatmap(singlet, dims = 1:10, cells = 100, balanced = TRUE)})
   output$VizDimLoadings <- renderPlot({VizDimLoadings(singlet, dims = 1:5, reduction = "pca")})
   output$JackStrawPlot <- renderPlot({JackStrawPlot(singlet, dims = 1:15)})
+  
   
   # -- Enrichissement de gène -- ##
   observeEvent(input$actBtnVisualisation,{
@@ -286,6 +299,7 @@ shinyServer(function(input, output, session) {
   #masterPCAPlot(ES2, PCx = "PC1", PCy = "PC2", top.contribution = 10)
   #})
   
+  
   ## -- Monocle -- ##
   output$cell_trajectory <- renderPlot({
     plot_cell_trajectory(data, color_by = input$color_trajectory)
@@ -308,6 +322,7 @@ shinyServer(function(input, output, session) {
   
   
   output$dataTable = DT::renderDataTable({singlet@meta.data}, options = list(
-    scrollY = '700px', paging = FALSE
+    scrollY = '700px', paging = FALSE,scrollX = TRUE
   ))
+
 })

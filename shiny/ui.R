@@ -1,42 +1,57 @@
 # ui.R
 shinyUI(dashboardPage(
-  # Titre de l'application
-  dashboardHeader(title = "Seurat object"),
+  ######################### Titre ##########################
+  dashboardHeader(title = "Flinovo"),
   
-  # Menu
+  ########################## Menu ##########################
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Visualisation des données", tabName = "visualization", icon = icon("poll")),
-      menuItem("Réduction de dimension", tabName = "readData", icon = icon("indent-right", lib = "glyphicon")),
-      menuItem("3D Visualisation", tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
-      menuItem("Analyses PCA", tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
-      menuItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
-      menuItem("Trajectoires évolutives", tabName = "monocle", icon = icon("calendar")),
-      #menuItem("Top50 gènes plus variables", tabName = "top50", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
-      menuItem("Analyses mitochondriales", tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
-      menuItem("Lecture des données", tabName = "readData", icon = icon("readme"))
+      menuItem(text = "Lecture", startExpanded = T,
+        menuSubItem("Chargement des données",       tabName = "Chargement", icon = icon("readme")),
+        menuSubItem("Métadonnées",                  tabName = "metadata", icon = icon("poll"))),
+      
+      menuItem("Analyses", startExpanded = F,
+        menuSubItem("Réduction de dimension",       tabName = "readData", icon = icon("poll")),
+        menuSubItem("3D Visualisation",             tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
+        menuSubItem("Analyses PCA",                 tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
+        menuSubItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
+        menuSubItem("Trajectoires évolutives",      tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+        menuSubItem("Analyses mitochondriales",     tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")))
     )
   ),
   
-  # Body
+  ########################## Body ##########################
   dashboardBody(
+    ## -- Thème -- ##
+    shinyDashboardThemes(theme = "blue_gradient"),
+    tags$head(tags$style(HTML('
+      .main-header .logo {
+        font-family: "system-ui", Times, "Times New Roman", serif;
+        font-weight: italic;
+        font-size: 36px;
+      }
+    '))),
+    
+    ## -- Page -- ##
     tabItems(
-      tabItem(tabName = "visualization",
-              # Input: Checkbox if file has header
-              selectInput("patient", "Sélectionnez le patient : ",choices = c("hFL_180008B","hFL_130337")),
-              
+      # Chargement
+      tabItem(tabName = "Chargement",
               h1("Lecture des données"),
               fileInput("dataFile",label = NULL,buttonLabel = "Browse...", placeholder = "No file selected"),
-              fluidRow(),
-              
-              h1("Visualisation des données"),
-              h2("Exploration du tableau"),
+              selectInput("patient", "Sélectionnez le patient : ", choices = c("hFL_180008B","hFL_130337", "FL12C1888", "FL140304"), selected = F),
+              div(actionButton(inputId = "actBtnPatient", label = "Apply",icon = icon("play") ), align = "center")
+      ),
+
+      # Métadonnées
+      tabItem(tabName = "metadata",
+              h2("Visualisation des métadonnées"),
               dataTableOutput('dataTable')
       ),
+      
       # Read data
       tabItem(tabName = "readData",
+              # Group by choice
               h3("Parameters :"),
-              #################################################################################################
               wellPanel(h4("Group by :"),
                         useShinyjs(),
                         uiOutput("Dynamic_Group"),
@@ -48,7 +63,7 @@ shinyUI(dashboardPage(
               ),
 
               
-              #################################################################################################
+              # Split by choice
               fluidRow(),
               wellPanel(h4("Split by :"),
                         useShinyjs(),
@@ -63,13 +78,11 @@ shinyUI(dashboardPage(
                           fluidRow(),
                           sliderInput("NBS_Clonotype", "Clonotype number:", min = 0, max = 5, value = 0),
                         ),
-                        
                         fluidRow(),
               ),
               
               
-              #################################################################################################
-              #Visualisation
+              # Visualisation
               navbarPage("Reduction dimention",
                          tabPanel("PCA",
                                     plotOutput("PCA", width = "100%",  height = "650px"),
@@ -96,19 +109,15 @@ shinyUI(dashboardPage(
                 condition = "input.Features == 'Features' ",
                 fluidRow(column(6,uiOutput('variables'))),
               ),
-              
               #Other
               #column(11,h3("File preview"),dataTableOutput(outputId = "preview")),
               #tags$br(),
               #div(actionButton(inputId = "actBtnVisualisation", label = "Visualisation",icon = icon("play") ), align = "center")
-              
       ),
+      
       # 3D Reduction dimention 
       tabItem(tabName = "3D_RD",
-              radioButtons("metadata", "Metadata:",inline=T,
-                           c("seurat_clusters", "SingleR.calls", "Greffe", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "HTO_maxID")
-                           ),
-              
+              radioButtons("metadata", "Metadata:",inline=T,c("seurat_clusters", "SingleR.calls", "Greffe", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "HTO_maxID")),
               
               navbarPage("Reduction dimention",
                          tabPanel("PCA",
@@ -146,7 +155,7 @@ shinyUI(dashboardPage(
               ),
       ),
       
-      # mitochondrie
+      # Mitochondrie
       tabItem(tabName = "mitochondrie",
               navbarPage("MT paramètres : ",
                          tabPanel("VlnPlot", plotOutput("MT_VlnPlot", width = "100%",  height = "1000px")),
@@ -155,7 +164,7 @@ shinyUI(dashboardPage(
               ),
       ),
       
-      # monocle
+      # Monocle
       tabItem(tabName = "monocle",
               navbarPage("Analyses: ",
                          tabPanel("Trajectory", 
@@ -173,8 +182,7 @@ shinyUI(dashboardPage(
               ),
       ),
       
-      
-      # hallmark
+      # Hallmark
       tabItem(tabName = "hallmark",
               navbarPage("Analyses : ",
                          tabPanel("Expression",
