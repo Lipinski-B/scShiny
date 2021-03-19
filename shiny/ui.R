@@ -37,6 +37,7 @@ shinyUI(dashboardPage(
       # Chargement
       tabItem(tabName = "Chargement",
               h1("Lecture des données"),
+              HTML("Additional text to disply only when menuItem tab One is selected \n"),
               fileInput("dataFile",label = NULL,buttonLabel = "Browse...", placeholder = "No file selected"),
               selectInput("patient", "Sélectionnez le patient : ", choices = c("hFL_180008B","hFL_130337", "FL12C1888", "FL140304"), selected = F),
               div(actionButton(inputId = "actBtnPatient", label = "Apply",icon = icon("play") ), align = "center")
@@ -50,69 +51,106 @@ shinyUI(dashboardPage(
       
       # Read data
       tabItem(tabName = "readData",
-              # Group by choice
-              h3("Parameters :"),
-              wellPanel(h4("Group by :"),
-                        useShinyjs(),
-                        uiOutput("Dynamic_Group"),
-                        fluidRow(),
-              ),
-              wellPanel(h4("Specifications :"),
-                        uiOutput("Dynamic_Group_Spe"),
-                        fluidRow(),
-              ),
 
-              
-              # Split by choice
-              fluidRow(),
-              wellPanel(h4("Split by :"),
-                        useShinyjs(),
-                        uiOutput("Dynamic_Split"),
-                        column(1,align="right",checkboxGroupInput("sclonotype", NULL, choices = list("Clonotype" = "Clonotype"), selected = 1)),
-                        fluidRow(),
+              a(
+                href = "https://www.dublinbus.ie/RTPI/Sources-of-Real-Time-Information/",
+                "Bus stop numbers can be found here.",
+                target = "_blank"
               ),
-              wellPanel(h4("Specification :"),
-                        uiOutput("Dynamic_Split_Spe"),
-                        conditionalPanel(
-                          condition = "input.sclonotype == 'Clonotype' ",
-                          fluidRow(),
-                          sliderInput("NBS_Clonotype", "Clonotype number:", min = 0, max = 5, value = 0),
-                        ),
-                        fluidRow(),
-              ),
+              br(),
+              h3("Custom URL"),
+              p("A custom URL can be used to pre select choices when loading the app. Use the button below to create a URL for the choices currently selected."), 
               
               
-              # Visualisation
-              navbarPage("Reduction dimention",
-                         tabPanel("PCA",
-                                    plotOutput("PCA", width = "100%",  height = "650px"),
-                                    uiOutput("feature_pca")
-                                  ),
-                         tabPanel("UMAP",
-                                    plotOutput("UMAP", width = "100%",  height = "650px"),
-                                    uiOutput("feature_umap")
-                                  ),
-                         tabPanel("TSNE",
-                                    plotOutput("TSNE", width = "100%",  height = "650px"),
-                                    uiOutput("feature_tsne")
-                         ),
-                         tabPanel("Other",
-                                  plotlyOutput("feature_other", width = "100%",  height = "650px")
-                         )
-              ),
+               
+              # Paramètre
+              sidebarLayout(
+                sidebarPanel(
+                  h4("Parameters : "),
+                  br(),
+                    # Group by choice
+                    materialSwitch(inputId = "SwitchGroup", label = "Group by", value = F, status = "primary", inline = T),
+                    conditionalPanel(
+                      condition = "input.SwitchGroup == true ",
+                      wellPanel(
+                        checkboxGroupInput(inputId = "Groupes", label = "Select Group(s):", choices = metadata, selected = F),
+                      ),
+                      #wellPanel(uiOutput("Dynamic_Group_Spe"))
+                    ),
+                  
+                  
+                  #conditionalPanel(
+                  #condition = "input.SwitchGroup == true ",
+                  #wellPanel(h4("Group by :"),
+                  #           useShinyjs(),
+                  #          uiOutput("Dynamic_Group"),
+                  #           fluidRow(),
+                  # ),
+                  #  wellPanel(h4("Specifications :"),
+                  # uiOutput("Dynamic_Group_Spe"),
+                  #    fluidRow(),
+                  #   )
+                  #  ),
+                    
+                
+                    # Split by choice
+                    fluidRow(),
+                    materialSwitch(inputId = "SwitchSplit", label = "Split by", value = F, status = "primary", inline = T),
+  
+                    conditionalPanel(
+                      condition = "input.SwitchSplit == true ",
+                      wellPanel(h4("Split by :"),
+                                useShinyjs(),
+                                uiOutput("Dynamic_Split"),
+                                column(1,align="right",checkboxGroupInput("sclonotype", NULL, choices = list("Clonotype" = "Clonotype"), selected = 1)),
+                                fluidRow(),
+                      ),
+                      
+                      wellPanel(h4("Specification :"),
+                                uiOutput("Dynamic_Split_Spe"),
+                                conditionalPanel(
+                                  condition = "input.sclonotype == 'Clonotype' ",
+                                  fluidRow(),
+                                  sliderInput("NBS_Clonotype", "Clonotype number:", min = 0, max = 5, value = 0),
+                                ),
+                                fluidRow(),
+                      )
+                )),
+                mainPanel(
+                  # Visualisation
+                  navbarPage("Reduction dimention",
+                             tabPanel("PCA",
+                                      plotOutput("PCA", width = "100%",  height = "650px"),
+                                      uiOutput("feature_pca")
+                             ),
+                             tabPanel("UMAP",
+                                      plotOutput("UMAP", width = "100%",  height = "650px"),
+                                      uiOutput("feature_umap")
+                             ),
+                             tabPanel("TSNE",
+                                      plotOutput("TSNE", width = "100%",  height = "650px"),
+                                      uiOutput("feature_tsne")
+                             ),
+                             tabPanel("Other",
+                                      plotlyOutput("feature_other", width = "100%",  height = "650px")
+                             )
+                  ),
+                  
+                  fluidRow(),
+                  column(1,align="right",checkboxGroupInput("Features", NULL, choices = list("Features" = "Features"), selected = 0)),
+                  
+                  fluidRow(),
+                  conditionalPanel(
+                    condition = "input.Features == 'Features' ",
+                    fluidRow(column(6,uiOutput('variables'))),
+                  ),
+                  #Other
+                  #column(11,h3("File preview"),dataTableOutput(outputId = "preview")),
+                  #tags$br(),
+                  #div(actionButton(inputId = "actBtnVisualisation", label = "Visualisation",icon = icon("play") ), align = "center")
+                  
+               )),
               
-              fluidRow(),
-              column(1,align="right",checkboxGroupInput("Features", NULL, choices = list("Features" = "Features"), selected = 0)),
-              
-              fluidRow(),
-              conditionalPanel(
-                condition = "input.Features == 'Features' ",
-                fluidRow(column(6,uiOutput('variables'))),
-              ),
-              #Other
-              #column(11,h3("File preview"),dataTableOutput(outputId = "preview")),
-              #tags$br(),
-              #div(actionButton(inputId = "actBtnVisualisation", label = "Visualisation",icon = icon("play") ), align = "center")
       ),
       
       # 3D Reduction dimention 

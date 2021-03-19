@@ -3,6 +3,7 @@ shinyServer(function(input, output, session) {
   #################################################################################################
   observeEvent(input$actBtnPatient,{
     cat(str(input$patient))
+    rm(list = ls())
     load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
   })
   
@@ -91,6 +92,9 @@ shinyServer(function(input, output, session) {
     }
     return(List)                     
   })
+  
+  
+  
   output$Dynamic_Group_Spe <- renderUI({
     List <- list()   
     for(i in 1:length(colnames(singlet@meta.data))){
@@ -103,6 +107,13 @@ shinyServer(function(input, output, session) {
     }
     return(List)
   })
+  
+  
+  
+  
+  
+  
+  
   output$Dynamic_Split <- renderUI({
     List <- list()
     for(i in 1:length(colnames(singlet@meta.data))){
@@ -304,7 +315,6 @@ shinyServer(function(input, output, session) {
   output$cell_trajectory <- renderPlot({
     plot_cell_trajectory(data, color_by = input$color_trajectory)
   })
-
   output$order_trajectory <- renderPlot({
     data_expressed_genes <-  row.names(subset(fData(data), num_cells_expressed >= 10))
     data_filtered <- data[data_expressed_genes,]
@@ -319,7 +329,6 @@ shinyServer(function(input, output, session) {
       axis.title=element_text(size=14)
     ) 
   })
-  
   
   output$dataTable = DT::renderDataTable({singlet@meta.data}, options = list(
     scrollY = '700px', paging = FALSE,scrollX = TRUE
