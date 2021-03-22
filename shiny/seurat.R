@@ -44,7 +44,7 @@ library(dplyr)
 library(cellrangerRkit)
 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
-patient <- "test"
+patient <- "FL12C1888"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
 #pregreffe vs post greff (rchop placebo)
@@ -65,10 +65,10 @@ seurat_object <- function(patient){
   umis <- GetAssayData(object = cso, slot = "counts")
   
   # Matrice HTO
-  raw.hto <- Read10X(paste0(patient,"/HTO/umi_count/"), gene.column = 1)        
+  raw.hto <- Read10X(paste0(patient,"/HTO_huge/umi_count/"), gene.column = 1)        
   colnames(raw.hto) <- paste0(colnames(raw.hto),"-1")                          
-  hto <- raw.hto[c(1:4),]                                                       # Suppression des séquences unmapped : rownames(raw.hto)
-  rownames(hto) <- c("pregreffe","subtilisin","collagenase","actinomycin_D")    
+  hto <- raw.hto[c(1:3),]                                                       # Suppression des séquences unmapped : rownames(raw.hto)
+  rownames(hto) <- c("Pré-greffe","Excipient","RCHOP")    
   
   joint.bcs <- intersect(colnames(umis),colnames(hto))                          # Sélection des cellules avec barcode commun HTO / mRNA
   
@@ -104,7 +104,7 @@ seurat_object <- function(patient){
   # DB: DatabaseImmuneCellExpressionData()
   hpca.se <- celldex::DatabaseImmuneCellExpressionData()
   results <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.main)
-  results.fine <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.fine)
+  #results.fine <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.fine)
   
   #singlet$SingleR.pruned.calls <- results$pruned.labels
   singlet$SingleR.calls <- results$labels
@@ -177,7 +177,9 @@ pregreffe <- subset(singlet, idents = "pregreffe")
 actinomycin <- subset(singlet, idents = "actinomycin-D")
 collagenase <- subset(singlet, idents = "collagenase")
 subtilisin <- subset(singlet, idents = "subtilisin")
-postgreffe <- subset(singlet, idents = c("subtilisin", "actinomycin-D", "collagenase"))
+
+
+singlet <- subset(singlet, idents = c("Excipient","RCHOP"))
 
 ## -- Visualisation -- ##
 visualitation <- function(singlet){
@@ -363,8 +365,8 @@ data <- monocle(singlet)
 
 ## -- Save -- ##
 save(singlet, data, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
-write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/jupyter/metadata_matrix_",patient,".csv"))
-write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/jupyter/count_matrix_", patient,".csv"))
+write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/metadata_matrix_",patient,".csv"))
+write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/count_matrix_", patient,".csv"))
 
 #save(singlet, file = paste0(patient,"/R/singlet_",patient,".RData"))
 #write.csv(singlet@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))

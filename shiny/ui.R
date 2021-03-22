@@ -64,33 +64,33 @@ shinyUI(dashboardPage(
               
                
               # Paramètre
-              sidebarLayout(
-                sidebarPanel(
+              #sidebarLayout(
+              #sidebarPanel(
                   h4("Parameters : "),
                   br(),
                     # Group by choice
-                    materialSwitch(inputId = "SwitchGroup", label = "Group by", value = F, status = "primary", inline = T),
-                    conditionalPanel(
-                      condition = "input.SwitchGroup == true ",
-                      wellPanel(
-                        checkboxGroupInput(inputId = "Groupes", label = "Select Group(s):", choices = metadata, selected = F),
-                      ),
-                      #wellPanel(uiOutput("Dynamic_Group_Spe"))
-                    ),
-                  
-                  
+                  materialSwitch(inputId = "SwitchGroup", label = "Group by", value = F, status = "primary", inline = T),
                   #conditionalPanel(
-                  #condition = "input.SwitchGroup == true ",
-                  #wellPanel(h4("Group by :"),
-                  #           useShinyjs(),
-                  #          uiOutput("Dynamic_Group"),
-                  #           fluidRow(),
-                  # ),
-                  #  wellPanel(h4("Specifications :"),
-                  # uiOutput("Dynamic_Group_Spe"),
-                  #    fluidRow(),
-                  #   )
-                  #  ),
+                      #condition = "input.SwitchGroup == true ",
+                      #wellPanel(
+                        #checkboxGroupInput(inputId = "Groupes", label = "Select Group(s):", choices = metadata, selected = F),
+                        #),
+                      ##wellPanel(uiOutput("Dynamic_Group_Spe"))
+                      #  ),
+                  
+                  
+                  conditionalPanel(
+                  condition = "input.SwitchGroup == true ",
+                  wellPanel(h4("Group by :"),
+                             useShinyjs(),
+                            uiOutput("Dynamic_Group"),
+                             fluidRow(),
+                   ),
+                    wellPanel(h4("Specifications :"),
+                   uiOutput("Dynamic_Group_Spe"),
+                      fluidRow(),
+                     )
+                    ),
                     
                 
                     # Split by choice
@@ -114,9 +114,9 @@ shinyUI(dashboardPage(
                                   sliderInput("NBS_Clonotype", "Clonotype number:", min = 0, max = 5, value = 0),
                                 ),
                                 fluidRow(),
-                      )
-                )),
-                mainPanel(
+                      ),
+                ),
+              #mainPanel(
                   # Visualisation
                   navbarPage("Reduction dimention",
                              tabPanel("PCA",
@@ -149,7 +149,7 @@ shinyUI(dashboardPage(
                   #tags$br(),
                   #div(actionButton(inputId = "actBtnVisualisation", label = "Visualisation",icon = icon("play") ), align = "center")
                   
-               )),
+               #),
               
       ),
       
