@@ -39,6 +39,7 @@ library(clues)
 library(dplyr)
 library(DT)
 library(dashboardthemes)
+library(reticulate)
 load(file = paste0("/home/boris/Documents/analyse/singlet_FL12C1888.RData"))
 meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
 #meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
@@ -46,17 +47,12 @@ annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.cs
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
 hallmark = singlet@tools$hallmarks
 
-#metadata <- c()
-#for(i in 1:length(colnames(singlet@meta.data))){
-#  if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
-#    metadata <- c(metadata, colnames(singlet@meta.data)[i])
-#  }
-#}
+metadata <- c()
+for(i in 1:length(colnames(singlet@meta.data))){
+  if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
+    metadata <- c(metadata, colnames(singlet@meta.data)[i])
+  }
+}
 
-
-#List <- list()   
-#for(i in 1:length(colnames(singlet@meta.data))){
-#  for(j in 1:length(levels(as.factor(singlet@meta.data[[i]])))){
-#      List[[levels(as.factor(singlet@meta.data[[i]]))[j]]] <- list(column(3,align="left",checkboxGroupInput(inputId = levels(as.factor(singlet@meta.data[[i]]))[j], label = NULL, choices = levels(as.factor(singlet@meta.data[[i]]))[j])))  
-#  }
-#}
+List <- list()
+for(i in 1:length(metadata) ){List[[metadata[i]]] <- levels(as.factor(singlet@meta.data[[metadata[i]]]))}

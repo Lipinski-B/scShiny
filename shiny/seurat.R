@@ -47,9 +47,44 @@ setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 patient <- "FL12C1888"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
-#pregreffe vs post greff (rchop placebo)
-#pregreffe vs placebo
-#placebo rchop 
+
+RCHOP <- subset(singlet, idents = c("RCHOP")) #placebo rchop 
+RCHOP
+Excipient <- subset(singlet, idents = c("Excipient")) #pregreffe vs placebo
+Excipient
+greffe <- subset(singlet, idents = c("Pré-greffe")) #pregreffe vs placebo
+greffe
+
+RCHOP[["percent.mt"]] <- PercentageFeatureSet(RCHOP, pattern = "^MT-")
+Excipient[["percent.mt"]] <- PercentageFeatureSet(Excipient, pattern = "^MT-")
+greffe[["percent.mt"]] <- PercentageFeatureSet(greffe, pattern = "^MT-")
+
+RCHOP2 <- subset(RCHOP, subset = percent.mt < 5)            # QC Filter : tester 15%
+RCHOP2
+Excipient2 <- subset(Excipient, subset = percent.mt < 5)            # QC Filter : tester 15%
+Excipient2
+greffe2 <- subset(greffe, subset = percent.mt < 5)   
+greffe2
+
+RCHOP2 <- subset(RCHOP, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
+RCHOP2
+Excipient2 <- subset(Excipient, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
+Excipient2
+greffe2 <- subset(greffe, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
+greffe2
+
+
+VlnPlot(RCHOP, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(RCHOP, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
+
+VlnPlot(Excipient, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(Excipient, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
+
+VlnPlot(greffe, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(greffe, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
+
+VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
@@ -65,7 +100,7 @@ seurat_object <- function(patient){
   umis <- GetAssayData(object = cso, slot = "counts")
   
   # Matrice HTO
-  raw.hto <- Read10X(paste0(patient,"/HTO_huge/umi_count/"), gene.column = 1)        
+  raw.hto <- Read10X(paste0(patient,"/HTO/umi_count/"), gene.column = 1)        
   colnames(raw.hto) <- paste0(colnames(raw.hto),"-1")                          
   hto <- raw.hto[c(1:3),]                                                       # Suppression des séquences unmapped : rownames(raw.hto)
   rownames(hto) <- c("Pré-greffe","Excipient","RCHOP")    
@@ -94,9 +129,9 @@ seurat_object <- function(patient){
   
   # Dissociation Pré/Post greffe
   singlet@meta.data$Greffe <- as.character(singlet@meta.data$HTO_maxID)
-  singlet@meta.data[singlet@meta.data$HTO_maxID == "actinomycin-D", "Greffe" ] <- "postgreffe"
-  singlet@meta.data[singlet@meta.data$HTO_maxID == "subtilisin", "Greffe" ] <- "postgreffe"
-  singlet@meta.data[singlet@meta.data$HTO_maxID == "collagenase", "Greffe" ] <- "postgreffe"
+  singlet@meta.data[singlet@meta.data$HTO_maxID == "RCHOP", "Greffe" ] <- "Post-Greffe"
+  singlet@meta.data[singlet@meta.data$HTO_maxID == "Excipient", "Greffe" ] <- "Post-Greffe"
+  singlet@meta.data[singlet@meta.data$HTO_maxID == "Pré-greffe", "Greffe" ] <- "Pré-Greffe"
   
   #############################################################################################################################################
   ##### -- identification des cellules -- ##### 
@@ -123,7 +158,7 @@ seurat_object <- function(patient){
   
   # Récap
   table(results$labels)
-  table(results.fine$labels)
+  #table(results.fine$labels)
   
   
   #############################################################################################################################################
@@ -173,13 +208,12 @@ singlet <- seurat_object(patient)
 
 #### Extraction des sous pop HTO : pregreffe / actinomycin RCHOP / actinomycin placébo 
 Idents(singlet)<-"hash.ID"
-pregreffe <- subset(singlet, idents = "pregreffe")
-actinomycin <- subset(singlet, idents = "actinomycin-D")
-collagenase <- subset(singlet, idents = "collagenase")
-subtilisin <- subset(singlet, idents = "subtilisin")
+C1 <- subset(singlet, idents = c("Excipient","RCHOP")) #placebo rchop 
+C2 <- subset(singlet, idents = c("Excipient","Pré-greffe")) #pregreffe vs placebo
 
 
-singlet <- subset(singlet, idents = c("Excipient","RCHOP"))
+#Idents(singlet)<-"Greffe"
+#C3 <- subset(singlet, idents = c("Post-greffe","Pré-greffe")) #pregreffe vs post greff (rchop placebo)
 
 ## -- Visualisation -- ##
 visualitation <- function(singlet){
@@ -187,7 +221,7 @@ visualitation <- function(singlet){
   
   ## -- ADD MITOCHONDRIAL ANALYSES -- ## 
   singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
-  singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
+  singlet <- subset(singlet, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
   
   ## -- ADD PCA TO SEURAT OBJECT -- ## 
   # Pre-processing  
@@ -227,6 +261,8 @@ visualitation <- function(singlet){
   return(singlet)
 }
 singlet <- visualitation(singlet)
+C1 <- visualitation(C1)
+C2 <- visualitation(C2)
 
 ## -- Monocle -- ##
 monocle <- function(singlet){

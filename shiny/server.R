@@ -7,9 +7,8 @@ shinyServer(function(input, output, session) {
     load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
   })
   
-  
   heatmap <- reactive({
-    top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 25, wt = avg_log2FC)
+    top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
   })
   FeaturesVariable <- reactive({
@@ -20,12 +19,12 @@ shinyServer(function(input, output, session) {
   
   group <- reactive({
     v <- c()
-    for(i in 1:length(colnames(singlet@meta.data))){if(length(input[[colnames(singlet@meta.data)[i]]])== 1){v = c(v, as.character(input[[colnames(singlet@meta.data)[i]]]))}}
+    for(i in 1:length(metadata)){if(metadata[i] %in% input$Groupes){v = c(v, as.character(metadata[i]))}}
     return(v)
   })
   split <- reactive({
     v <- c()
-    for(i in 1:length(colnames(singlet@meta.data))){if(length(input[[paste0("s",colnames(singlet@meta.data)[i])]])== 1){v = c(v, as.character(input[[paste0("s",colnames(singlet@meta.data)[i])]]))}}
+    for(i in 1:length(metadata)){if(metadata[i] %in% input$Splites){v = c(v, as.character(metadata[i]))}}
     if(length(input$sclonotype) == 1){v = c(v, 'nbs_clonotype')}
     return(v)
   })
@@ -39,7 +38,6 @@ shinyServer(function(input, output, session) {
   tokeep <- reactive({
     singlet2 <- singlet
     for (l in split()) {
-      
       Idents(singlet2) <- l
       tokeep <- levels(Idents(singlet2))
       t <- c()
@@ -82,58 +80,48 @@ shinyServer(function(input, output, session) {
     order = NULL
   )
 
-
-  output$Dynamic_Group <- renderUI({
-    List <- list()
-    for(i in 1:length(colnames(singlet@meta.data))){
-      if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
-        List[[colnames(singlet@meta.data)[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = colnames(singlet@meta.data)[i], label = NULL, choices = colnames(singlet@meta.data)[i])))
-      }
-    }
-    return(List)                     
-  })
-  
-  
-  
+  #output$Dynamic_Group <- renderUI({
+  #List <- list()
+  #for(i in 1:length(colnames(singlet@meta.data))){
+  #    if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
+  #      List[[colnames(singlet@meta.data)[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = colnames(singlet@meta.data)[i], label = NULL, choices = colnames(singlet@meta.data)[i])))
+  #    }
+  #  }
+  #  return(List)                     
+  #})
   output$Dynamic_Group_Spe <- renderUI({
-    List <- list()   
-    for(i in 1:length(colnames(singlet@meta.data))){
-      for(j in 1:length(levels(as.factor(singlet@meta.data[[i]])))){
-        if(length(input[[colnames(singlet@meta.data)[i]]]) == 1){
-          List[[levels(as.factor(singlet@meta.data[[i]]))[j]]] <- list(column(3,align="left",checkboxGroupInput(inputId = levels(as.factor(singlet@meta.data[[i]]))[j], label = NULL, choices = levels(as.factor(singlet@meta.data[[i]]))[j])))  
+    choice <- list()
+    for(i in 1:length(metadata)){
+      for(j in 1:length(List[[metadata[i]]])){
+        if(metadata[i] %in% input$Groupes){
+          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = List[[metadata[i]]][j], label = NULL, choices = List[[metadata[i]]][j]))  
         }
       }
       fluidRow()
     }
-    return(List)
+    return(choice)
   })
   
-  
-  
-  
-  
-  
-  
-  output$Dynamic_Split <- renderUI({
-    List <- list()
-    for(i in 1:length(colnames(singlet@meta.data))){
-      if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
-        List[[colnames(singlet@meta.data)[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = paste0("s",colnames(singlet@meta.data)[i]), label = NULL, choices = colnames(singlet@meta.data)[i])))
-      }
-    }
-    return(List)                     
-  })
+  #output$Dynamic_Split <- renderUI({
+  #  List <- list()
+  #  for(i in 1:length(colnames(singlet@meta.data))){
+  #    if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
+  #      List[[colnames(singlet@meta.data)[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = paste0("s",colnames(singlet@meta.data)[i]), label = NULL, choices = colnames(singlet@meta.data)[i])))
+  #    }
+  #  }
+  #  return(List)                     
+  #})
   output$Dynamic_Split_Spe <- renderUI({
-    List <- list()   
-    for(i in 1:length(colnames(singlet@meta.data))){
-      for(j in 1:length(levels(as.factor(singlet@meta.data[[i]])))){
-        if(length(input[[paste0("s",colnames(singlet@meta.data)[i])]]) == 1){
-          List[[levels(as.factor(singlet@meta.data[[i]]))[j]]] <- list(column(3,align="left",checkboxGroupInput(inputId =  paste0("s",levels(as.factor(singlet@meta.data[[i]]))[j]), label = NULL, choices = levels(as.factor(singlet@meta.data[[i]]))[j])))  
+    choice <- list()   
+    for(i in 1:length(metadata)){
+      for(j in 1:length(List[[metadata[i]]])){
+        if(metadata[i] %in% input$Splites){
+          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("s",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))  
         }
       }
       fluidRow()
     }
-    return(List)
+    return(choice)
   })
   
   
@@ -330,8 +318,13 @@ shinyServer(function(input, output, session) {
     ) 
   })
   
-  output$dataTable = DT::renderDataTable({singlet@meta.data}, options = list(
-    scrollY = '700px', paging = FALSE,scrollX = TRUE
-  ))
+  #output$dataTable = DT::renderDataTable({singlet@meta.data}, options = list(
+  #  scrollY = '700px', paging = FALSE,scrollX = TRUE
+  #))
 
+  output$dataTable = renderImage({
+    list(src = '/home/boris/Documents/analyse/sunburst.png', contentType = 'image/png',width = 1100, height = 800,
+         alt = "Alternate text")
+  }, deleteFile = FALSE)
+  
 })

@@ -46,7 +46,7 @@ shinyUI(dashboardPage(
       # Métadonnées
       tabItem(tabName = "metadata",
               h2("Visualisation des métadonnées"),
-              dataTableOutput('dataTable')
+              imageOutput('dataTable')
       ),
       
       # Read data
@@ -64,59 +64,39 @@ shinyUI(dashboardPage(
               
                
               # Paramètre
-              #sidebarLayout(
-              #sidebarPanel(
+              sidebarLayout(
+                sidebarPanel(
                   h4("Parameters : "),
                   br(),
                     # Group by choice
                   materialSwitch(inputId = "SwitchGroup", label = "Group by", value = F, status = "primary", inline = T),
-                  #conditionalPanel(
-                      #condition = "input.SwitchGroup == true ",
-                      #wellPanel(
-                        #checkboxGroupInput(inputId = "Groupes", label = "Select Group(s):", choices = metadata, selected = F),
-                        #),
-                      ##wellPanel(uiOutput("Dynamic_Group_Spe"))
-                      #  ),
-                  
+                  conditionalPanel(
+                      condition = "input.SwitchGroup == true ",
+                      column(6,wellPanel(checkboxGroupInput(inputId = "Groupes", label = NULL, choices = metadata, selected = F))),
+                      column(6,wellPanel(uiOutput("Dynamic_Group_Spe"))),
+                      ),
+              
+  
+                  # Split by choice
+                  fluidRow(),
+                  materialSwitch(inputId = "SwitchSplit", label = "Split by", value = F, status = "primary", inline = T),
                   
                   conditionalPanel(
-                  condition = "input.SwitchGroup == true ",
-                  wellPanel(h4("Group by :"),
-                             useShinyjs(),
-                            uiOutput("Dynamic_Group"),
-                             fluidRow(),
-                   ),
-                    wellPanel(h4("Specifications :"),
-                   uiOutput("Dynamic_Group_Spe"),
-                      fluidRow(),
-                     )
-                    ),
-                    
-                
-                    # Split by choice
-                    fluidRow(),
-                    materialSwitch(inputId = "SwitchSplit", label = "Split by", value = F, status = "primary", inline = T),
-  
-                    conditionalPanel(
-                      condition = "input.SwitchSplit == true ",
-                      wellPanel(h4("Split by :"),
-                                useShinyjs(),
-                                uiOutput("Dynamic_Split"),
-                                column(1,align="right",checkboxGroupInput("sclonotype", NULL, choices = list("Clonotype" = "Clonotype"), selected = 1)),
+                    condition = "input.SwitchSplit == true ",
+                    column(6,wellPanel(checkboxGroupInput(inputId = "Splites", label = NULL, choices = metadata, selected = F),
+                              checkboxGroupInput("sclonotype", NULL, choices = list("Clonotype" = "Clonotype"), selected = 1),
+                              conditionalPanel(
+                                condition = "input.sclonotype == 'Clonotype' ",
                                 fluidRow(),
-                      ),
-                      
-                      wellPanel(h4("Specification :"),
-                                uiOutput("Dynamic_Split_Spe"),
-                                conditionalPanel(
-                                  condition = "input.sclonotype == 'Clonotype' ",
-                                  fluidRow(),
-                                  sliderInput("NBS_Clonotype", "Clonotype number:", min = 0, max = 5, value = 0),
-                                ),
-                                fluidRow(),
-                      ),
-                ),
-              #mainPanel(
+                                sliderInput("NBS_Clonotype", "Clonotype number:", min = 0, max = 5, value = 0),
+                              ),
+                              fluidRow(),
+                    )),
+                    column(6,wellPanel(uiOutput("Dynamic_Split_Spe"))),
+                  ),
+                  fluidRow(),
+              ),
+              mainPanel(
                   # Visualisation
                   navbarPage("Reduction dimention",
                              tabPanel("PCA",
@@ -149,7 +129,7 @@ shinyUI(dashboardPage(
                   #tags$br(),
                   #div(actionButton(inputId = "actBtnVisualisation", label = "Visualisation",icon = icon("play") ), align = "center")
                   
-               #),
+               )),
               
       ),
       
