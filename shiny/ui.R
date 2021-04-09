@@ -51,7 +51,7 @@ shinyUI(dashboardPage(
       
       # Read data
       tabItem(tabName = "readData",
-
+              
               a(
                 href = "https://www.dublinbus.ie/RTPI/Sources-of-Real-Time-Information/",
                 "Bus stop numbers can be found here.",
@@ -59,7 +59,7 @@ shinyUI(dashboardPage(
               ),
               br(),
               h3("Custom URL"),
-              p("A custom URL can be used to pre select choices when loading the app. Use the button below to create a URL for the choices currently selected."), 
+              p("A custom URL can be used to pre select choices when loading the app. Use the button below to create a URL for the choices currently selected."),
               
               
                
@@ -68,7 +68,9 @@ shinyUI(dashboardPage(
                 sidebarPanel(
                   h4("Parameters : "),
                   br(),
-                    # Group by choice
+                  
+                  
+                  # Group by choice
                   materialSwitch(inputId = "SwitchGroup", label = "Group by", value = F, status = "primary", inline = T),
                   conditionalPanel(
                       condition = "input.SwitchGroup == true ",
@@ -97,6 +99,8 @@ shinyUI(dashboardPage(
                   fluidRow(),
               ),
               mainPanel(
+                  
+                  radioButtons("Conditions","Conditions : ", inline=T, c("All","Excipient/RCHOP","Excipient/Pré-greffe")),
                   # Visualisation
                   navbarPage("Reduction dimention",
                              tabPanel("PCA",
@@ -205,14 +209,14 @@ shinyUI(dashboardPage(
               navbarPage("Analyses : ",
                          tabPanel("Expression",
                                   tabsetPanel(
-                                  tabPanel("Heatmap", plotOutput("Heatmap", width = "100%",  height = "1400px")),
+                                  tabPanel("Heatmap", plotOutput("Heatmap", width = "100%",  height = "1200px")),
                                   tabPanel("Info ", verbatimTextOutput("Heatmap_feature")))
                          ),
                          
                          tabPanel("Enrichissement Fonctionnel",
                                   tabsetPanel(
                                   tabPanel("Heatmap",
-                                            plotOutput("hallmark_Heatmap", width = "100%",  height = "1000px"),
+                                            plotOutput("hallmark_Heatmap", width = "100%",  height = "900px"),
                                             fluidRow(),
                                             column(1,align="right",checkboxGroupInput("Subsets", NULL, choices = list("Subsets" = "Subsets"), selected = 0)),
                                             

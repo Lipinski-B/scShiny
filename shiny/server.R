@@ -7,6 +7,21 @@ shinyServer(function(input, output, session) {
     load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
   })
   
+
+  data <- reactive({
+    if(input$Conditions == "All"){
+      singlet <<- all
+    }
+    if(input$Conditions == "Excipient/Pré-greffe"){
+      singlet <<- C1
+    }
+    if(input$Conditions == "Excipient/RCHOP"){
+      singlet <<- C2
+    }
+    return(singlet)
+  })
+  
+  
   heatmap <- reactive({
     top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
@@ -36,6 +51,7 @@ shinyServer(function(input, output, session) {
     return(singlet)
   })
   tokeep <- reactive({
+    singlet <- data()
     singlet2 <- singlet
     for (l in split()) {
       Idents(singlet2) <- l
@@ -76,19 +92,10 @@ shinyServer(function(input, output, session) {
     return(plot.data)
   })
   rv <- reactiveValues(
-    hallmark = singlet@tools$hallmarks,
+    hallmark = all@tools$hallmarks,
     order = NULL
   )
 
-  #output$Dynamic_Group <- renderUI({
-  #List <- list()
-  #for(i in 1:length(colnames(singlet@meta.data))){
-  #    if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
-  #      List[[colnames(singlet@meta.data)[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = colnames(singlet@meta.data)[i], label = NULL, choices = colnames(singlet@meta.data)[i])))
-  #    }
-  #  }
-  #  return(List)                     
-  #})
   output$Dynamic_Group_Spe <- renderUI({
     choice <- list()
     for(i in 1:length(metadata)){
@@ -101,16 +108,6 @@ shinyServer(function(input, output, session) {
     }
     return(choice)
   })
-  
-  #output$Dynamic_Split <- renderUI({
-  #  List <- list()
-  #  for(i in 1:length(colnames(singlet@meta.data))){
-  #    if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
-  #      List[[colnames(singlet@meta.data)[i]]] <- list(column(3,align="left",checkboxGroupInput(inputId = paste0("s",colnames(singlet@meta.data)[i]), label = NULL, choices = colnames(singlet@meta.data)[i])))
-  #    }
-  #  }
-  #  return(List)                     
-  #})
   output$Dynamic_Split_Spe <- renderUI({
     choice <- list()   
     for(i in 1:length(metadata)){
@@ -123,7 +120,6 @@ shinyServer(function(input, output, session) {
     }
     return(choice)
   })
-  
   
   D3feature <- reactive({
     gene_feature <- input$in7
@@ -238,7 +234,9 @@ shinyServer(function(input, output, session) {
 
   
   ## -- Mitochondrie Figure -- ##
-  output$MT_VlnPlot <- renderPlot({VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)})
+  output$MT_VlnPlot <- renderPlot({
+    singlet@tools$mitochondrie_all + VlnPlot(singlet, features = "nFeature_RNA", group.by = "HTO_maxID") +  VlnPlot(singlet, features = "nCount_RNA", group.by = "HTO_maxID") + VlnPlot(singlet, features = "percent.mt", group.by = "HTO_maxID")
+  })
   output$MT_FeatureScatter <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")})
   output$MT_FeatureScatter2 <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")})
   
@@ -261,18 +259,18 @@ shinyServer(function(input, output, session) {
   
   # -- Enrichissement de gène -- ##
   observeEvent(input$actBtnVisualisation,{
-    if(length(input$numSelector)==0){rv$hallmark <- singlet@tools$hallmarks}
+    if(length(input$numSelector)==0){rv$hallmark <- all@tools$hallmarks}
     else{rv$hallmark <- input$numSelector}
     rv$order <- input$hallmark_order
   })
   observeEvent(input$Subsets,{
-    rv$hallmark <- singlet@tools$hallmarks
+    rv$hallmark <- all@tools$hallmarks
     rv$order <-NULL}, ignoreNULL = FALSE)
   output$hallmark_Heatmap <- renderPlot({
     singlet@meta.data$active.idents <- singlet@active.ident
     
     if(is.null(rv$order)){
-      dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
+      dittoHeatmap(singlet, genes = NULL, metas = all@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
                    annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
     } else{
       dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
@@ -323,8 +321,9 @@ shinyServer(function(input, output, session) {
   #))
 
   output$dataTable = renderImage({
-    list(src = '/home/boris/Documents/analyse/sunburst.png', contentType = 'image/png',width = 1100, height = 800,
+    list(src = '/home/boris/Documents/analyse/sunburst2.png', contentType = 'image/png',width = 1100, height = 800,
          alt = "Alternate text")
   }, deleteFile = FALSE)
   
+
 })

@@ -40,19 +40,23 @@ library(dplyr)
 library(DT)
 library(dashboardthemes)
 library(reticulate)
-load(file = paste0("/home/boris/Documents/analyse/singlet_FL12C1888.RData"))
+
+load(file = paste0("/home/boris/Documents/analyse/singlet_FL140304.RData"))
+
 meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
 #meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
 annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
-hallmark = singlet@tools$hallmarks
+hallmark = all@tools$hallmarks
 
 metadata <- c()
-for(i in 1:length(colnames(singlet@meta.data))){
-  if (length(levels(as.factor(singlet@meta.data[[i]]))) > 1 && length(levels(as.factor(singlet@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(singlet@meta.data[[1]])))==F ){
-    metadata <- c(metadata, colnames(singlet@meta.data)[i])
+for(i in 1:length(colnames(all@meta.data))){
+if (length(levels(as.factor(all@meta.data[[i]]))) > 1 && length(levels(as.factor(all@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(all@meta.data[[1]])))==F ){
+    metadata <- c(metadata, colnames(all@meta.data)[i])
   }
 }
 
 List <- list()
-for(i in 1:length(metadata) ){List[[metadata[i]]] <- levels(as.factor(singlet@meta.data[[metadata[i]]]))}
+for(i in 1:length(metadata) ){List[[metadata[i]]] <- levels(as.factor(all@meta.data[[metadata[i]]]))}
+
+singlet <- all

@@ -44,47 +44,8 @@ library(dplyr)
 library(cellrangerRkit)
 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
-patient <- "FL12C1888"
+patient <- "FL140304"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-
-
-RCHOP <- subset(singlet, idents = c("RCHOP")) #placebo rchop 
-RCHOP
-Excipient <- subset(singlet, idents = c("Excipient")) #pregreffe vs placebo
-Excipient
-greffe <- subset(singlet, idents = c("Pré-greffe")) #pregreffe vs placebo
-greffe
-
-RCHOP[["percent.mt"]] <- PercentageFeatureSet(RCHOP, pattern = "^MT-")
-Excipient[["percent.mt"]] <- PercentageFeatureSet(Excipient, pattern = "^MT-")
-greffe[["percent.mt"]] <- PercentageFeatureSet(greffe, pattern = "^MT-")
-
-RCHOP2 <- subset(RCHOP, subset = percent.mt < 5)            # QC Filter : tester 15%
-RCHOP2
-Excipient2 <- subset(Excipient, subset = percent.mt < 5)            # QC Filter : tester 15%
-Excipient2
-greffe2 <- subset(greffe, subset = percent.mt < 5)   
-greffe2
-
-RCHOP2 <- subset(RCHOP, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
-RCHOP2
-Excipient2 <- subset(Excipient, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
-Excipient2
-greffe2 <- subset(greffe, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
-greffe2
-
-
-VlnPlot(RCHOP, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
-VlnPlot(RCHOP, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
-
-VlnPlot(Excipient, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
-VlnPlot(Excipient, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
-
-VlnPlot(greffe, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
-VlnPlot(greffe, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
-
-VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
-VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
@@ -139,12 +100,12 @@ seurat_object <- function(patient){
   # DB: DatabaseImmuneCellExpressionData()
   hpca.se <- celldex::DatabaseImmuneCellExpressionData()
   results <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.main)
-  #results.fine <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.fine)
+  results.fine <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.fine)
   
   #singlet$SingleR.pruned.calls <- results$pruned.labels
   singlet$SingleR.calls <- results$labels
   #singlet$SingleR.pruned.calls.fine <- results.fine$pruned.labels
-  #singlet$SingleR.calls.fine <- results.fine$labels
+  singlet$SingleR.calls.fine <- results.fine$labels
   
   # DB: BlueprintEncodeData()
   #BD <- celldex::BlueprintEncodeData()
@@ -158,7 +119,7 @@ seurat_object <- function(patient){
   
   # Récap
   table(results$labels)
-  #table(results.fine$labels)
+  table(results.fine$labels)
   
   
   #############################################################################################################################################
@@ -202,25 +163,29 @@ seurat_object <- function(patient){
   singlet <- AddMetaData(object=singlet, metadata = bcr)                        #, col.name = colnames(as.data.frame(bcr)))   # Add to the Seurat object's metadata.
   
 
+  #############################################################################################################################################
+  ##### --             GoT             -- ##### 
+  #############################################
+  load(paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient,"/GoT/",patient,"_GoT.Rdata"))
+  singlet <- AddMetaData(object = singlet, metadata = GOT)
+  
+  
   return(singlet)
 }
-singlet <- seurat_object(patient)
+all <- seurat_object(patient)
 
-#### Extraction des sous pop HTO : pregreffe / actinomycin RCHOP / actinomycin placébo 
-Idents(singlet)<-"hash.ID"
-C1 <- subset(singlet, idents = c("Excipient","RCHOP")) #placebo rchop 
-C2 <- subset(singlet, idents = c("Excipient","Pré-greffe")) #pregreffe vs placebo
-
-
-#Idents(singlet)<-"Greffe"
-#C3 <- subset(singlet, idents = c("Post-greffe","Pré-greffe")) #pregreffe vs post greff (rchop placebo)
+## -- Extraction des conditions -- ##
+Idents(all)<-"hash.ID"
+C1 <- subset(all, idents = c("Excipient","RCHOP")) 
+C2 <- subset(all, idents = c("Excipient","Pré-greffe"))
 
 ## -- Visualisation -- ##
 visualitation <- function(singlet){
   #annotations <- read.csv("/home/boris/Bureau//scShiny/annotation_FindAllMarkers.csv")
   
-  ## -- ADD MITOCHONDRIAL ANALYSES -- ## 
+  ## -- ADD MITOCHONDRIAL ANALYSES -- ##
   singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
+  singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_maxID")
   singlet <- subset(singlet, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
   
   ## -- ADD PCA TO SEURAT OBJECT -- ## 
@@ -260,7 +225,7 @@ visualitation <- function(singlet){
   
   return(singlet)
 }
-singlet <- visualitation(singlet)
+all <- visualitation(all)
 C1 <- visualitation(C1)
 C2 <- visualitation(C2)
 
@@ -397,20 +362,20 @@ monocle <- function(singlet){
   
   return(data)
 }
-data <- monocle(singlet)
+data <- monocle(all)
 
 ## -- Save -- ##
-save(singlet, data, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
-write.csv(singlet@meta.data, file = paste0("/home/boris/Documents/analyse/metadata_matrix_",patient,".csv"))
-write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/count_matrix_", patient,".csv"))
+save(all, C1, C2, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+write.csv(all@meta.data, file = paste0("/home/boris/Documents/analyse/metadata_matrix_",patient,".csv"))
+write.csv(as.matrix(all[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/count_matrix_", patient,".csv"))
 
-#save(singlet, file = paste0(patient,"/R/singlet_",patient,".RData"))
-#write.csv(singlet@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))
-#write.csv(as.matrix(singlet[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
+save(all, C1, C2, file = paste0(patient,"/R/singlet_",patient,".RData"))
+write.csv(all@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))
+write.csv(as.matrix(all[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
 
 ## -- Summary metadata -- ## 
 result=list()
-summary <- list(singlet@meta.data)
+summary <- list(all@meta.data)
 names(summary) <- patient
 resume=list()
 for (elm in 1:length(names(summary[[patient]]))) {
@@ -427,21 +392,21 @@ load(file = "/home/boris/Documents/analyse/shiny/result.RData")
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## To test                                                                                                                       ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-#annotations_finale <- singlet@meta.data[which(singlet@meta.data$gene_name %in% top10),] 
-#singlet <- BuildClusterTree(singlet)
-#Tool(singlet,'BuildClusterTree')
-#PlotClusterTree(singlet)
+#annotations_finale <- all@meta.data[which(all@meta.data$gene_name %in% top10),] 
+#all <- BuildClusterTree(all)
+#Tool(all,'BuildClusterTree')
+#PlotClusterTree(all)
 
-#singlet <- SCTransform(singlet)
-#Stdev(singlet[["pca"]])
+#all <- SCTransform(all)
+#Stdev(all[["pca"]])
 
-sce.singlet <- as.SingleCellExperiment(singlet)
-colData(sce.singlet)
+sce.all <- as.SingleCellExperiment(all)
+colData(sce.all)
 
-sce.singlet@metadata <- singlet@meta.data
-metadata(sce.singlet)$which_qc
+sce.all@metadata <- all@meta.data
+metadata(sce.all)$which_qc
 
-fluidigm <- as.SingleCellExperiment(singlet)
+fluidigm <- as.SingleCellExperiment(all)
 #Add QC for Mitochondrial genes
 fluidigm <- addPerCellQC(fluidigm)
 colData(fluidigm)
@@ -450,6 +415,47 @@ rowData(fluidigm)
 
 View(fluidigm)
 
+
+RCHOP <- subset(all, idents = c("RCHOP")) #placebo rchop 
+RCHOP
+Excipient <- subset(all, idents = c("Excipient")) #pregreffe vs placebo
+Excipient
+greffe <- subset(all, idents = c("Pré-greffe")) #pregreffe vs placebo
+greffe
+
+RCHOP[["percent.mt"]] <- PercentageFeatureSet(RCHOP, pattern = "^MT-")
+Excipient[["percent.mt"]] <- PercentageFeatureSet(Excipient, pattern = "^MT-")
+greffe[["percent.mt"]] <- PercentageFeatureSet(greffe, pattern = "^MT-")
+
+RCHOP2 <- subset(RCHOP, subset = percent.mt < 5)            # QC Filter : tester 15%
+RCHOP2
+Excipient2 <- subset(Excipient, subset = percent.mt < 5)            # QC Filter : tester 15%
+Excipient2
+greffe2 <- subset(greffe, subset = percent.mt < 5)   
+greffe2
+
+RCHOP2 <- subset(RCHOP, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
+RCHOP2
+Excipient2 <- subset(Excipient, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
+Excipient2
+greffe2 <- subset(greffe, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
+greffe2
+
+
+VlnPlot(RCHOP, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(RCHOP, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
+
+VlnPlot(Excipient, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(Excipient, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
+
+VlnPlot(greffe, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(greffe, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
+
+VlnPlot(all, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(all, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident")
+
+
+
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## ANALYSES                                                                                                                      ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -457,67 +463,67 @@ View(fluidigm)
 ## -- Main visualisation -- ##
 ##############################
 #  TSNE single and multi label
-DimPlot(singlet, reduction = "tsne", label = TRUE)
+DimPlot(all, reduction = "tsne", label = TRUE)
 BD <- "SingleR.calls" #"SingleR.calls.fine", "SingleR.calls.blueprint", "SingleR.calls.blueprint.fine"
 
-Idents(singlet)<-"HTO_maxID"
-tokeep <- levels(Idents(singlet))
+Idents(all)<-"HTO_maxID"
+tokeep <- levels(Idents(all))
 tokeep <- tokeep[tokeep %in% "pregreffe"]
-singlet2 <- subset(singlet, idents = tokeep)
-Idents(singlet2)<-"seurat_clusters"
+all2 <- subset(all, idents = tokeep)
+Idents(all2)<-"seurat_clusters"
 
-plots <- TSNEPlot(object = singlet2, group.by = c("HTO_maxID", BD), split.by = "Phase", label.size = 0.0, pt.size = 1)
+plots <- TSNEPlot(object = all2, group.by = c("HTO_maxID", BD), split.by = "Phase", label.size = 0.0, pt.size = 1)
 plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 1)))
 
 # Heatmap de correlation
-top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by("HTO_maxID") %>% top_n(n = 100, wt = avg_log2FC)
-DoHeatmap(singlet, features = top10$gene, group.by = "HTO_maxID") + NoLegend()
+top10 <- all@commands[["FindAllMarkers"]] %>% group_by("HTO_maxID") %>% top_n(n = 100, wt = avg_log2FC)
+DoHeatmap(all, features = top10$gene, group.by = "HTO_maxID") + NoLegend()
 
 # PCA
-DimPlot(singlet, reduction = "pca")
-print(singlet[["pca"]], dims = 1:10, nfeatures = 10)
-ElbowPlot(singlet, ndims = 50, reduction = "pca")
-DimHeatmap(singlet, dims = 1:10, cells = 100, balanced = TRUE)
-VizDimLoadings(singlet, dims = 1:5, reduction = "pca")
-JackStrawPlot(singlet, dims = 1:15)
+DimPlot(all, reduction = "pca")
+print(all[["pca"]], dims = 1:10, nfeatures = 10)
+ElbowPlot(all, ndims = 50, reduction = "pca")
+DimHeatmap(all, dims = 1:10, cells = 100, balanced = TRUE)
+VizDimLoadings(all, dims = 1:5, reduction = "pca")
+JackStrawPlot(all, dims = 1:15)
 
 # UMAP
-DimPlot(singlet, reduction = "umap", label = TRUE)
-DimPlot(singlet, reduction = "umap", group.by = "HTO_maxID")
+DimPlot(all, reduction = "umap", label = TRUE)
+DimPlot(all, reduction = "umap", group.by = "HTO_maxID")
 
 # TSNE
-DimPlot(singlet, reduction = "tsne", group.by = "HTO_maxID")
-DimPlot(singlet, reduction = "tsne", group.by = BD)
-DimPlot(singlet, reduction = "tsne", group.by = "Phase")
-TSNEPlot(object = singlet, group.by = "clonotype_id", label.size = 0.0, pt.size = 1)
+DimPlot(all, reduction = "tsne", group.by = "HTO_maxID")
+DimPlot(all, reduction = "tsne", group.by = BD)
+DimPlot(all, reduction = "tsne", group.by = "Phase")
+TSNEPlot(object = all, group.by = "clonotype_id", label.size = 0.0, pt.size = 1)
 
 # Mitochondrie 
-VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
-VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident") # Visualize QC metrics as a violin plot
-FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-plot1 <- FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification")
-plot2 <- FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")
+VlnPlot(all, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_classification")
+VlnPlot(all, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "orig.ident") # Visualize QC metrics as a violin plot
+FeatureScatter(all, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(all, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(all, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification")
+plot2 <- FeatureScatter(all, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")
 plot1 + plot2
 
 # Identify the 10 most highly variable genes
-top10 <- head(VariableFeatures(singlet), 10)
-VariableFeaturePlot(singlet)
-LabelPoints(plot = VariableFeaturePlot(singlet), points = top10, repel = TRUE) # plot variable features with and without labels
+top10 <- head(VariableFeatures(all), 10)
+VariableFeaturePlot(all)
+LabelPoints(plot = VariableFeaturePlot(all), points = top10, repel = TRUE) # plot variable features with and without labels
 
 annotations_finale <- annotations[which(annotations$gene_name %in% top10),] 
 
 # Visualize the distribution of cell cycle markers across
-RidgePlot(singlet, features = c("PCNA", "TOP2A", "MCM6", "MKI67"), ncol = 2)
+RidgePlot(all, features = c("PCNA", "TOP2A", "MCM6", "MKI67"), ncol = 2)
 
 # Verification Expression marqueurs B_T
 feature <-c("MS4A1", "CD19", "CD79A", "CD79B")
-FeaturePlot(singlet, features = feature, cols = RColorBrewer::brewer.pal(6,"YlOrBr"), combine = TRUE, blend = TRUE) & NoAxes() & NoLegend()
-FeaturePlot(singlet, features = feature, split.by = "Phase")
-FeaturePlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='umap')
-FeaturePlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='tsne')
-VlnPlot(singlet, features = c("MS4A1", "CD19", "CD79A", "CD79B"), group.by = "HTO_classification")
-FeaturePlot(singlet, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197")) # Expression marqueurs T cells
-VlnPlot(singlet, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197"), group.by = "HTO_classification")
+FeaturePlot(all, features = feature, cols = RColorBrewer::brewer.pal(6,"YlOrBr"), combine = TRUE, blend = TRUE) & NoAxes() & NoLegend()
+FeaturePlot(all, features = feature, split.by = "Phase")
+FeaturePlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='umap')
+FeaturePlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='tsne')
+VlnPlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), group.by = "HTO_classification")
+FeaturePlot(all, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197")) # Expression marqueurs T cells
+VlnPlot(all, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197"), group.by = "HTO_classification")
 
 
 ###############################################################################################################################################
@@ -547,24 +553,24 @@ p <- plot_genes_in_pseudotime(cds_subset, color_by = "SingleR.calls")
 ## -- 3D Visualisation -- ##
 ############################
 # Main visualitation
-# cell plotting : Embeddings(object = singlet, reduction = "umap") --> Visualize what headings are called so that you can extract them to form a dataframe
-singlet2 <- singlet
-singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
-singlet2 <- RunTSNE(singlet2, reduction = "pca", dims = 1:40, dim.embed = 3)
+# cell plotting : Embeddings(object = all, reduction = "umap") --> Visualize what headings are called so that you can extract them to form a dataframe
+all2 <- all
+all2 <- RunUMAP(all2, reduction = "pca", dims = 1:40, n.components = 3L)
+all2 <- RunTSNE(all2, reduction = "pca", dims = 1:40, dim.embed = 3)
 meta_variable = c("orig.ident", "HTO_maxID", "SingleR.calls", "clonotype_id","chain","v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "old.ident", "seurat_clusters")
-plot.data <- FetchData(object = singlet2, vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
+plot.data <- FetchData(object = all2, vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
 plot.data$label <- paste(rownames(plot.data))
 
 plot_ly(data = plot.data, x = ~PC_1, y = ~PC_2, z = ~PC_3, # ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, or ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
-        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(singlet@meta.data$seurat_clusters)),"Spectral"),
+        color = ~seurat_clusters, colors = RColorBrewer::brewer.pal(length(levels(all@meta.data$seurat_clusters)),"Spectral"),
         type = "scatter3d", mode = "markers", 
         marker = list(size = 3, width=2),
         text=~label, hoverinfo="text")
 
 # Feature plot
 gene_feature <- "CD19"
-all_feature <- rownames(as.matrix(singlet2[["RNA"]]@counts))
-plot.data <- FetchData(object = singlet2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
+all_feature <- rownames(as.matrix(all2[["RNA"]]@counts))
+plot.data <- FetchData(object = all2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
 plot.data$changed <- ifelse(test = plot.data[[gene_feature]] <1, yes = plot.data[[gene_feature]], no = 1)
 plot.data$label <- paste(rownames(plot.data)," - ", plot.data[[gene_feature]], sep="")
 
@@ -595,29 +601,29 @@ plot_ly(data = plot.data, x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, name = gene_fea
 ## -- ESCAPE : Enrichissement de gène -- ##
 ###########################################
 #The Heatmap
-singlet@meta.data$active.idents <- singlet@active.ident
-dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
+all@meta.data$active.idents <- all@active.ident
+dittoHeatmap(all, genes = NULL, metas = all@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
              annot.by = "HTO_maxID", cluster_cols = F, fontsize = 7, order.by = "HTO_maxID")
 
-dittoHeatmap(singlet, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
+dittoHeatmap(all, genes = NULL, metas = names(ES), heatmap.colors = rev(colorblind_vector(50)),
              annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
 
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
-dittoHeatmap(singlet, genes = NULL, metas = c("HALLMARK_APOPTOSIS", "HALLMARK_DNA_REPAIR", "HALLMARK_P53_PATHWAY"), 
+dittoHeatmap(all, genes = NULL, metas = c("HALLMARK_APOPTOSIS", "HALLMARK_DNA_REPAIR", "HALLMARK_P53_PATHWAY"), 
              heatmap.colors = rev(colorblind_vector(50)), annot.by = meta_variable, cluster_cols = TRUE, fontsize = 7)
 
 #The Violin Plot
-dittoPlot(singlet, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") #+ scale_fill_manual(values = colorblind_vector(5))
+dittoPlot(all, "HALLMARK_DNA_REPAIR", group.by = "SingleR.calls") #+ scale_fill_manual(values = colorblind_vector(5))
 
 #Hex Density Enrichment Plots
-dittoScatterHex(singlet,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 
+dittoScatterHex(all,x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE) + theme_classic() + 
   scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
 
-dittoScatterHex(singlet, x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE, split.by = "SingleR.calls") + 
+dittoScatterHex(all, x.var = "HALLMARK_DNA_REPAIR", y.var = "HALLMARK_MTORC1_SIGNALING", do.contour = TRUE, split.by = "SingleR.calls") + 
   theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2) 
 
 # Enrichment along a Ridge Plot
-ES2 <- data.frame(singlet[[]], Idents(singlet))
+ES2 <- data.frame(all[[]], Idents(all))
 colnames(ES2)[ncol(ES2)] <- "cluster"
 ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "SingleR.calls", add.rug = TRUE)
 ridgeEnrichment(ES2, gene.set = "HALLMARK_DNA_REPAIR", group = "cluster", facet = "SingleR.calls", add.rug = TRUE)
@@ -627,7 +633,7 @@ splitEnrichment(ES2, split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
 splitEnrichment(ES2, x.axis = "cluster", split = "SingleR.calls", gene.set = "HALLMARK_DNA_REPAIR")
 
 # Expanded Analysis
-ES2 <- data.frame(singlet[[]], Idents(singlet))
+ES2 <- data.frame(all[[]], Idents(all))
 PCA <- performPCA(enriched = ES2, groups = c("cluster", "SingleR.calls"))
 pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = TRUE)
 pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 
@@ -666,15 +672,15 @@ quantContig_output
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ######## CellSIUS - Cell Subtype Identification from Upregulated gene Sets                                                             ######## 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-singlet_matrix <- as.matrix(singlet[["RNA"]]@counts)
-CellSIUS.out <- CellSIUS(singlet_matrix, as.character(Idents(singlet)))
+all_matrix <- as.matrix(all[["RNA"]]@counts)
+CellSIUS.out <- CellSIUS(all_matrix, as.character(Idents(all)))
 Result_List = CellSIUS_GetResults(CellSIUS.out=CellSIUS.out)
 
-my_tsne <- Embeddings(singlet[["tsne"]])
+my_tsne <- Embeddings(all[["tsne"]])
 d = CellSIUS_plot(coord = my_tsne, CellSIUS.out = CellSIUS.out)
 d + scale_color_brewer(palette = "Blues")
 
-Final_Clusters = CellSIUS_final_cluster_assignment(CellSIUS.out=CellSIUS.out, group_id=Idents(singlet), min_n_genes = 3)
+Final_Clusters = CellSIUS_final_cluster_assignment(CellSIUS.out=CellSIUS.out, group_id=Idents(all), min_n_genes = 3)
 table(Final_Clusters)
 p <- qplot(my_tsne[,1],my_tsne[,2],xlab="tSNE1",ylab="tSNE2",color=as.factor(Final_Clusters))
 p + theme(legend.position = "none")
@@ -713,9 +719,9 @@ target[taget_name] <- str_replace(as.character(target[taget_name]), "2", "alt/al
 target[taget_name] <- str_replace(as.character(target[taget_name]), "3", "alt/ref") # Both alleles detected
 
 target <- t(target)
-target <- target[ , which(colnames(target) %in% colnames(singlet))] 
+target <- target[ , which(colnames(target) %in% colnames(all))] 
 
-singlet <- AddMetaData(object = singlet, metadata = as.data.frame(target), col.name = colnames(as.data.frame(target)))
-TSNEPlot(object = singlet, group.by = "target", label.size = 0.0, pt.size = 1)
+all <- AddMetaData(object = all, metadata = as.data.frame(target), col.name = colnames(as.data.frame(target)))
+TSNEPlot(object = all, group.by = "target", label.size = 0.0, pt.size = 1)
 #do.label = T, colors.use = c("azure2","black", "yellow","red"), plot.title = "chr18_63319316", do.return = T, plot.order = c("alt/alt" ,"alt/ref", "ref/ref","No Call"))
 #tableau <- data.frame(c(1:638),c(1:638),c(1:638),c(1:638)); for (i in 1:length(snv_matrix)){tableau[i,] <- table(factor(as.vector(snv_matrix[i]), levels = c(0:3)))} ;colnames(tableau) <- c('0','1','2','3')
