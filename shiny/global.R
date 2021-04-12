@@ -41,7 +41,7 @@ library(DT)
 library(dashboardthemes)
 library(reticulate)
 
-load(file = paste0("/home/boris/Documents/analyse/singlet_FL140304.RData"))
+load(file = paste0("/home/boris/Documents/analyse/singlet_FL12C1888.RData"))
 
 meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
 #meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
