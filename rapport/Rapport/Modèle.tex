@@ -1,0 +1,349 @@
+\documentclass[12pt]{report}
+
+%%%% Load packages %%%%
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{graphics}
+\usepackage{subfig}
+\usepackage{epic}
+\usepackage{ecltree}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{fontenc}
+\usepackage{boxedminipage}
+\usepackage[T1]{fontenc}
+\usepackage{xcolor}
+\usepackage{babel} 
+
+%%%% Load logo %%%%
+\newcommand{\faclogo}{\protect\includegraphics[height=25.9ex,keepaspectratio]{faclogo.png}}
+\newcommand{\ilogo}{\protect\includegraphics[height=25ex,keepaspectratio]{ilogo.jpg}}
+\newcommand{\Rlogo}{\protect\includegraphics[height=1.9ex,keepaspectratio]{Rlogo.png}}
+
+%%%%%%%%Load des couleurs%%%%%%
+\definecolor{bluemarine}{RGB}{0,102,204}
+\definecolor{bluelight}{RGB}{204,255,255}
+\definecolor{bluelight}{RGB}{186,213,240}
+\definecolor{bluelight}{RGB}{228,233,239}
+\definecolor{bleu_foncé}{RGB}{0,51,102}
+\definecolor{bleu_moyen}{RGB}{0,102,153}
+
+%%%% début réglage des packages%%%%%
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+\setcounter{secnumdepth}{5} %augmenter la profondeur de numérotation
+\geometry{a4paper}                   % ... or a4paper or a5paper or ... 
+\textheight=25truecm
+\textwidth=18truecm
+\topmargin=-15truemm
+\oddsidemargin=-10truemm
+\evensidemargin=-10truemm 
+%\geometry{landscape}                % Activate for rotated page geometry
+
+%%%% macro-section %%%%
+\makeatletter
+\renewcommand{\thesection}{\arabic{section}. }
+\renewcommand\section{\@startsection{section}{1}{\z@}%
+	{1cm\@plus -1ex\@minus -0.2ex}%
+	{1.3ex\@plus 0.2ex}%
+	{\reset@font\Large\bf\sc}}
+\makeatother
+
+%%%% macro-subsection %%%%
+\makeatletter
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection} }
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+	{1cm\@plus -1ex\@minus -0.2ex}%
+	{1.3ex\@plus 0.2ex}%
+	{\reset@font\large\bf}}
+\makeatother
+
+%%%% macro-subsubsection %%%%
+\makeatletter
+\renewcommand{\thesubsubsection}{\Alph{subsubsection}. }
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+	{1cm\@plus -1ex\@minus -0.2ex}%
+	{1.3ex\@plus 0.2ex}%
+	{\reset@font\normalsize\bf}}
+\makeatother
+
+%%%% macro-paragraph %%%%
+\makeatletter
+\renewcommand{\theparagraph}{\alph{paragraph}) }
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+	{1cm\@plus -1ex\@minus -0.2ex}%
+	{1.3ex\@plus 0.2ex}%
+	{\reset@font\normalsize\bf}}
+\makeatother
+
+%%%% macro-subparagraph %%%%
+\makeatletter
+\renewcommand{\thesubparagraph}{\roman{subparagraph}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{\z@}%
+	{1cm\@plus -1ex\@minus -0.2ex}%
+	{1.3ex\@plus 0.2ex}%
+	{\reset@font\normalsize\it}}
+\makeatother
+
+%%%% Other information %%%%
+\title{Titre de la Revue}
+\author{LIPINSKI Boris}
+\date{Septembre 2020 à Juin 2021}                                           % Activate to display a given date or no date
+
+\renewcommand{\contentsname}{Table des Matières}
+\renewcommand{\listfigurename}{Table des Figures}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\makeatletter
+
+%%%%%page de présentation%%%%
+\begin{titlepage}
+
+%%%%%Logo fac%%%%
+\begin{flushleft}
+\faclogo
+\end{flushleft}
+
+%%%%%Logo inserm%%%%
+\begin{flushright}
+\vspace{-4.5cm}\ilogo
+\end{flushright}
+
+%%%%Cadre principale%%%%
+\centering
+\vfill
+ 
+\fcolorbox{bleu_moyen}{white}{
+\begin{minipage}{17cm}
+\vspace{0.2cm}
+
+\begin{center}
+\LARGE \textbf{{Rapport de Stage : Projet Flinovo \\ Analyses en single cell des réponses de patients atteint de lymphome folliculaire à un traitement, le RCHOP.}} 
+
+\end{center}
+
+\vspace{0.2cm}
+\end{minipage}}
+
+%%%%Cadre secondaire%%%%
+\vspace{4cm}
+\LARGE\@author \\
+\vspace{1cm}   
+\Large\@date\   
+\vfill
+
+\begin{flushleft}
+
+\normalsize{
+\textbf{Maitre d'apprentissage :} SUJOBERT Pierre \\
+\textbf{Tuteur pédagogique :}  BROCHIER Céline \\
+\textbf{Entreprise d'acceuil :} Laboratoire UR LIB « Lymphoma Immuno-Biology », Équipe Gilles Salle.\\
+\textbf{Etablissement :} Université de Claude Bernard Lyon 1, Faculté de Médecine Lyon-Sud.\\
+\textbf{Formation :} Master 2 Bioinformatique Moléculaire, Méthodes et Analyses. 
+}
+
+\end{flushleft}
+\end{titlepage}
+
+\let\original@addcontentsline\addcontentsline
+\newcommand{\dummy@addcontentsline}[3]{}
+\newcommand{\DeactivateToc}{\let\addcontentsline\dummy@addcontentsline}
+\newcommand{\ActivateToc}{\let\addcontentsline\original@addcontentsline}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{minipage}{\textwidth}
+\section*{Résumé}
+\tableofcontents
+\listoffigures
+%\vspace{6cm}
+\section{Liste des abréviations utilisées}
+\begin{itemize}
+\item item 1
+\end{itemize}
+\end{minipage}
+
+\section{Liste des logiciels utilisés}
+\begin{itemize}
+\item \Rlogo : 4.0.5 (2021-03-31) Shake and Throw
+\begin{itemize}
+\item Seurat : 4.0.0
+\item SingleR : 1.4.1
+\item celldex : 1.0.0
+\item scRNAseq : 2.4.0
+\item CellSIUS : 1.0.0
+\item ggplot2 : 3.3.3
+\item plotly : 4.9.3
+\item shiny : 1.6.0
+\item shinyjs : 2.0.0
+\item shinydashboard : 0.7.1
+\item Signac : 1.1.1
+\item scone : 1.14.0
+\item escape : 1.1.1
+\item dittoSeq : 1.2.5
+\item shinyWidgets : 0.5.7
+\item monocle : 2.18.0
+\item cowplot : 1.1.1
+\item scran : 1.18.5
+\item clues : 0.6.2.2
+\item TENxBUSData : 1.4.0
+\item dplyr : 1.0.5
+\item tidyverse : 1.3.0
+\end{itemize}
+\item Python : 3.8.3
+\begin{itemize}
+\item pandas : 1.1.4
+\item plotly : 4.14.3
+\item seaborn : 0.11.1
+\item numpy : 1.19.4
+\item scipy : 1.5.4
+\item matplotlib : 3.3.2
+\item jupyter-notebook : 6.2.0
+\end{itemize}
+\item CellRanger : count, VDJ
+\item CITE-SEQ count :
+\item IronThrone-GoT : 2.1
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Section principale}
+\subsection{Introduction}
+
+Une introduction présentant l'état de l'art et le contexte scientifique dans lequel s'inscrit le travail réalisé ainsi que la(les) problématique(s) abordées pendant le stage ;
+
+De nombreux processus sont impliqués dans le développement et l’évolution du cancer. L’expansion de cellules tumorales dans l’organisme va de pair avec l’accumulation d’altérations génétiques induites par mutations somatiques.
+
+
+\subsubsection*{Contexte scientifique}
+
+Le cancer est une maladie dont l’adaptation environnementale et la progression sont des processus évolutifs. Il est généralement accepté que les cellules 
+tumorales sont issues d’une seule cellule donnant lieu à des sous-populations caractérisées par l'accumulation de nombreuses nouvelles altérations génétiques. 
+Au fur et à mesure, la diversité génétique au sein de la population cellulaire tend à s'accroitre par acquisition successive de mutations somatiques génération après génération [McGranahan N. et Swanton C. Biological and therapeutic impact of intratumor heterogeneity
+in cancer evolution. Cancer Cell, 27(1) :15 – 26, 2015.], 
+favorisant l'apparition de cellules de plus en plus disfonctionnelles qui s'écartent des processus physiologiques standards et qui sont potentiellement précurseures de tumeurs cancéreuse. 
+De ce fait, le cancer découle de dynamiques cellulaires et moléculaires complexes et anormales, suivant des modèles d’expansion clonale et de diversité très variable à la fois selon le type de cancer et selon l’individu. 
+
+Parmis les différents types de cancers se trouve le diagnostique du lymphome folliculaire, une tumeur maligne incurable des lymphocyte B qui compte pour 25\% des lymphomes, soit le 2ème lymphome par ordre de fréquence. 
+En dépit des progrès récents de notre compréhension sur la physiopathologie de ce cancer [papier Sarah huet], cette maladie est toujours concidérée comme étant incurable, et la plupart des patients atteints en décède des années après le diagnostique. 
+La manifestation des symptomes cliniques est en grande partie indolore, s'exprimant principalement via gonflements des ganglions lymphatiques dans les régions du cou, des aisselles ou de l’aine. 
+
+Administrer un traitement revient toujours à être délicat quelque soit le cancer diagnostiqué. 
+Au delà des effets curatifs thérapeutiques primaire et secondaires connus et attendus, le résultat peut tout aussi se révéler être inatendu, amplifiant une certaine progression tumorale pour des lignées cellulaires résistantes,
+favorisée par pressions de sélections et donc éliminant progressivement toutes autres cellules sensibles au traitement [2]. Ainsi une adaptation et une résistance au traitement des sous-populations cellulaires déjà existantes peut apparaitre par sélection darwinienne, 
+phénomène souvent grandement impliqué dans l’échec thérapeutique. 
+
+Dans le contexte du lymphome folliculaire, il a été montré que la majorité des patients parviennent à une rémission complète s'ils sont soumis au traitement composé à base de RCHOP, 
+ensemble de 5 molécules thérapeutiques : Rituximab, Cyclophosphamide, Hydroxyadrimycine, Vincristine et Prendisone [papier gille salle]. 
+Cependant, un gand nombre de patient ont été victimes de rechute post-traitrement pouvant mener jusqu'a la mort, principalement à cause de toxicités liées au traitement même ou bien à une progression incontrolable de la malaide (Hiddemann and cheson).
+Ainsi, prédire et caractériser correctement la réponse clinique au traitement consititue un des enjeux majeur lié à cette problématique biologique. 
+Cela pourrait se montrer être décisif dans la compréhension de l'évolution tumorale face au traitement, et ainsi maximiser les chances de guérison des patients.
+
+Aujourd’hui, l’efficacité technologiques des méthodes d’analyse en single-cell est telle qu’elles permettent de caractériser les populations cellulaires intra-tumorale au plus haut degré de précision possible, tant au niveau ADN qu’ARN. 
+Les outils de RT-qPCR ont d'abord montré que le single-cell peut être utilisé pour étudier les changements d’expressions par gènes et par cellules au cours de la différentiation embryonnaire [9]. 
+La méthode de séquençage et d’analyse cellulaire RNA-seq en single-cell a aussi permis de caractériser la complexe évolution de populations cellulaires en observant les trajectoires de différenciation de lignées distinctes, 
+l’hétérogénéité transcriptionnelle associée au cycle cellulaire et les programmes cellulaires de résistance aux médicaments impliqués [10] [11].
+La profondeur analytiques que permettent les technologies en single cell semblent donc tout à fait pertinante pour apporter des éléments de réponses à la fois vastes et précis à notre problématique.
+
+En ce qui concerne le séquençage lui-même, de plus en plus d’études utilisent des identificateurs moléculaires uniques (UMI) grâce à l’incorporation d’un barcode dans l’étape de reversetranscription.
+Ainsi chaque read (fragment d’ARN/ADN séquencé) comptabilisé peut être assigné à la cellule d’origine. 
+Cela permet une meilleure précision du comptage de transcrits en single-cell et une meilleure reproductibilité de quantification, car chaque lecture peut être affectée à sa cellule d’origine ce qui supprime efficacement les biais induit par la PCR [10].
+C’est ainsi que des sous-types de populations cellulaires peuvent être identifiés sur la base d’observation des résultats d’analyses transcriptomiques.
+
+ce processus constituant le coeur analytiques des outils bioinformatiques développées par les technologies 10X
+
+10X...
+
+
+
+
+
+\subsubsection*{Problématiques abordées pendant le stage}
+
+
+Objectif:
+C’est dans ce contexte biologique que se projette le travail effectué pendant ce contrat d'alternance, dont la problématique vise à établir
+
+Pouvoir caractériser les différentes réponses de patients atteint de lymphome folliculaire à un traitement spécifique nécessite l'élaboration d'un protocole analytique bioiformatique à la fois vaste et profond,
+incluant le plus faible biais de variabilité technique possible et maximisant l'expression de la variabilité biologique. 
+D'une manière globale, cela demande de savoir manipuler dfférents language de programation, adapter des scripts executables sur des clusters à hautes perfomrances, manipuler de nombreux fichiers très volumineux, mais aussi d'avoir le recul nécessaire pour choisir pertinemment les outils et techniques d'analyses, de normalisation et de réduction de dimensions adéquates à nos données, notre méthode et notre problématique.
+De plus et plus précisément, de nombreuses recherches complémentaire sont nécessaire de manière à donner la plus grande profondeur possible à nos analyses. 
+Ce travail d'approfondissement divise notre objectif en plusieurs taches concrètes nécésitant à la fois d'être en mesure de reproduir des analyses issues de la littérature mais aussi de ce les approprier. Parmis ces taches on retrouve
+l'observation et la comparaison les tendances d'expression géniques des différentes populations cellulaires pour chaque patient intra et inter groupes,
+la possibilité de génotyper certains gènes à tendance anti-apoptotique ou oncogène qui joueraient un rôle déterminant dans l'apparition de lymphome folliculaire et les superposer avec les résultats d'expression géniques,
+Détecter et quantifier la présence des différentes populations de récepteurs BCR au sein des populations polyclonales des lymphocytes B issus des populations cellulaires tumorales,
+Analyser l'état du cycle cellulaire dans lequel se trouvent les cellules tumorales,
+
+Identifier les ressources CPU, RAM et stockage nécessaires au bon déroulement du projet en vue de pouvoir allouer ces ressources sur un cluster de calcul dédié,
+Autre objectif déterminable en fonction de l'évolution du projet : analyse du microenvironnement, des LT,...
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Matériels et méthodes}
+Une section présentant le matériel et les méthodes utilisés ;
+
+\subsubsection*{Données d'expression single-cell.}
+\subsubsection*{Score d'enrichissement d'expression.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Résultats}
+Une section présentant les résultats obtenus ;
+
+\subsubsection*{1.}
+
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.8]{figure/FL}
+\caption{\small{Graphiques  \cite{1}.}}
+\label{I1}
+\end{figure}
+
+\subsubsection*{2.}
+%\begin{figure}[h!]
+%   \begin{minipage}[c]{.46\linewidth}
+%     \centering 
+%     \includegraphics[scale=0.4]{figure/GSEA_tot1}
+%     \caption{\small{Heatmap de corrélation des scores entre chacune des 19 activités en utilisant la méthode GSEA.}}
+%     \label{I1}
+%   \end{minipage} \hfill
+%   \begin{minipage}[c]{.46\linewidth}
+%     \centering 
+%     \includegraphics[scale=0.4]{figure/AUC_tot1}
+%     \caption{\small{Heatmap de corrélation des scores entre chacune des 19 activités en utilisant la méthode AUCell.}}
+%     \label{I1}
+%   \end{minipage}
+%\end{figure}
+
+%\begin{itemize}
+%\item Groupe 1A : \textit{Blablabla}
+%\end{itemize}
+
+%\paragraph*{Relation entre activités et phase du cycle cellulaire.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Discussion}
+Une section discussion qui contextualise les résultats par rapport à la problématique et au contexte général dans lequel s'inscrit le stage ;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conclusion}
+Une conclusion qui présente également les perspectives ouvertes par le travail réalisé. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Votre page de biblio%%%%%
+\addcontentsline{toc}{section}{4.Bibliographie}
+\bibliographystyle{unsrt}
+\renewcommand{\bibname}{\LARGE{\normalfont 4.~~\,\,\, B\textsc{ibliographie}}}
+\vspace{-3cm}
+\bibliography{mabiblio}
+\end{document}

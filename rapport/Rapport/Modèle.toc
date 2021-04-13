@@ -1,0 +1,10 @@
+\babel@toc {nil}{}
+\contentsline {section}{\numberline {1. }Liste des abréviations utilisées}{1}{section.0.1}%
+\contentsline {section}{\numberline {2. }Liste des logiciels utilisés}{1}{section.0.2}%
+\contentsline {section}{\numberline {3. }Section principale}{2}{section.0.3}%
+\contentsline {subsection}{\numberline {3.1 }Introduction}{2}{subsection.0.3.1}%
+\contentsline {subsection}{\numberline {3.2 }Matériels et méthodes}{4}{subsection.0.3.2}%
+\contentsline {subsection}{\numberline {3.3 }Résultats}{5}{subsection.0.3.3}%
+\contentsline {subsection}{\numberline {3.4 }Discussion}{5}{subsection.0.3.4}%
+\contentsline {subsection}{\numberline {3.5 }Conclusion}{5}{subsection.0.3.5}%
+\contentsline {section}{4.Bibliographie}{5}{subsection.0.3.5}%
