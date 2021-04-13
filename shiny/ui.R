@@ -100,7 +100,7 @@ shinyUI(dashboardPage(
               ),
               mainPanel(
                   
-                  radioButtons("Conditions","Conditions : ", inline=T, c("All","Excipient/RCHOP","Excipient/Pré-greffe")),
+                  radioButtons("Conditions","Conditions : ", inline=T, c("All","Excipient/Pré-greffe","Excipient/RCHOP", "B:All", "B:Excipient/Pré-greffe","B:Excipient/RCHOP")),
                   # Visualisation
                   navbarPage("Reduction dimention",
                              tabPanel("PCA",

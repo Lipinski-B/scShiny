@@ -43,7 +43,7 @@ library(reticulate)
 
 load(file = paste0("/home/boris/Documents/analyse/singlet_FL12C1888.RData"))
 
-meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
+meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase", "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")
 #meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
 annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))

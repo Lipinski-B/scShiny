@@ -130,7 +130,7 @@ seurat_object <- function(patient){
   names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
   singlet <- AddMetaData(singlet, ES)
   singlet@tools$hallmarks <- names(ES)
-  singlet@tools$meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase")
+  singlet@tools$meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase", "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")
   
   
   #############################################################################################################################################
@@ -166,10 +166,10 @@ seurat_object <- function(patient){
   #############################################################################################################################################
   ##### --             GoT             -- ##### 
   #############################################
-  load(paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient,"/GoT/",patient,"_GoT.Rdata"))
+  load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
   singlet <- AddMetaData(object = singlet, metadata = GOT)
   
-  
+
   return(singlet)
 }
 all <- seurat_object(patient)
@@ -178,6 +178,17 @@ all <- seurat_object(patient)
 Idents(all)<-"hash.ID"
 C1 <- subset(all, idents = c("Excipient","RCHOP")) 
 C2 <- subset(all, idents = c("Excipient","Pré-greffe"))
+
+## -- Extraction des LB -- ##
+Idents(all)<-"SingleR.calls"
+allB <- subset(all, idents = "B cells") 
+
+Idents(C1)<-"SingleR.calls"
+B1 <- subset(C1, idents = "B cells")
+
+Idents(C2)<-"SingleR.calls"
+B2 <- subset(C2, idents = "B cells") 
+
 
 ## -- Visualisation -- ##
 visualitation <- function(singlet){
@@ -226,8 +237,11 @@ visualitation <- function(singlet){
   return(singlet)
 }
 all <- visualitation(all)
+allB <- visualitation(allB)
 C1 <- visualitation(C1)
 C2 <- visualitation(C2)
+B1 <- visualitation(B1)
+B2 <- visualitation(B2)
 
 ## -- Monocle -- ##
 monocle <- function(singlet){
@@ -365,11 +379,11 @@ monocle <- function(singlet){
 data <- monocle(all)
 
 ## -- Save -- ##
-save(all, C1, C2, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+save(all, C1, C2, allB, B1, B2, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 write.csv(all@meta.data, file = paste0("/home/boris/Documents/analyse/metadata_matrix_",patient,".csv"))
 write.csv(as.matrix(all[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/count_matrix_", patient,".csv"))
 
-save(all, C1, C2, file = paste0(patient,"/R/singlet_",patient,".RData"))
+save(all, C1, C2, allB, B1, B2, file = paste0(patient,"/R/singlet_",patient,".RData"))
 write.csv(all@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))
 write.csv(as.matrix(all[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
 

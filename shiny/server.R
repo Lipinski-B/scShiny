@@ -12,11 +12,20 @@ shinyServer(function(input, output, session) {
     if(input$Conditions == "All"){
       singlet <<- all
     }
-    if(input$Conditions == "Excipient/Pré-greffe"){
+    if(input$Conditions == "Excipient/RCHOP"){
       singlet <<- C1
     }
-    if(input$Conditions == "Excipient/RCHOP"){
+    if(input$Conditions == "Excipient/Pré-greffe"){
       singlet <<- C2
+    }
+    if(input$Conditions == "B:All"){
+      singlet <<- allB
+    }
+    if(input$Conditions == "B:Excipient/RCHOP"){
+      singlet <<- B1
+    }
+    if(input$Conditions == "B:Excipient/Pré-greffe"){
+      singlet <<- B2
     }
     return(singlet)
   })
