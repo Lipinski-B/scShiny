@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  13 APR 2021 17:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  14 APR 2021 16:03
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/home/boris/Bureau/rapport/Rapport/ModÃ¨le.tex
-(/home/boris/Bureau/rapport/Rapport/ModÃ¨le.tex
+**/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.tex
+(/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.tex
 LaTeX2e <2020-10-01> patch level 4
 L3 programming layer <2021-02-18> (/home/boris/.TinyTeX/texmf-dist/tex/latex/base/report.cls
 Document Class: report 2020/04/10 v1.4m Standard LaTeX document class
@@ -369,7 +369,7 @@ Language: nil 2021/03/24 3.56 Nil language
 File: l3backend-pdftex.def 2021-03-18 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count300
 \l__pdf_internal_box=\box54
-) (/home/boris/Bureau/rapport/Rapport/ModÃ¨le.aux)
+) (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
 \openout1 = `ModÃ¨le.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 101.
@@ -442,7 +442,7 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 101.
 LaTeX Info: Redefining \pageref on input line 101.
 LaTeX Info: Redefining \nameref on input line 101.
- (/home/boris/Bureau/rapport/Rapport/ModÃ¨le.out) (/home/boris/Bureau/rapport/Rapport/ModÃ¨le.out)
+ (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.out) (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.out)
 \@outlinefile=\write3
 \openout3 = `ModÃ¨le.out'.
 
@@ -465,11 +465,11 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 131.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-{/home/boris/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map} </home/boris/Bureau/rapport/Rapport/faclogo.png> </home/boris/Bureau/rapport/Rapport/ilogo.jpg (PNG copy)>] (/home/boris/Bureau/rapport/Rapport/ModÃ¨le.toc)
+{/home/boris/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map} </home/boris/Bureau/scShiny/rapport/Rapport/faclogo.png> </home/boris/Bureau/scShiny/rapport/Rapport/ilogo.jpg (PNG copy)>] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.toc)
 \tf@toc=\write4
 \openout4 = `ModÃ¨le.toc'.
 
- (/home/boris/Bureau/rapport/Rapport/ModÃ¨le.lof)
+ (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.lof)
 \tf@lof=\write5
 \openout5 = `ModÃ¨le.lof'.
 
@@ -490,79 +490,57 @@ l.182 \item s
              hiny : 1.6.0 [1
 
 
- </home/boris/Bureau/rapport/Rapport/Rlogo.png>] [2]
-Overfull \hbox (12.56657pt too wide) in paragraph at lines 225--231
-\T1/cmr/m/n/12 s'accroitre par acquisition successive de mutations somatiques génération après génération [McGranahan
- []
-
-
-Overfull \hbox (9.11853pt too wide) in paragraph at lines 241--246
+ </home/boris/Bureau/scShiny/rapport/Rapport/Rlogo.png>] [2]
+Overfull \hbox (9.11853pt too wide) in paragraph at lines 246--248
 \T1/cmr/m/n/12 majeur lié à cette problématique biologique. Cela pourrait se montrer être décisif dans la compréhension
  []
 
-
-Overfull \hbox (7.7058pt too wide) in paragraph at lines 241--246
-\T1/cmr/m/n/12 de l'évolution tumorale face au traitement, et ainsi maximiser les chances de guérison des patients. 
- []
-
-
-Overfull \hbox (11.31139pt too wide) in paragraph at lines 247--252
-[]\T1/cmr/m/n/12 Aujourd'hui, l'efficacité technologiques des méthodes d'analyse en single-cell est telle qu'elles permettent
- []
-
 [3]
-Overfull \hbox (12.2944pt too wide) in paragraph at lines 258--259
-[]\T1/cmr/m/n/12 ce processus constituant le coeur analytiques des outils bioinformatiques développées par les technologies
+Overfull \hbox (17.41527pt too wide) in paragraph at lines 257--261
+[]\T1/cmr/m/n/12 L'utilisation du single cell impose l'optimisation du séquençage lui-même par l'utilisation d'identificateurs
+ []
+
+[4] [5]
+Overfull \hbox (47.8138pt too wide) in paragraph at lines 320--320
+[][]\T1/cmr/bx/n/12 Tendances d'expression géniques des populations cellulaire et identifications phénotypiques. 
  []
 
 
-Overfull \hbox (6.90843pt too wide) in paragraph at lines 272--281
-[]\T1/cmr/m/n/12 Pouvoir caractériser les différentes réponses de patients atteint de lymphome folliculaire à un traitement
+Overfull \hbox (23.42807pt too wide) in paragraph at lines 331--331
+[][]\T1/cmr/bx/n/12 Identification des ressources et intéraction avec un cluster de calcul à haute perfomance. 
  []
 
-
-Overfull \hbox (18.22047pt too wide) in paragraph at lines 272--281
-\T1/cmr/m/n/12 biologique. D'une manière globale, cela demande de savoir manipuler dfférents language de programation,
- []
-
-
-Overfull \hbox (5.07571pt too wide) in paragraph at lines 272--281
-\T1/cmr/m/n/12 Détecter et quantifier la présence des différentes populations de récepteurs BCR au sein des populations
- []
-
-[4]
-<figure/FL.png, id=93, 585.68813pt x 819.8128pt>
+<figure/FL.png, id=98, 585.68813pt x 819.8128pt>
 File: figure/FL.png Graphic file (type png)
 <use figure/FL.png>
-Package pdftex.def Info: figure/FL.png  used on input line 304.
+Package pdftex.def Info: figure/FL.png  used on input line 343.
 (pdftex.def)             Requested size: 468.55113pt x 655.85112pt.
-
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-(/home/boris/Bureau/rapport/Rapport/ModÃ¨le.bbl [5]
+(/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [6]
 
-LaTeX Warning: Text page 6 contains only floats.
+LaTeX Warning: Text page 7 contains only floats.
 
-[6 </home/boris/Bureau/rapport/Rapport/figure/FL.png>]) [7
+[7 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>]) [8
 
-] (/home/boris/Bureau/rapport/Rapport/ModÃ¨le.aux)
+] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
 Package rerunfilecheck Info: File `ModÃ¨le.out' has not changed.
 (rerunfilecheck)             Checksum: 082059C526E7A8656AC7DAA7D52D5061;1310.
  ) 
 Here is how much of TeX's memory you used:
- 12517 strings out of 480954
- 184175 string characters out of 5907138
- 511373 words of memory out of 5000000
+ 12526 strings out of 480954
+ 184421 string characters out of 5907138
+ 511396 words of memory out of 5000000
  29512 multiletter control sequences out of 15000+600000
  418940 words of font info for 60 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 71i,7n,79p,556b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,7n,79p,564b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2074.600pk>
-Output written on /home/boris/Bureau/rapport/Rapport/ModÃ¨le.pdf (8 pages, 327609 bytes).
+Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (9 pages, 337370 bytes).
 PDF statistics:
- 443 PDF objects out of 1000 (max. 8388607)
- 145 compressed objects within 2 object streams
- 28 named destinations out of 1000 (max. 500000)
+ 476 PDF objects out of 1000 (max. 8388607)
+ 160 compressed objects within 2 object streams
+ 37 named destinations out of 1000 (max. 500000)
  93 words of extra memory for PDF output out of 10000 (max. 10000000)
 

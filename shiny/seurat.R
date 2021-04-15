@@ -44,7 +44,7 @@ library(dplyr)
 library(cellrangerRkit)
 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
-patient <- "FL140304"
+patient <- "FL12C1888"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 

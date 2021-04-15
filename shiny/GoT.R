@@ -7,11 +7,12 @@ setwd(paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/r
 BC <- read.table(paste0("/home/boris/Documents/lipinskib/flinovo/data/", patient, "/GOT/barcodes/barcodes.txt"))
 
 got <- function(hotspot, colname){
-  result <- cbind(hotspot[,17],hotspot[,18],hotspot[,18])
+  result <- cbind(hotspot[,17],hotspot[,18],hotspot[,19], hotspot[,19])
   rownames(result) <- unique(unlist(str_split(hotspot[,1],";")))
-  colnames(result) <- c("WT","MUT","BCL2_L23L")
+  colnames(result) <- c("WT","MUT","BCL2_L23L","SUM")
   
   for (i in 1:length(rownames(result))){
+    result[i,4] <- sum(as.integer(result[i,1]),as.integer(result[i,2]),as.integer(result[i,3]))
     if(result[i,1]=="0" & result[i,2]!="0"){result[i,3]  <- colnames(result)[2]}
     else if(result[i,1]!="0" & result[i,2]=="0"){ result[i,3]  <- colnames(result)[1]} 
     else if(result[i,1]=="0" & result[i,2]=="0"){ result[i,3]  <-  "AMB"} 
@@ -28,17 +29,17 @@ got <- function(hotspot, colname){
     }
   }
   
-  final <- as.data.frame(result[,3])
-  count(final)
+  final <- data.frame(tomerge=result[,3], sum=result[,4])
   
   a <- as.data.frame(setdiff(BC$V1, rownames(final)))
   rownames(a) <- a$`setdiff(BC$V1, rownames(final))`
-  colnames(a) <- c("tomerge")
-  colnames(final) <- c("tomerge")
   a[,1] <- 'None'
+  a[,2] <- NA
+  
+  colnames(a) <- colnames(final) <- c("tomerge","sum")
   
   final <- rbind(final,a)
-  colnames(final) <- colname
+  colnames(final) <- c(colname, 'sum')
   
   return(final)
 }
@@ -55,13 +56,66 @@ EZH2_Y646H <- got(read.table("EZH2_Y646H.out/EZH2_Y646H.summTable.txt", header =
 EZH2_Y646N <- got(read.table("EZH2_Y646N.out/EZH2_Y646N.summTable.txt", header = T), "EZH2_Y646N")
 EZH2_Y646S <- got(read.table("EZH2_Y646S.out/EZH2_Y646S.summTable.txt", header = T), "EZH2_Y646S")
 
-GOT <- cbind(BCL2_L23L, BCL2_K22K, CD79B_Y696H, EZH2_A682G_1, EZH2_A682G_2, EZH2_A692V_1, EZH2_A692V_2, EZH2_Y646C, EZH2_Y646F, EZH2_Y646H, EZH2_Y646N, EZH2_Y646S)
 
+GOT<- cbind(BCL2_L23L[,1], BCL2_K22K[,1], CD79B_Y696H[,1], EZH2_A682G_1[,1], EZH2_A682G_2[,1], EZH2_A692V_1[,1], EZH2_A692V_2[,1], EZH2_Y646C[,1], EZH2_Y646F[,1], EZH2_Y646H[,1], EZH2_Y646N[,1], EZH2_Y646S[,1])
 rownames(GOT) <-paste0(rownames(GOT),"-1")
-save(GOT, file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
-dim(GOT)
+#save(GOT, file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
 
-#Histograme 1
+##################################################################################################################################################################
+######### Violin plot #########
+###############################
+library(ggplot2)
+a <- BCL2_L23L$sum[!is.na(BCL2_L23L$sum)]
+b <- data.frame(name=rep("BCL2_L23L",length(a)), sum=as.numeric(a))
+
+a <- BCL2_K22K$sum[!is.na(BCL2_K22K$sum)]
+c <- data.frame(name=rep("BCL2_K22K",length(a)), sum=as.numeric(a))
+
+a <- CD79B_Y696H$sum[!is.na(CD79B_Y696H$sum)]
+d <- data.frame(name=rep("CD79B_Y696H",length(a)), sum=as.numeric(a))
+
+a <- EZH2_A682G_1$sum[!is.na(EZH2_A682G_1$sum)]
+e <- data.frame(name=rep("EZH2_A682G_1",length(a)), sum=as.numeric(a))
+
+a <- EZH2_A682G_2$sum[!is.na(EZH2_A682G_2$sum)]
+f <- data.frame(name=rep("EZH2_A682G_2",length(a)), sum=as.numeric(a))
+
+a <- EZH2_A692V_1$sum[!is.na(EZH2_A692V_1$sum)]
+g <- data.frame(name=rep("EZH2_A692V_1",length(a)), sum=as.numeric(a))
+
+a <- EZH2_A692V_2$sum[!is.na(EZH2_A692V_2$sum)]
+h <- data.frame(name=rep("EZH2_A692V_2",length(a)), sum=as.numeric(a))
+
+a <- EZH2_Y646C$sum[!is.na(EZH2_Y646C$sum)]
+i <- data.frame(name=rep("EZH2_Y646C",length(a)), sum=as.numeric(a))
+
+a <- EZH2_Y646F$sum[!is.na(EZH2_Y646F$sum)]
+j <- data.frame(name=rep("EZH2_Y646F",length(a)), sum=as.numeric(a))
+
+a <- EZH2_Y646H$sum[!is.na(EZH2_Y646H$sum)]
+k <- data.frame(name=rep("EZH2_Y646H",length(a)), sum=as.numeric(a))
+
+a <- EZH2_Y646N$sum[!is.na(EZH2_Y646N$sum)]
+l <- data.frame(name=rep("EZH2_Y646N",length(a)), sum=as.numeric(a))
+
+a <- EZH2_Y646S$sum[!is.na(EZH2_Y646S$sum)]
+m <- data.frame(name=rep("EZH2_Y646S",length(a)), sum=as.numeric(a))
+
+n <- rbind(b,e)
+
+
+ggplot(n, aes(x=name,y=sum)) + 
+  geom_violin(trim = FALSE) +
+  geom_boxplot(width=.1, outlier.size=0, fill="grey50") +
+  stat_summary(fun.y=median, geom="point", fill="white", shape=21, size=4) +
+  xlab("Hotspot") +
+  ylab("Number of UMI/Cell") +
+  theme(axis.text = element_text(colour = "black"))# Violin plot basicp
+
+
+##################################################################################################################################################################
+######### Histograme 1 #########
+################################
 df2 <- data.frame(hotspot=rep(c("EZH2_A682G_1", "EZH2_A682G_2", "EZH2_A692V_1",  "EZH2_A692V_2", "EZH2_Y646C", "EZH2_Y646F", "EZH2_Y646N", "EZH2_Y646S"), each=4), 
                   condition=rep(c("AMB", "MUT", "None", "WT"),8),
                   frequence=c(round((table(GOT[,4])/length(GOT[,1]))*100,2),
