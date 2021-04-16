@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  14 APR 2021 16:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  16 APR 2021 17:01
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -500,47 +500,42 @@ Overfull \hbox (17.41527pt too wide) in paragraph at lines 257--261
 []\T1/cmr/m/n/12 L'utilisation du single cell impose l'optimisation du séquençage lui-même par l'utilisation d'identificateurs
  []
 
-[4] [5]
-Overfull \hbox (47.8138pt too wide) in paragraph at lines 320--320
-[][]\T1/cmr/bx/n/12 Tendances d'expression géniques des populations cellulaire et identifications phénotypiques. 
- []
-
-
-Overfull \hbox (23.42807pt too wide) in paragraph at lines 331--331
+[4] [5] [6] [7]
+Overfull \hbox (23.42807pt too wide) in paragraph at lines 394--394
 [][]\T1/cmr/bx/n/12 Identification des ressources et intéraction avec un cluster de calcul à haute perfomance. 
  []
 
-<figure/FL.png, id=98, 585.68813pt x 819.8128pt>
+<figure/FL.png, id=113, 585.68813pt x 823.57687pt>
 File: figure/FL.png Graphic file (type png)
 <use figure/FL.png>
-Package pdftex.def Info: figure/FL.png  used on input line 343.
-(pdftex.def)             Requested size: 468.55113pt x 655.85112pt.
+Package pdftex.def Info: figure/FL.png  used on input line 398.
+(pdftex.def)             Requested size: 468.55113pt x 658.8624pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-(/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [6]
+[8]
 
-LaTeX Warning: Text page 7 contains only floats.
+LaTeX Warning: Text page 9 contains only floats.
 
-[7 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>]) [8
+[9 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [10]) [11
 
 ] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
 Package rerunfilecheck Info: File `ModÃ¨le.out' has not changed.
 (rerunfilecheck)             Checksum: 082059C526E7A8656AC7DAA7D52D5061;1310.
  ) 
 Here is how much of TeX's memory you used:
- 12526 strings out of 480954
- 184421 string characters out of 5907138
- 511396 words of memory out of 5000000
+ 12532 strings out of 480954
+ 184474 string characters out of 5907138
+ 512396 words of memory out of 5000000
  29512 multiletter control sequences out of 15000+600000
  418940 words of font info for 60 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  71i,7n,79p,564b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
- </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2074.600pk>
-Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (9 pages, 337370 bytes).
+ </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2074.600pk>
+Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (12 pages, 359076 bytes).
 PDF statistics:
- 476 PDF objects out of 1000 (max. 8388607)
- 160 compressed objects within 2 object streams
- 37 named destinations out of 1000 (max. 500000)
+ 515 PDF objects out of 1000 (max. 8388607)
+ 173 compressed objects within 2 object streams
+ 43 named destinations out of 1000 (max. 500000)
  93 words of extra memory for PDF output out of 10000 (max. 10000000)
 

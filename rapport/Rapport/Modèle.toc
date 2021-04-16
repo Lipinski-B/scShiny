@@ -4,7 +4,7 @@
 \contentsline {section}{\numberline {3. }Section principale}{2}{section.0.3}%
 \contentsline {subsection}{\numberline {3.1 }Introduction}{2}{subsection.0.3.1}%
 \contentsline {subsection}{\numberline {3.2 }Matériels et méthodes}{5}{subsection.0.3.2}%
-\contentsline {subsection}{\numberline {3.3 }Résultats}{6}{subsection.0.3.3}%
-\contentsline {subsection}{\numberline {3.4 }Discussion}{6}{subsection.0.3.4}%
-\contentsline {subsection}{\numberline {3.5 }Conclusion}{6}{subsection.0.3.5}%
-\contentsline {section}{4.Bibliographie}{6}{subsection.0.3.5}%
+\contentsline {subsection}{\numberline {3.3 }Résultats}{8}{subsection.0.3.3}%
+\contentsline {subsection}{\numberline {3.4 }Discussion}{10}{subsection.0.3.4}%
+\contentsline {subsection}{\numberline {3.5 }Conclusion}{10}{subsection.0.3.5}%
+\contentsline {section}{4.Bibliographie}{10}{subsection.0.3.5}%

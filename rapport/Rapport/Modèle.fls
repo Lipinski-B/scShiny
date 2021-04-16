@@ -801,6 +801,7 @@ INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Rlogo.png
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Rlogo.png
 INPUT /home/boris/.TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecrm1440.tfm
 INPUT /home/boris/.TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecbx1440.tfm
+INPUT /home/boris/.TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecti1200.tfm
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png
@@ -810,12 +811,11 @@ INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Modèle.bbl
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Modèle.bbl
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Modèle.bbl
 INPUT /home/boris/.TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/eccc2074.tfm
-INPUT /home/boris/.TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecti1200.tfm
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Modèle.aux
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Modèle.out
 INPUT /home/boris/Bureau/scShiny/rapport/Rapport/Modèle.out
-INPUT /home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk
 INPUT /home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk
+INPUT /home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk
 INPUT /home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk
 INPUT /home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk
 INPUT /home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk

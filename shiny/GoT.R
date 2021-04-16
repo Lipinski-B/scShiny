@@ -101,7 +101,7 @@ l <- data.frame(name=rep("EZH2_Y646N",length(a)), sum=as.numeric(a))
 a <- EZH2_Y646S$sum[!is.na(EZH2_Y646S$sum)]
 m <- data.frame(name=rep("EZH2_Y646S",length(a)), sum=as.numeric(a))
 
-n <- rbind(b,e)
+n <- rbind(b,c)
 
 
 ggplot(n, aes(x=name,y=sum)) + 
@@ -112,6 +112,20 @@ ggplot(n, aes(x=name,y=sum)) +
   ylab("Number of UMI/Cell") +
   theme(axis.text = element_text(colour = "black"))# Violin plot basicp
 
+
+
+
+
+z <- read.table("/home/boris/Documents/lipinskib/flinovo/result/FL140304/mRNA/FL140304_CellrangerCount/outs/BCL2_nb_umi_figure1.txt", header = T)
+m <- data.frame(name=rep("BCL2",length(z$AAACCTGAGCGTTCCG)), sum=as.numeric(z$X1))
+
+ggplot(m, aes(x=name,y=sum)) + 
+  geom_violin(trim = FALSE) +
+  geom_boxplot(width=.1, outlier.size=0, fill="grey50") +
+  stat_summary(fun.y=median, geom="point", fill="white", shape=21, size=4) +
+  xlab("Hotspot") +
+  ylab("Number of UMI/Cell") +
+  theme(axis.text = element_text(colour = "black"))# Violin plot basicp
 
 ##################################################################################################################################################################
 ######### Histograme 1 #########
