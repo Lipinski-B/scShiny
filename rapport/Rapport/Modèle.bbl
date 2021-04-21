@@ -1,8 +1,144 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
-\bibitem{1}
-Nowell P.C.
-\newblock The clonal evolution of tumor cell populations.
-\newblock {\em Science}, 194(4260):23--28, 1976.
+\bibitem{MCGRANAHAN201515}
+McGranahan~N. et~Swanton~C.
+\newblock Biological and therapeutic impact of intratumor heterogeneity in
+  cancer evolution.
+\newblock {\em Cancer Cell}, 27(1):15--26, 2015.
+
+\bibitem{huet}
+Huet~S. et~al.
+\newblock A gene-expression profiling score for prediction of outcome in
+  patients with follicular lymphoma: a retrospective training and validation
+  analysis in three international cohorts.
+\newblock {\em {Lancet Oncology}}, 19(4):549 -- 561, April 2018.
+\newblock Erratum in: Correction to Lancet Oncol 2018; 19: 549-61. [Lancet
+  Oncol. 2018].
+
+\bibitem{Greaves}
+Greaves~M. et~Maley C.~C.
+\newblock Clonal evolution in cancer.
+\newblock {\em Nature}, 481:306--313, 2018.
+
+\bibitem{Salles}
+Salles~G. et~al.
+\newblock Rituximab maintenance for 2 years in patients with high tumour burden
+  follicular lymphoma responding to rituximab plus chemotherapy (prima): A
+  phase 3, randomised controlled trial.
+\newblock {\em Lancet}, 377:42--51, 01 2011.
+
+\bibitem{Hiddemann}
+Hiddemann~W. et~Cheson~B.
+\newblock How we manage follicular lymphoma.
+\newblock {\em Leukemia}, 28, 02 2014.
+
+\bibitem{Richard}
+Richard~A. et~al.
+\newblock Single-cell-based analysis highlights a surge in cell-to-cell
+  molecular variability preceding irreversible commitment in a differentiation
+  process.
+\newblock {\em PLOS Biology}, 14(12):1--35, 2016.
+\newblock e1002585.
+
+\bibitem{Hwang}
+Hwang B. Lee J.~H. et~Bang~D.
+\newblock Single-cell rna sequencing technologies and bioinformatics pipelines.
+\newblock {\em Experimental and Molecular Medicine}, 50(96), 2018.
+
+\bibitem{Tirosh}
+Tirosh~I. et~al.
+\newblock Dissecting the multicellular ecosystem of metastatic melanoma by
+  single-cell rna-seq.
+\newblock {\em Science}, 352(6282):189--196, 2016.
+
+\bibitem{Li}
+Li~H. et~al.
+\newblock Reference component analysis of single-cell transcriptomes elucidates
+  cellular heterogeneity in human colorectal tumors.
+\newblock {\em Nature Genetics}, 49:708--718, 2017.
+
+\bibitem{delloyebourgeois}
+Delloye-Bourgeois~C. et~al.
+\newblock {Microenvironment-Driven Shift of Cohesion/Detachment Balance within
+  Tumors Induces a Switch toward Metastasis in Neuroblastoma}.
+\newblock {\em {Cancer Cell}}, 32(4):427--443.e8, October 2017.
+
+\bibitem{Seurat}
+Hao~Y. et~al.
+\newblock Integrated analysis of multimodal single-cell data.
+\newblock {\em bioRxiv}, 2020.
+
+\bibitem{Ilicic}
+Ilicic~T. et~al.
+\newblock Classification of low quality cells from single-cell rna-seq data.
+\newblock {\em Genome Biology}, 17, 02 2016.
+
+\bibitem{Brennecke}
+Brennecke~P. et~al.
+\newblock Corrigendum: Accounting for technical noise in single-cell rna-seq
+  experiments.
+\newblock {\em Nature methods}, 10, 09 2013.
+
+\bibitem{Stuart}
+Stuart~T. et~al.
+\newblock Comprehensive integration of single cell data.
+\newblock 11 2018.
+
+\bibitem{Macosko}
+Macosko~E. et~al.
+\newblock Highly parallel genome-wide expression profiling of individual cells
+  using nanoliter droplets.
+\newblock {\em Cell}, 161:1202--1214, 05 2015.
+
+\bibitem{celldex}
+Dvir~A. et~al.
+\newblock Reference-based analysis of lung single-cell sequencing reveals a
+  transitional profibrotic macrophage.
+\newblock {\em Nat. Immunol.}, 20:163--172, 2019.
+
+\bibitem{Schmiedel}
+Schmiedel~B. et~al.
+\newblock Impact of genetic polymorphisms on human immune cell gene expression.
+\newblock {\em The Journal of Immunology}, 202(1 Supplement):182.27--182.27,
+  2019.
+
+\bibitem{Blueprint}
+Joost~H.A. Martens and Hendrik~G. Stunnenberg.
+\newblock Blueprint: mapping human blood cell epigenomes.
+\newblock {\em Haematologica}, 98(10):1487--1489, Oct. 2013.
+
+\bibitem{ENCODEProject}
+Bernstein et~al.
+\newblock An integrated encyclopedia of dna elements in the human genome.
+\newblock {\em NATURE}, 489(7414):57--74, September 2012.
+
+\bibitem{Escape}
+Vishwakarma~A. et~al.
+\newblock Mapping the immune landscape of clear cell renal cell carcinoma by
+  single-cell rna-seq.
+\newblock {\em bioRxiv}, 2019.
+
+\bibitem{GSEA1}
+Subramanian~A. et~al.
+\newblock Gene set enrichment analysis: A knowledge-based approach for
+  interpreting genome-wide expression profiles.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  102(43):15545--15550, 2005.
+
+\bibitem{GSEA2}
+Mootha~V. et~al.
+\newblock Pgc-1 alpha-responsive genes involved in oxidative phosphorylation
+  are coordinately downregulated in human diabetes.
+\newblock {\em Nature genetics}, 34:267--73, 08 2003.
+
+\bibitem{Hallmark1}
+Liberzon~A. et~al.
+\newblock {Molecular signatures database (MSigDB) 3.0}.
+\newblock {\em Bioinformatics}, 27(12):1739--1740, 2011.
+
+\bibitem{Hallmark2}
+Liberzon~A. et~al.
+\newblock The molecular signatures database hallmark gene set collection.
+\newblock {\em Cell Systems}, 1(6):417 -- 425, 2015.
 
 \end{thebibliography}

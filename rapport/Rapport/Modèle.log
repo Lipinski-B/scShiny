@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  16 APR 2021 17:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  21 APR 2021 10:54
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -478,7 +478,7 @@ Overfull \hbox (30.0pt too wide) in paragraph at lines 160--170
 []$[]$ 
  []
 
-<Rlogo.png, id=63, 726.715pt x 563.10374pt>
+<Rlogo.png, id=62, 726.715pt x 563.10374pt>
 File: Rlogo.png Graphic file (type png)
 <use Rlogo.png>
 Package pdftex.def Info: Rlogo.png  used on input line 173.
@@ -491,51 +491,74 @@ l.182 \item s
 
 
  </home/boris/Bureau/scShiny/rapport/Rapport/Rlogo.png>] [2]
-Overfull \hbox (9.11853pt too wide) in paragraph at lines 246--248
-\T1/cmr/m/n/12 majeur lié à cette problématique biologique. Cela pourrait se montrer être décisif dans la compréhension
+Overfull \hbox (18.38568pt too wide) in paragraph at lines 245--247
+\T1/cmr/m/n/12 majeurs liés à cette problématique biologique. Cela pourrait se montrer être décisif dans la compréhension
+ []
+
+
+Overfull \hbox (0.70853pt too wide) in paragraph at lines 251--255
+\T1/cmr/m/n/12 L'évolution complexe de populations cellulaires a aussi pu être caractérisée par méthode de séquençage
+ []
+
+
+Overfull \hbox (7.09575pt too wide) in paragraph at lines 251--255
+\T1/cmr/m/n/12 et d'analyse cellulaire RNA-seq en single-cell, permettant l'observation de trajectoires de différenciation
+ []
+
+
+Overfull \hbox (4.85468pt too wide) in paragraph at lines 251--255
+\T1/cmr/m/n/12 de lignées distinctes, de l'hétérogénéité transcriptionnelle associée au cycle cellulaire et des programmes
  []
 
 [3]
-Overfull \hbox (17.41527pt too wide) in paragraph at lines 257--261
+Overfull \hbox (17.41527pt too wide) in paragraph at lines 256--260
 []\T1/cmr/m/n/12 L'utilisation du single cell impose l'optimisation du séquençage lui-même par l'utilisation d'identificateurs
  []
 
-[4] [5] [6] [7]
-Overfull \hbox (23.42807pt too wide) in paragraph at lines 394--394
+[4] [5] [6] [7] [8]
+Overfull \hbox (2.11363pt too wide) in paragraph at lines 428--433
+\T1/cmr/m/n/12 centraliser, faciliter et accélérer la génération et la visualisation des différents résultats, une application
+ []
+
+[9]
+Overfull \hbox (23.42807pt too wide) in paragraph at lines 449--449
 [][]\T1/cmr/bx/n/12 Identification des ressources et intéraction avec un cluster de calcul à haute perfomance. 
  []
 
-<figure/FL.png, id=113, 585.68813pt x 823.57687pt>
+<figure/FL.png, id=178, 587.19376pt x 828.84656pt>
 File: figure/FL.png Graphic file (type png)
 <use figure/FL.png>
-Package pdftex.def Info: figure/FL.png  used on input line 398.
-(pdftex.def)             Requested size: 468.55113pt x 658.8624pt.
+Package pdftex.def Info: figure/FL.png  used on input line 453.
+(pdftex.def)             Requested size: 469.75565pt x 663.07814pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[8]
+(/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [10]
 
-LaTeX Warning: Text page 9 contains only floats.
+LaTeX Warning: Text page 11 contains only floats.
 
-[9 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [10]) [11
 
-] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
+Overfull \vbox (3.98923pt too high) has occurred while \output is active []
+
+ [11 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>] [12] [13
+
+]) [14] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
 Package rerunfilecheck Info: File `ModÃ¨le.out' has not changed.
 (rerunfilecheck)             Checksum: 082059C526E7A8656AC7DAA7D52D5061;1310.
  ) 
 Here is how much of TeX's memory you used:
- 12532 strings out of 480954
- 184474 string characters out of 5907138
- 512396 words of memory out of 5000000
- 29512 multiletter control sequences out of 15000+600000
+ 12581 strings out of 480954
+ 185022 string characters out of 5907138
+ 511396 words of memory out of 5000000
+ 29535 multiletter control sequences out of 15000+600000
  418940 words of font info for 60 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 71i,7n,79p,564b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,7n,79p,564b,450s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2074.600pk>
-Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (12 pages, 359076 bytes).
+Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (15 pages, 520539 bytes).
 PDF statistics:
- 515 PDF objects out of 1000 (max. 8388607)
- 173 compressed objects within 2 object streams
- 43 named destinations out of 1000 (max. 500000)
+ 617 PDF objects out of 1000 (max. 8388607)
+ 237 compressed objects within 3 object streams
+ 69 named destinations out of 1000 (max. 500000)
  93 words of extra memory for PDF output out of 10000 (max. 10000000)
 

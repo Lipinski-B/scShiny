@@ -3,44 +3,46 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Modèle.aux
 The style file: unsrt.bst
 Database file #1: mabiblio.bib
-You've used 1 entry,
+Warning--empty journal in Stuart
+You've used 24 entries,
             1791 wiz_defined-function locations,
-            453 strings with 3652 characters,
-and the built_in function-call counts, 224 in all, are:
-= -- 21
-> -- 4
+            632 strings with 7347 characters,
+and the built_in function-call counts, 4754 in all, are:
+= -- 456
+> -- 100
 < -- 0
-+ -- 2
-- -- 1
-* -- 17
-:= -- 41
-add.period$ -- 3
-call.type$ -- 1
-change.case$ -- 1
++ -- 49
+- -- 25
+* -- 327
+:= -- 769
+add.period$ -- 74
+call.type$ -- 24
+change.case$ -- 24
 chr.to.int$ -- 0
-cite$ -- 1
-duplicate$ -- 9
-empty$ -- 23
-format.name$ -- 1
-if$ -- 45
+cite$ -- 25
+duplicate$ -- 209
+empty$ -- 515
+format.name$ -- 25
+if$ -- 1045
 int.to.chr$ -- 0
-int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 8
-num.names$ -- 1
-pop$ -- 1
+int.to.str$ -- 24
+missing$ -- 24
+newline$ -- 125
+num.names$ -- 24
+pop$ -- 30
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 3
+skip$ -- 76
 stack$ -- 0
-substring$ -- 19
-swap$ -- 1
+substring$ -- 420
+swap$ -- 23
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 0
-while$ -- 3
-width$ -- 2
-write$ -- 13
+warning$ -- 1
+while$ -- 47
+width$ -- 26
+write$ -- 266
+(There was 1 warning)
