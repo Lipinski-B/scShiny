@@ -42,21 +42,16 @@ library(dashboardthemes)
 library(reticulate)
 
 load(file = paste0("/home/boris/Documents/analyse/singlet_FL140304.RData"))
-
-meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase", "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")
-#meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
-annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
-colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
-hallmark = all@tools$hallmarks
+meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "clonotype_id", "Phase", "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")
 
 metadata <- c()
-for(i in 1:length(colnames(all@meta.data))){
-if (length(levels(as.factor(all@meta.data[[i]]))) > 1 && length(levels(as.factor(all@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(all@meta.data[[1]])))==F ){
-    metadata <- c(metadata, colnames(all@meta.data)[i])
-  }
-}
+for(i in 1:length(colnames(all@meta.data))){if (length(levels(as.factor(all@meta.data[[i]]))) > 1 && length(levels(as.factor(all@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(all@meta.data[[1]])))==F ){metadata <- c(metadata, colnames(all@meta.data)[i])}}
 
 List <- list()
 for(i in 1:length(metadata) ){List[[metadata[i]]] <- levels(as.factor(all@meta.data[[metadata[i]]]))}
 
 singlet <- all
+#meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
+#annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
+#colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
+#hallmark = all@tools$hallmarks

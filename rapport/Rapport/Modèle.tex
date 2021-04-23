@@ -19,6 +19,8 @@
 \usepackage[T1]{fontenc}
 \usepackage{xcolor}
 \usepackage{babel} 
+\usepackage{multirow}
+\usepackage{float} 
 
 %%%% Load logo %%%%
 \newcommand{\faclogo}{\protect\includegraphics[height=25.9ex,keepaspectratio]{faclogo.png}}
@@ -161,12 +163,14 @@
 \section*{Résumé}
 \tableofcontents
 \listoffigures
+\end{minipage}
+
 %\vspace{6cm}
 \section{Liste des abréviations utilisées}
 \begin{itemize}
-\item item 1
+\item FL : Follicular Lymphoma
+\item FLINOVO : Follicular Lymphoma In Ovo
 \end{itemize}
-\end{minipage}
 
 \section{Liste des logiciels utilisés}
 \begin{itemize}
@@ -255,10 +259,10 @@ La profondeur analytique que permettent les techniques en single cell semblent d
 
 L'utilisation du single cell impose l'optimisation du séquençage lui-même par l'utilisation d'identificateurs moléculaires uniques (UMI). 
 L’incorporation d’un barcode dans l’étape de reversetranscription du séquençage permet d'assigner chaque read séquencé issu de transcrits exprimés à la cellule d’origine.  
-La précision du comptage de transcrits et la reproductibilité de quantification en single-cell s'en retrouve donc bien meilleure, tout en supprimant efficacement les biais de réplicats induits par la PCR, vecteur de surexpression génique factice\cite{Hwang}.
+La précision du comptage de transcrits et la reproductibilité de quantification en single-cell s'en retrouve donc bien meilleure, tout en supprimant efficacement les biais d'amplification induits par la PCR, vecteur de surexpression génique factice\cite{Hwang}.
 C’est ainsi que des comportements et sous-types de populations cellulaires peuvent être identifiés sur la base d’observation des résultats d’analyses transcriptomiques.\cite{Tirosh}\cite{Li}
 
-C'est en prenant parti des avancées technologiques que des industries telles que 10X Genomics ont pu de s'agrandir, mettant toujours à disposition des techniques de séquençage de pointe utilisable pour la recherche scientifique, notamment en single cell. 
+C'est en prenant parti de ces avancées technologiques que des industries telles que 10X Genomics ont pu de s'agrandir, mettant toujours à disposition des techniques de séquençage de pointe utilisable pour la recherche scientifique, notamment en single cell. 
 Les outils analytiques proposés par 10X Genomics permettent l'investigation d'analyse intégrative en single cell de populations tumorales à des niveaux phénotypiques, transcriptomiques et génétiques, 
 et leur application se trouve donc être en adéquation parfaite notre projet.
 
@@ -278,14 +282,14 @@ mais aussi d'avoir le recul nécessaire pour choisir pertinemment les outils et 
 D'autre part et plus précisément, de nombreuses recherches complémentaires sont nécessaires de manière à donner la plus grande profondeur possible à nos analyses. 
 Ce travail d'approfondissement divise notre objectif en plusieurs taches concrètes nécessitant à la fois d'être en mesure de reproduire des analyses issues de la littérature mais aussi de pouvoir se les approprier. 
 
-Le but est donc tout d'abord de mettre en évidence les résultats d'observations et comparaisons des tendances d'expression géniques issues des analyses en single-cell des différentes populations phénotypiques cellulaires pour chaque patient intra et inter groupes cliniques.
-Ces résultats se complètent grâce à des analyses d'enrichissements de gènes afin d'éclaircir la nature des fonctions cellulaires les plus impactées entre les 2 groupes de patients.
-En parallèle, il s'agit aussi de mettre en place le génotypage du transcriptome à l'échelle de la cellule unique de hotspot d'intérêt présent dans certains gènes à tendance anti-apoptotique ou oncogène qui joueraient un rôle déterminant dans l'apparition de lymphome folliculaire.
+Le but est donc tout d'abord de mettre en évidence les résultats d'observations et comparaisons des tendances d'expression géniques issues des analyses en single-cell des différentes populations phénotypiques cellulaires pour chaque patient, et comparer ces tendances intra et inter groupes cliniques.
+Ces résultats se complètent grâce à des analyses d'enrichissements de gènes afin d'éclaircir la nature des fonctions cellulaires les plus impactées.
+En parallèle, il s'agit aussi de mettre en place le génotypage du transcriptome à l'échelle de la cellule unique de hotspots d'intérêts présent dans certains gènes à tendance anti-apoptotique ou oncogène qui joueraient un rôle déterminant dans l'apparition de lymphome folliculaire.
 La détection et la quantification de la présence des différentes populations de récepteurs BCR au sein des populations polyclonales des lymphocytes B issus des populations cellulaires tumorales sont aussi à réaliser en tandem, 
 tout comme l'analyse de l'état du cycle cellulaire dans lequel ces dernières se trouvent.
 
-La superposition de l'ensemble de ces informations et d'autres pour chacune des cellules d'intérêt constituent aussi en soi une tache à réaliser, relatant d'un aspect plus technique que biologique. 
-Cette dernière tache introduit la besoin d'aborder la problématique de clusterisation et de réduction de dimension de notre jeu de données, afin d'identifier quelles informations expliquent le plus de variance. 
+La superposition de l'ensemble de ces informations et d'autres pour chacune des cellules d'intérêt constitue aussi en soi une tache à réaliser, relatant d'un aspect plus technique que biologique. 
+Cette dernière tache introduit le besoin d'aborder la problématique de clusterisation et de réduction de dimension de notre jeu de données, afin d'identifier quelles informations expliquent le plus de variance. 
 De plus, il est nécessaire de mettre en place des outils analytiques purement technique de manière à rendre la réalisation la visualisation des analyses simples, facilement compréhensible, automatisable et à la portée de biologiste et médecin non bio-informaticien.
 Dans le prolongement des taches techniques, des compétences purement informatiques sont requises. L'identification pertinante des ressources CPU, RAM et stockage a dû être nécessaires afin de rendre les calcules réalisables, 
 car un tel projet basé sur l'utilisation des techniques en single cell amène forcément à la génération d'un grand nombre de données extrêmement volumineuses.
@@ -311,7 +315,7 @@ Ainsi, pour chaque patient nous obtenons à ce stade 3 différentes populations 
 une première non soumise à la greffe (condition contrôle), une seconde soumise à la greffe mais non soumise au traitement (condition excipient) et une dernière soumise à la fois à la greffe et au traitement (condition RCHOP).
 Ce protocole expérimental est appliqué en vue de nous permettre à termes de distinguer les effets propres à la greffe et propres au traitement.
 S'ensuit une étape de marquage par anticorps barcodés via un tag moléculaire propre à chaque condition, de sorte à labéliser chaque cellule comme appartenant à une condition particulière.
-Enfin, les 3 populations cellulaires sont regroupées en une.
+Enfin, les 3 populations cellulaires sont regroupées en une, chacune constitué à hauteur de 15 000 cellules, pour un total d'un mélange de 45 000 cellules utilisé par la suite.
 
 
 \subparagraph*{Séquençage des libraries.}
@@ -324,7 +328,8 @@ Les transcrits sont ensuite transformés en cDNA, amplifiés et fragmentés sur 
 Enfin des amorces R1 et R2 sont respectivement ajoutées aux extrémités de sorte à rendre le séquençage Illumina réalisable par l'entreprise Macrogène. 
 Ce dernier est réalisé en paired-end jusqu'à hauteur de 150 paires de bases par molécules de cDNA. Ainsi 3 fichiers de sortis brutes au format BCL résultent du séquençage : 
 un fichier R1 contenant l'information de label cellulaire dans lequel n'est gardé que les premières 26 paires de bases correpondant aux séquences nucléotidiques consécutives des barcodes et UMI relatives aux transcrits, 
-un fichier R2 contenant l'information d'expression cellulaire issue des fragments de transcrits (ou reads) d'une longueur de 150 paires de bases, et un fichier d'index.  
+un fichier R2 contenant l'information d'expression cellulaire issue des fragments de transcrits (ou reads) d'une longueur de 150 paires de bases, et un fichier d'index. 
+Les flowcells utilisées ici permettent une profondeur de séquençage à hauteur de 750 millions de read.
 
 Le marquage par anticorps barcodés appliqué plus tôt permet l'élaboration d'une seconde librarie cellulaire, la librarie HTO. Celle-ci est réalisée en parallèle de la librarie mRNA, et permet la réalisation en aval d'une étape de démultiplexage.
 Lors de la lyse cellulaire, le tag moléculaire des anticorps barcodés marqué à la cellule est lui aussi soumis à une double labélisation, à l'image des transcrits grace au matériel de la perle 10X.  
@@ -448,7 +453,13 @@ Enfin un dernier panel expose des figures permettant de comparer visuellement le
 
 \subsubsection*{Identification des ressources et intéraction avec un cluster de calcul à haute perfomance.}
 
-\begin{figure}[h!]
+En terme de stockage et puissance de calcul une évaluation des besoin à du être réaliser. 
+Ainsi, 6To de stockage, 200 Go de RAM par job, et 15 000 heures de calculs sur CPU ont été demandé pour la bonne réalisation de toutes les analyses pour chaqu'un des 30 patients.
+Ces ressources nous ont été spécifiquement alloué sur le Centre de Calcul de l’IN2P3 (CC-IN2P3), qui est une infrastructure de recherche nationale appartenant au CNRS.
+Le role du CC-IN2P3 conçoit et opère un ensemble de services, dont un système de stockage de masse et des moyens de traitement de grandes masses de données.
+L'ensemble de nos scripts bash sont directement élaborés via ordonanceur pour rendre leurs executions réalisable depuis le cluster. 
+
+\begin{figure}[H]
 \centering 
 \includegraphics[scale=0.8]{figure/FL}
 \caption{\small{Workflow des analyses du projet FLINOVO}}
@@ -458,32 +469,231 @@ Enfin un dernier panel expose des figures permettant de comparer visuellement le
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Résultats}
-Une section présentant les résultats obtenus ;
 
-\subsubsection*{1.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsubsection*{Présentation des 2 patients}
+Le temps de préparation des librairies et du séquençage s'élevant jusqu'à 2 mois pour un patient, seulement 2 échantillons tumoraux de patients ont pu être séquencé et annalysé pour le moment : 
+les patients FL12C1888 et FL140304 issues du groupe de patient non répondeur au RCHOP. Chacun des 2 patients à subit a un moment donnée une rechute lié à la malaide même s'ils sont tout 2 traités au RCHOP.
+L'ensemble des analyses, résultats et discussions présent dans ce rapport s'élaborera seulement autour de ces 2 patients.   
 
 
-\subsubsection*{2.}
-%\begin{figure}[h!]
-%   \begin{minipage}[c]{.46\linewidth}
-%     \centering 
-%     \includegraphics[scale=0.4]{figure/GSEA_tot1}
-%     \caption{\small{Heatmap de corrélation des scores entre chacune des 19 activités en utilisant la méthode GSEA.}}
-%     \label{I1}
-%   \end{minipage} \hfill
-%   \begin{minipage}[c]{.46\linewidth}
-%     \centering 
-%     \includegraphics[scale=0.4]{figure/AUC_tot1}
-%     \caption{\small{Heatmap de corrélation des scores entre chacune des 19 activités en utilisant la méthode AUCell.}}
-%     \label{I1}
-%   \end{minipage}
-%\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{La greffe introduit un biais de mort cellulaires confondue avec les effets du RCHOP.}
+%\subsubsection*{Alignement des lectures sur le génome de référence via CellRanger Count}
+
+Le point de départ de toutes analyses consiste pour chaque patient en l'alignement des lectures issus du séquençage la librarie mRNA sur le génome de référence vien CellRanger count.
+La figure 2 résume différentes informations issus des rapports élaborée par le programme en sortie de cette étape.
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tabular}{|l||c|c|}
+			\hline
+			%\multicolumn{3}{|c|}{Informations issues de CellRanger} \\ \hline
+			Patient 											& FL12C1888 	& FL140304 		\\ \hline
+			Nombre de reads séquencés							& 688 776 340 	& 743 651 875 	\\ \hline
+			Pourcentage de reads mappés sur le génome 			& 86.2\% 		& 89.5\% 		\\ \hline
+			Nombre de cellules estimé 							& 10 376 		& 5 793 		\\ \hline
+			Moyenne des reads par cellule 						& 66 382 		& 128 371 		\\ \hline
+			Médianne du nombre d'UMI par cellule 				& 5 144		 	& 5 707 		\\ \hline
+			Médianne du nombre de gènes exprimés par cellule 	& 1 860 		& 1 845 		\\ \hline
+			Nombre total de gènes détectés					 	& 21 897 		& 21 309 		\\ \hline
+			%\multirow{2}{*}{Attaquants} & ST & Alan Smith \\ & ST & Mark Viduka \\ \hline
+		\end{tabular}
+	\end{center}
+	\caption{\small{Informations d'alignement des rapports de CellRanger count pour les 2 patients d'intérets}}
+	\label{I1}
+\end{figure}
+
+Comme attendu, nous avons dans les 2 cas un nombre de read séquencé aux alentours de 700 millions, dont plus de 85\% se retrouve alignés
+sur le génome de référence. On obtient approximativement un rapport de 2 concernant le nombre de cellules estimé entre les 2 patients :
+10 376 pour le patient FL12C1888 contre 5 793 pour FL140304. Etant donnée l'équivalence du nombre de read retrouvé et 
+la différence du nombre de cellule estimé chez les 2 patients, il est normale d'obtenir un rapport inversement proportionnel
+concernant la moyenne des reads comptés par cellule, respectivement de 66 382 et de 128 371 pour FL12C1888 et FL140304.
+La médianne du nombre d'UMI par cellule, du nombre de gènes exprimés par cellule et le nombre total de gènes détectés sont quant
+à eux équivalents et tous assez élevés chez les 2 patients, indiquant une excelente qualité et quantité de matériel biologique
+disponible pour réaliser au mieux les analyses qui suivent.
+
+Ainsi pour chaque patient, des objects Seurat sont créer à partir du chargement des matrices gènes/cellules issues de CellRanger, et les premières étapes du workflow sont appliquées.
+Le résultats des application de filtres cellulaires sur la base de mesures de contrôle de qualité pour chacun des patients est montré figure 3.
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tabular}{|l||c|c|}
+			\hline
+			Patient 											& FL12C1888 	& FL140304 		\\ \hline
+			Nombre de cellules chargé avant séquençage			& 45 000 		& 45 000 		\\ \hline
+			Nombre de cellules estimé par CellRanger 			& 10 376 		& 5 793 		\\ \hline
+			Nombre de bille double soustraite					& 913 			& 519	 		\\ \hline
+			Nombre de bille vide soustraite						& 418 			& 111			\\ \hline
+			Nombre de bille simple gardée						& 8 975 		& 5 093 		\\ \hline
+			Nombre de cellule morte	soustraite					& 1 699 		& 2 166 		\\ \hline \hline
+			Nombre de cellule finale analysable					& 7 276 		& 2 927 		\\ \hline
+			Nombre total de gènes détectés						& 18 442 		& 17 564 		\\ \hline
+		\end{tabular}
+	\end{center}
+	\caption{\small{Nombre gène et de cellule analysable après applications de filtres QC pour les 2 patients d'intérets}}
+	\label{I1}
+\end{figure}
+
+Au final pour les patients FL12C1888 et FL140304, on garde respectivement 70.12\% et et 50.5\% du nombre totale de cellules
+estimé par CellRanger count. La filtration basé sur la présence du nombre de cellule dans chaque soustrait un pourcentage
+de cellules équivalents pour chacun des 2 patients, représentant en moyenne une soustraction de 8.85\% issus du comptage de bille double 
+et une soustraction 3\% issus du comptage de bille vide. Ainsi en moyenne on garde 87.2\% de bille supportant l'inclusion d'une seule et unique cellule à l'intérieur. 
+Le pourcentage qui diffère le plus entre les 2 patients est celui du nombre de cellule morte soustraite, 
+représentatif de l'application du filtre gardant uniquement les cellules dont le pourcentage de lectures issus de 
+l'expression du génome mitochondrial correspondent à moins de 5\% des lecture totales.
+Ce pourcentage de cellule s'élève à hauteur de 37.4\% du nombre de cellule issus de CellRanger pour FL140304
+contre seulement 16.4\% pour FL12C1888. De plus, ces 2 derniers pourcentages étant à la fois bien différent et bien plus élevé que les autres,
+on peut supposer que la majorité de la perte de cellule est expliqué par un phénomène biologique qui impacte la durée de vie 
+des cellules plutot qu'un biais de manipulation technique.
+
+La figure 4 indique visuellement la proportion de cellules gardé après application du filtre basé sur le pourcentage de lectures issus de l'expression du génome mitochondrial.
+
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.28]{figure/QC.png}
+\caption{\small{Violin Plot représentant la distribution des cellules selon leur proportion à exprimé des lectures issus de l'expression du génome mitochondrial, dans chacunes des 3 conditions expérimentales, pour FL12C1888 à gauche et FL140304 à droite. Haut : distribution avant filtration ; Bas : distribition après filtration}}
+\label{I1}
+\end{figure}
+
+Sur les différent Violin Plot, on peut observer et confirmer la sauvegarde d'une grande proportion des cellules présentes dans nos objet Seurat initiaux, ce qui est un bon point.
+On peut aussi s'apercevoir que le seuil des 5\% supprime une plus grande partie de la distribution des cellules dans les conditions Excipient et RCHOP que dans la condition Pré-greffe.
+Les cellules soumises à une condition de greffe aurait tendance à mourir plus rapidement que les cellules non gréffées. 
+Une hypothèse serait de dire que le stress lié à la greffe impacte donc négativement les cellules, les amenants à mourir plus rapidement.
+Ce phénomène viendrait se confondre avec les effets néfaste des propriétés tumorales propre au lyphome folliculaire,
+et ajoute un premier biais sur l'évaluation des effets propre au RCHOP sur nos cellules.
+
+
+L'application des autres étapes du workflow nous permet d'obtenir des objets Seurat élaborés. 
+Cela nous a naturellement amené à construire des sunbursts à partir des information retrouvé dans les différents niveaux de métadonnées.
+Ainsi la figure 5 présente et quantifie les différentes populations cellulaires retrouvable dans chacunes des conditions expérimentales,
+après filtration de controle qualité.
+
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.21]{figure/sunburst.png}
+\caption{\small{Sunburst descriptifs des métadonnées pour chaque patient.}}
+\label{I1}
+\end{figure}
+
+L'analyse des sunbursts indique pour chacun des patients la présence des cellule des différentes conditions expérimentales en proportion similaires.
+En effet, dans les 2 cas la majorité des cellules retrouvés sont des cellule issus de la condition pré-greffe, représentant grossièrement la premiere moitié des cellules.
+La seconde moitié est divisée équitablement entre les condition Excipient et RCHOP. Ainsi on retrouve des ratios de proportion de cellules à hauteur de 
+1:2 pour la condition pré-greffe, et de 1:4 pour les condition RCHOP et Excipient.
+Ce dernier point conforte l'hypothèse selon laquelle la greffe véhicule les cellules vers une mort cellulaire plus rapide.
+Plus précisément, il semblerait qu'un plus gand nombre de sous-types cellulaire soit retrouvable dans la condition pré-greffe, contrairement aux 2 autres conditions.
+En effet, les proportions des cellules types lymphocyte B, TCD4+ et TCD8+ sont assez grande pour être clairement notable en condition pré-greffe, 
+tandis que les populations cellulaire types lymphocyte TCD4+ et TCD8+ sont bien plus rares voire parfois inexistantes dans les 2 autres conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Réduction de dimension + expression de gène :}
+\subparagraph*{sortie brute} 
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.23]{figure/sortie_brute.png}
+\caption{\small{PCA}}
+\label{I1}
+\end{figure}
+		
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subparagraph*{en 3D}
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.23]{figure/3D.png}
+\caption{\small{PCA 3D}}
+\label{I1}
+\end{figure}
+	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ \subparagraph*{Réduction avec les 2 PCA} 
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.21]{figure/facteur.png}
+\caption{\small{Explication des facteurs en composantes principales}}
+\label{I1}
+\end{figure}
+	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subparagraph*{Réduction qu'avec les B : excipient / RCHOP}
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.24]{figure/B_ex_rchop.png}
+\caption{\small{Réduction qu'avec les B : excipient / RCHOP}}
+\label{I1}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subparagraph*{réduction qu'avec les B : excipient / pré-greffe}
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.236]{figure/B_ex_pg.png}
+\caption{\small{Réduction qu'avec les B : excipient / pré-greffe}}
+\label{I1}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subparagraph*{Explication du facteur de division des B pour patient FL12C1888}
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.35]{figure/B_ex_pg_FL12_chain.png}
+\caption{\small{Explication du facteur de division des B pour patient FL12C1888 : excipient / pré-greffe}}
+\label{I1}
+\end{figure}
+
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.35]{figure/B_ex_rchop_FL12_chain.png}
+\caption{\small{Explication du facteur de division des B pour patient FL12C1888 : excipient / RCHOP}}
+\label{I1}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Expression de gènes}
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.28]{figure/Expression.png}
+\caption{\small{Heatmap d'expression}}
+\label{I1}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Enrichissement de gènes}
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.22]{figure/Enrichissement.png}
+\caption{\small{Heatmap d'enrichissement}}
+\label{I1}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{GoT}
+\begin{figure}[h!]
+	\begin{minipage}[c]{.55\linewidth}
+	  \centering 
+	  \includegraphics[scale=0.4]{figure/Got_hotspot.png}
+	  \caption{\small{Histogramme GoT.}}
+	  \label{I1}
+	\end{minipage} \hfill
+	\begin{minipage}[c]{.4\linewidth}
+	  \centering 
+	  \includegraphics[scale=0.3]{figure/GOT.png}
+	  \caption{\small{Violin plot GoT.}}
+	  \label{I1}
+	\end{minipage}
+\end{figure}
 
 %\begin{itemize}
 %\item Groupe 1A : \textit{Blablabla}
 %\end{itemize}
-
-%\paragraph*{Relation entre activités et phase du cycle cellulaire.}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

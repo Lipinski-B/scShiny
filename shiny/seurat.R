@@ -42,9 +42,12 @@ library(cowplot)
 library(clues)
 library(dplyr)
 library(cellrangerRkit)
+library(treemap)
+library(sunburstR)
 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
-patient <- "FL12C1888"
+siege <- c("FL140304","FL12C1888")
+patient <- siege[1]
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -130,7 +133,7 @@ seurat_object <- function(patient){
   names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
   singlet <- AddMetaData(singlet, ES)
   singlet@tools$hallmarks <- names(ES)
-  singlet@tools$meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id", "Phase", "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")
+  singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "clonotype_id", "Phase", "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")
   
   
   #############################################################################################################################################
@@ -169,7 +172,6 @@ seurat_object <- function(patient){
   load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
   singlet <- AddMetaData(object = singlet, metadata = GOT)
   
-
   return(singlet)
 }
 all <- seurat_object(patient)
@@ -189,16 +191,54 @@ B1 <- subset(C1, idents = "B cells")
 Idents(C2)<-"SingleR.calls"
 B2 <- subset(C2, idents = "B cells") 
 
-
 ## -- Visualisation -- ##
 visualitation <- function(singlet){
   #annotations <- read.csv("/home/boris/Bureau//scShiny/annotation_FindAllMarkers.csv")
-  
+  make_sunburst_data <- function(met){
+    df <- data.frame(ids=character(), labels=character(), parents=character(), values=integer(),stringsAsFactors=FALSE)
+    
+    df0 <- met %>% mutate(path = paste(patient,  sep=";")) %>% dplyr::select(path, value)
+    df1 <- met %>% mutate(path = paste(patient, etat,  sep=";")) %>% dplyr::select(path, value)
+    df2 <- met %>% mutate(path = paste(patient, etat, condition,  sep=";")) %>% dplyr::select(path, value)
+    df3 <- met %>% mutate(path = paste(patient, etat, condition, phénotype, sep=";")) %>% dplyr::select(path, value)
+    df4 <- met %>% mutate(path = paste(patient, etat, condition, phénotype, sub, sep=";")) %>% dplyr::select(path, value)
+    df5 <- met %>% mutate(path = paste(patient, etat, condition, phénotype, sub, phase, sep=";")) %>% dplyr::select(path, value)
+    
+    for (dfX in c(df0,df1,df2,df3,df4,df5)) {
+      xnames <- row.names(table(dfX))
+      max <- 0
+      
+      for (rows in xnames) {
+        orga = strsplit(rows,";")
+        if (max < length(orga[[1]])){max = length(orga[[1]])}}
+      
+      for (i in 1:max){
+        for (rows in xnames) {
+          orga = strsplit(rows,";")
+          if ((length(orga[[1]]))==i){
+            c = ""
+            c2 = ""
+            for (j in 1:i){c = paste0(c,orga[[1]][j],"-")}
+            for (k in 1:i-1){c2 = paste0(c2,orga[[1]][k],"-")}
+            c = str_sub(c,1,-2)
+            c2 = str_sub(c2,2,-2)
+            df[rows,"labels"]= orga[[1]][i]
+            df[rows,"ids"]=c
+            df[rows,"parents"]=c2
+          }
+        }
+      }
+    }
+    df <- df[-2,]
+    df$values <- c(table(df0)[,1],table(df1)[,1],table(df2)[,1],table(df3)[,1],table(df4)[,1],table(df5)[,1])
+    return(df)
+  }
+
   ## -- ADD MITOCHONDRIAL ANALYSES -- ##
   singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
   singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "HTO_maxID")
   singlet <- subset(singlet, subset = nFeature_RNA > 50 & nFeature_RNA < 2500 & percent.mt < 5)            # QC Filter : tester 15%
-  
+  singlet
   ## -- ADD PCA TO SEURAT OBJECT -- ## 
   # Pre-processing  
   singlet <- NormalizeData(singlet, normalization.method = "LogNormalize", scale.factor = 10000) 
@@ -233,6 +273,16 @@ visualitation <- function(singlet){
   singlet@meta.data$HTO_classification <- NULL
   singlet@meta.data$RNA_snn_res.0.5 <- NULL
   singlet@meta.data$hash.ID <- NULL
+  
+  colnames(singlet@meta.data)[9] <- "Phénotype"
+  colnames(singlet@meta.data)[5] <- "Condition"
+
+  ## -- Sunburst -- ## 
+  met <- data.frame(
+    patient = singlet@meta.data$orig.ident, etat =  singlet@meta.data$Greffe, condition = singlet@meta.data$HTO_maxID, phénotype = singlet@meta.data$SingleR.calls, sub = singlet@meta.data$SingleR.calls.fine, phase = singlet@meta.data$Phase,
+    value = rep(1, length(singlet@meta.data$SingleR.calls)), stringsAsFactors = FALSE
+  )
+  singlet@tools$sunburst <- make_sunburst_data(met)
   
   return(singlet)
 }
@@ -378,6 +428,11 @@ monocle <- function(singlet){
 }
 data <- monocle(all)
 
+
+
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
+######## Other                                                                                                                         ######## 
+######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
 ## -- Save -- ##
 save(all, C1, C2, allB, B1, B2, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
 write.csv(all@meta.data, file = paste0("/home/boris/Documents/analyse/metadata_matrix_",patient,".csv"))
@@ -401,6 +456,7 @@ for (elm in 1:length(names(summary[[patient]]))) {
 result[[patient]] <- resume
 save(result, file = "/home/boris/Documents/analyse/shiny/result.RData")
 load(file = "/home/boris/Documents/analyse/shiny/result.RData")
+
 
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -538,6 +594,7 @@ FeaturePlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='tsn
 VlnPlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), group.by = "HTO_classification")
 FeaturePlot(all, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197")) # Expression marqueurs T cells
 VlnPlot(all, features = c("CD3E", "CD3D", "CD56", "CD4", "CD2", "CD25", "CD62L", "CD197"), group.by = "HTO_classification")
+
 
 
 ###############################################################################################################################################

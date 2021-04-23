@@ -46,7 +46,7 @@ shinyUI(dashboardPage(
       # Métadonnées
       tabItem(tabName = "metadata",
               h2("Visualisation des métadonnées"),
-              imageOutput('dataTable')
+              plotlyOutput('dataTable', width = "100%",  height = "650px")
       ),
       
       # Read data
@@ -139,7 +139,7 @@ shinyUI(dashboardPage(
       
       # 3D Reduction dimention 
       tabItem(tabName = "3D_RD",
-              radioButtons("metadata", "Metadata:",inline=T,c("seurat_clusters", "SingleR.calls", "Greffe", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "HTO_maxID")),
+              radioButtons("metadata", "Metadata:",inline=T,c("seurat_clusters", "Phénotype", "Greffe", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "Condition")),
               
               navbarPage("Reduction dimention",
                          tabPanel("PCA",
@@ -227,7 +227,7 @@ shinyUI(dashboardPage(
                                                         radioGroupButtons(inputId = "hallmark_order", label = "To order :", choices = meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
                                                         fluidRow(),
                                                         
-                                                        pickerInput(inputId = "numSelector", label = "To subset :", choices = hallmark, multiple = TRUE, options = list(`actions-box` = TRUE)),
+                                                        pickerInput(inputId = "numSelector", label = "To subset :", choices = all@tools$hallmarks, multiple = TRUE, options = list(`actions-box` = TRUE)),
                                                         fluidRow(),
                                               ),
           
@@ -239,7 +239,7 @@ shinyUI(dashboardPage(
                                             plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px"),
                                             fluidRow(),
                                             wellPanel(h4("Group by :"),
-                                                      pickerInput(inputId = "hallmark_order_vln",label = "Choices : ", choices = hallmark),
+                                                      pickerInput(inputId = "hallmark_order_vln",label = "Choices : ", choices = all@tools$hallmarks),
                                                       fluidRow(),
                                                       pickerInput(inputId = "metadata_order_vln",label = "Choices : ", choices = meta_variable)
                                             )
@@ -248,9 +248,9 @@ shinyUI(dashboardPage(
                                             plotOutput("hallmark_HD", width = "100%",  height = "1000px"),
                                             
                                             wellPanel(h4("Group by :"),
-                                                      pickerInput(inputId = "hallmark_order_X",label = "X : ", choices = hallmark),
+                                                      pickerInput(inputId = "hallmark_order_X",label = "X : ", choices = all@tools$hallmarks),
                                                       fluidRow(),
-                                                      pickerInput(inputId = "hallmark_order_Y",label = "Y : ", choices = hallmark),
+                                                      pickerInput(inputId = "hallmark_order_Y",label = "Y : ", choices = all@tools$hallmarks),
                                                       fluidRow(),
                                                       pickerInput(inputId = "metadata_order_density", label = "Metadata : ", choices = meta_variable)   
                                             )
@@ -259,7 +259,7 @@ shinyUI(dashboardPage(
                                             plotOutput("hallmark_RP", width = "100%",  height = "1000px"),
                                             
                                             wellPanel(h4("Group by :"),
-                                                      pickerInput(inputId = "hallmark_order_RP", label = "Hallmark : ", choices = hallmark),
+                                                      pickerInput(inputId = "hallmark_order_RP", label = "Hallmark : ", choices = all@tools$hallmarks),
                                                       fluidRow(),
                                                       pickerInput(inputId = "metadata_group_RP", label = "Group by : ", choices = meta_variable),
                                                       fluidRow(),

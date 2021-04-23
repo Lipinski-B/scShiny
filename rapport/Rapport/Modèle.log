@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  21 APR 2021 10:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  22 APR 2021 17:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -365,31 +365,90 @@ Package babel Info: You haven't specified a language. I'll use 'nil'
  (/home/boris/.TinyTeX/texmf-dist/tex/generic/babel/nil.ldf
 Language: nil 2021/03/24 3.56 Nil language
 \l@nil=\language4
-)) (/home/boris/.TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+)) (/home/boris/.TinyTeX/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip62
+\multirow@cntb=\count300
+\multirow@dima=\skip63
+\bigstrutjot=\dimen190
+) (/home/boris/.TinyTeX/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count301
+\float@exts=\toks27
+\float@box=\box54
+\@float@everytoks=\toks28
+\@floatcapt=\box55
+) (/home/boris/.TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2021-03-18 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count300
-\l__pdf_internal_box=\box54
-) (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
+\l__color_backend_stack_int=\count302
+\l__pdf_internal_box=\box56
+) (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+
+LaTeX Warning: Label `I1' multiply defined.
+
+)
 \openout1 = `ModÃ¨le.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 101.
-LaTeX Font Info:    ... okay on input line 101.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 103.
+LaTeX Font Info:    ... okay on input line 103.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -425,23 +484,38 @@ LaTeX Font Info:    ... okay on input line 101.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
+(/home/boris/.TinyTeX/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count303
+\scratchdimen=\dimen191
+\scratchbox=\box57
+\nofMPsegments=\count304
+\nofMParguments=\count305
+\everyMPshowfont=\toks29
+\MPscratchCnt=\count306
+\MPscratchDim=\dimen192
+\MPnumerator=\count307
+\makeMPintoPDFobject=\count308
+\everyMPtoPDFconversion=\toks30
+)
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
+Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring OFF on input line 101.
-(/home/boris/.TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty
+Package hyperref Info: Link coloring OFF on input line 103.
+ (/home/boris/.TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
  (/home/boris/.TinyTeX/texmf-dist/tex/latex/refcount/refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ) (/home/boris/.TinyTeX/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count301
+\c@section@level=\count309
 )
-LaTeX Info: Redefining \ref on input line 101.
-LaTeX Info: Redefining \pageref on input line 101.
-LaTeX Info: Redefining \nameref on input line 101.
+LaTeX Info: Redefining \ref on input line 103.
+LaTeX Info: Redefining \pageref on input line 103.
+LaTeX Info: Redefining \nameref on input line 103.
  (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.out) (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.out)
 \@outlinefile=\write3
 \openout3 = `ModÃ¨le.out'.
@@ -449,18 +523,18 @@ LaTeX Info: Redefining \nameref on input line 101.
 <faclogo.png, id=39, 264.99pt x 191.71625pt>
 File: faclogo.png Graphic file (type png)
 <use faclogo.png>
-Package pdftex.def Info: faclogo.png  used on input line 109.
+Package pdftex.def Info: faclogo.png  used on input line 111.
 (pdftex.def)             Requested size: 184.92564pt x 133.78395pt.
 <ilogo.jpg, id=40, 149.96025pt x 86.21811pt>
 File: ilogo.jpg Graphic file (type jpg)
 <use ilogo.jpg>
-Package pdftex.def Info: ilogo.jpg  used on input line 114.
+Package pdftex.def Info: ilogo.jpg  used on input line 116.
 (pdftex.def)             Requested size: 224.64462pt x 129.13513pt.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 131.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 133.
  (/home/boris/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 131.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 133.
  (/home/boris/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
@@ -474,91 +548,206 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 \openout5 = `ModÃ¨le.lof'.
 
 
-Overfull \hbox (30.0pt too wide) in paragraph at lines 160--170
+Overfull \hbox (30.0pt too wide) in paragraph at lines 162--167
 []$[]$ 
  []
 
-<Rlogo.png, id=62, 726.715pt x 563.10374pt>
-File: Rlogo.png Graphic file (type png)
-<use Rlogo.png>
-Package pdftex.def Info: Rlogo.png  used on input line 173.
-(pdftex.def)             Requested size: 12.66336pt x 9.81422pt.
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.182 \item s
-             hiny : 1.6.0 [1
+l.172 \item F
+             LINOVO : Follicular Lymphoma In Ovo [1
 
 
- </home/boris/Bureau/scShiny/rapport/Rapport/Rlogo.png>] [2]
-Overfull \hbox (18.38568pt too wide) in paragraph at lines 245--247
+]
+<Rlogo.png, id=105, 726.715pt x 563.10374pt>
+File: Rlogo.png Graphic file (type png)
+<use Rlogo.png>
+Package pdftex.def Info: Rlogo.png  used on input line 177.
+(pdftex.def)             Requested size: 12.66336pt x 9.81422pt.
+ [2 </home/boris/Bureau/scShiny/rapport/Rapport/Rlogo.png>] [3]
+Overfull \hbox (18.38568pt too wide) in paragraph at lines 249--251
 \T1/cmr/m/n/12 majeurs liés à cette problématique biologique. Cela pourrait se montrer être décisif dans la compréhension
  []
 
 
-Overfull \hbox (0.70853pt too wide) in paragraph at lines 251--255
+Overfull \hbox (0.70853pt too wide) in paragraph at lines 255--259
 \T1/cmr/m/n/12 L'évolution complexe de populations cellulaires a aussi pu être caractérisée par méthode de séquençage
  []
 
 
-Overfull \hbox (7.09575pt too wide) in paragraph at lines 251--255
+Overfull \hbox (7.09575pt too wide) in paragraph at lines 255--259
 \T1/cmr/m/n/12 et d'analyse cellulaire RNA-seq en single-cell, permettant l'observation de trajectoires de différenciation
  []
 
 
-Overfull \hbox (4.85468pt too wide) in paragraph at lines 251--255
+Overfull \hbox (4.85468pt too wide) in paragraph at lines 255--259
 \T1/cmr/m/n/12 de lignées distinctes, de l'hétérogénéité transcriptionnelle associée au cycle cellulaire et des programmes
  []
 
-[3]
-Overfull \hbox (17.41527pt too wide) in paragraph at lines 256--260
+
+Overfull \hbox (17.41527pt too wide) in paragraph at lines 260--264
 []\T1/cmr/m/n/12 L'utilisation du single cell impose l'optimisation du séquençage lui-même par l'utilisation d'identificateurs
  []
 
-[4] [5] [6] [7] [8]
-Overfull \hbox (2.11363pt too wide) in paragraph at lines 428--433
+[4] [5] [6] [7] [8] [9]
+Overfull \hbox (2.11363pt too wide) in paragraph at lines 433--438
 \T1/cmr/m/n/12 centraliser, faciliter et accélérer la génération et la visualisation des différents résultats, une application
  []
 
-[9]
-Overfull \hbox (23.42807pt too wide) in paragraph at lines 449--449
+[10]
+Overfull \hbox (23.42807pt too wide) in paragraph at lines 454--454
 [][]\T1/cmr/bx/n/12 Identification des ressources et intéraction avec un cluster de calcul à haute perfomance. 
  []
 
-<figure/FL.png, id=178, 587.19376pt x 828.84656pt>
+<figure/FL.png, id=216, 587.19376pt x 828.84656pt>
 File: figure/FL.png Graphic file (type png)
 <use figure/FL.png>
-Package pdftex.def Info: figure/FL.png  used on input line 453.
+Package pdftex.def Info: figure/FL.png  used on input line 464.
 (pdftex.def)             Requested size: 469.75565pt x 663.07814pt.
+[11] [12 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-(/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [10]
+[13]
+<figure/QC.png, id=233, 1501.61pt x 1138.2525pt>
+File: figure/QC.png Graphic file (type png)
+<use figure/QC.png>
+Package pdftex.def Info: figure/QC.png  used on input line 555.
+(pdftex.def)             Requested size: 420.44794pt x 318.70853pt.
+ [14 </home/boris/Bureau/scShiny/rapport/Rapport/figure/QC.png>]
+<figure/sunburst.png, id=239, 2422.04875pt x 1174.3875pt>
+File: figure/sunburst.png Graphic file (type png)
+<use figure/sunburst.png>
+Package pdftex.def Info: figure/sunburst.png  used on input line 575.
+(pdftex.def)             Requested size: 508.64526pt x 246.62865pt.
+<figure/sortie_brute.png, id=240, 2118.91624pt x 1163.34625pt>
+File: figure/sortie_brute.png Graphic file (type png)
+<use figure/sortie_brute.png>
+Package pdftex.def Info: figure/sortie_brute.png  used on input line 594.
+(pdftex.def)             Requested size: 487.3405pt x 267.56401pt.
+ [15 </home/boris/Bureau/scShiny/rapport/Rapport/figure/sunburst.png>]
+<figure/3D.png, id=246, 2111.89pt x 989.6975pt>
+File: figure/3D.png Graphic file (type png)
+<use figure/3D.png>
+Package pdftex.def Info: figure/3D.png  used on input line 604.
+(pdftex.def)             Requested size: 485.72449pt x 227.62563pt.
+<figure/facteur.png, id=247, 2439.1125pt x 1081.03876pt>
+File: figure/facteur.png Graphic file (type png)
+<use figure/facteur.png>
+Package pdftex.def Info: figure/facteur.png  used on input line 614.
+(pdftex.def)             Requested size: 512.22874pt x 227.02484pt.
 
-LaTeX Warning: Text page 11 contains only floats.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<figure/B_ex_rchop.png, id=248, 2162.0775pt x 1108.14pt>
+File: figure/B_ex_rchop.png Graphic file (type png)
+<use figure/B_ex_rchop.png>
+Package pdftex.def Info: figure/B_ex_rchop.png  used on input line 624.
+(pdftex.def)             Requested size: 518.90921pt x 265.95903pt.
+
+Overfull \hbox (6.75961pt too wide) in paragraph at lines 624--625
+ [][] 
+ []
+
+[16 </home/boris/Bureau/scShiny/rapport/Rapport/figure/sortie_brute.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/3D.png>]
+<figure/B_ex_pg.png, id=258, 2181.14874pt x 1114.1625pt>
+File: figure/B_ex_pg.png Graphic file (type png)
+<use figure/B_ex_pg.png>
+Package pdftex.def Info: figure/B_ex_pg.png  used on input line 634.
+(pdftex.def)             Requested size: 514.73334pt x 262.93327pt.
+
+Overfull \hbox (2.58374pt too wide) in paragraph at lines 634--635
+ [][] 
+ []
 
 
-Overfull \vbox (3.98923pt too high) has occurred while \output is active []
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
- [11 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>] [12] [13
+<figure/B_ex_pg_FL12_chain.png, id=259, 1454.43375pt x 650.43pt>
+File: figure/B_ex_pg_FL12_chain.png Graphic file (type png)
+<use figure/B_ex_pg_FL12_chain.png>
+Package pdftex.def Info: figure/B_ex_pg_FL12_chain.png  used on input line 644.
+(pdftex.def)             Requested size: 509.05945pt x 227.6539pt.
 
-]) [14] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<figure/B_ex_rchop_FL12_chain.png, id=260, 1455.4375pt x 652.4375pt>
+File: figure/B_ex_rchop_FL12_chain.png Graphic file (type png)
+<use figure/B_ex_rchop_FL12_chain.png>
+Package pdftex.def Info: figure/B_ex_rchop_FL12_chain.png  used on input line 651.
+(pdftex.def)             Requested size: 509.41077pt x 228.35654pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<figure/Expression.png, id=261, 1898.09125pt x 1057.9525pt>
+File: figure/Expression.png Graphic file (type png)
+<use figure/Expression.png>
+Package pdftex.def Info: figure/Expression.png  used on input line 661.
+(pdftex.def)             Requested size: 531.46193pt x 296.22469pt.
+
+Overfull \hbox (19.31233pt too wide) in paragraph at lines 661--662
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<figure/Enrichissement.png, id=262, 2343.75626pt x 1055.945pt>
+File: figure/Enrichissement.png Graphic file (type png)
+<use figure/Enrichissement.png>
+Package pdftex.def Info: figure/Enrichissement.png  used on input line 671.
+(pdftex.def)             Requested size: 515.62798pt x 232.30861pt.
+
+Overfull \hbox (3.47838pt too wide) in paragraph at lines 671--672
+ [][] 
+ []
+
+[17 </home/boris/Bureau/scShiny/rapport/Rapport/figure/facteur.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_rchop.png>]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<figure/Got_hotspot.png, id=271, 713.66624pt x 554.07pt>
+File: figure/Got_hotspot.png Graphic file (type png)
+<use figure/Got_hotspot.png>
+Package pdftex.def Info: figure/Got_hotspot.png  used on input line 682.
+(pdftex.def)             Requested size: 285.46143pt x 221.62407pt.
+
+Overfull \hbox (3.77759pt too wide) in paragraph at lines 682--683
+ [][] 
+ []
+
+<figure/GOT.png, id=272, 654.19406pt x 415.5525pt>
+File: figure/GOT.png Graphic file (type png)
+<use figure/GOT.png>
+Package pdftex.def Info: figure/GOT.png  used on input line 688.
+(pdftex.def)             Requested size: 196.25972pt x 124.6667pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[18 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_pg.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_pg_FL12_chain.png>] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [19 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_rchop_FL12_chain.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/Expression.png>] [20 </home/boris/Bureau/scShiny/rapport/Rapport/figure/Enrichissement.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/Got_hotspot.png (PNG copy)> </home/boris/Bureau/scShiny/rapport/Rapport/figure/GOT.png (PNG copy)>] [21
+
+]) [22] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
+
+LaTeX Warning: There were multiply-defined labels.
+
 Package rerunfilecheck Info: File `ModÃ¨le.out' has not changed.
 (rerunfilecheck)             Checksum: 082059C526E7A8656AC7DAA7D52D5061;1310.
  ) 
 Here is how much of TeX's memory you used:
- 12581 strings out of 480954
- 185022 string characters out of 5907138
- 511396 words of memory out of 5000000
- 29535 multiletter control sequences out of 15000+600000
+ 13099 strings out of 480954
+ 192782 string characters out of 5907138
+ 521316 words of memory out of 5000000
+ 29998 multiletter control sequences out of 15000+600000
  418940 words of font info for 60 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 71i,7n,79p,564b,450s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,9n,79p,564b,452s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2074.600pk>
-Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (15 pages, 520539 bytes).
+Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (23 pages, 5835222 bytes).
 PDF statistics:
- 617 PDF objects out of 1000 (max. 8388607)
- 237 compressed objects within 3 object streams
- 69 named destinations out of 1000 (max. 500000)
- 93 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 775 PDF objects out of 1000 (max. 8388607)
+ 310 compressed objects within 4 object streams
+ 100 named destinations out of 1000 (max. 500000)
+ 158 words of extra memory for PDF output out of 10000 (max. 10000000)
 

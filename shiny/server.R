@@ -1,4 +1,5 @@
 # server.R
+colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
 shinyServer(function(input, output, session) {
   #################################################################################################
   observeEvent(input$actBtnPatient,{
@@ -36,6 +37,7 @@ shinyServer(function(input, output, session) {
     return(top10)
   })
   FeaturesVariable <- reactive({
+    annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
     fv <- annotations[which(annotations$gene_name %in% heatmap()$gene),] 
     fv <- fv[order(fv$gene_name),] 
     return(fv)
@@ -184,7 +186,7 @@ shinyServer(function(input, output, session) {
   
   #################################################################################################
   ## -- FeaturePlot -- ## 
-  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "pca", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
+  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "pca", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend() & theme(title = element_text(size=25))})
   output$FeaturePlot_UMAP <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "umap", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
   output$FeaturePlot_TSNE <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "tsne", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
   output$feature_other <- renderPlotly({FeaturePlot(singlet, features = "CD19", interactive = T)})
@@ -193,7 +195,11 @@ shinyServer(function(input, output, session) {
   ## -- PCA -- ##
   output$PCA <- renderPlot({
     plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
-    plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
+    plots & theme(title = element_text(size=25),
+                  legend.position = "top",
+                  legend.title = element_text(size=20),
+                  legend.text = element_text(size=20)
+                  ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
   })
   output$D_PCA <- renderPlotly({
     plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3, 
@@ -238,13 +244,13 @@ shinyServer(function(input, output, session) {
   })
   
   ## -- Heatmap -- ##
-  output$Heatmap <- renderPlot({DoHeatmap(singlet, features = heatmap()$gene, group.by = "HTO_maxID") + NoLegend()})
+  output$Heatmap <- renderPlot({DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()})
   output$Heatmap_feature <- renderPrint({print(singlet@commands[["FindAllMarkers"]])})
 
   
   ## -- Mitochondrie Figure -- ##
   output$MT_VlnPlot <- renderPlot({
-    singlet@tools$mitochondrie_all + VlnPlot(singlet, features = "nFeature_RNA", group.by = "HTO_maxID") +  VlnPlot(singlet, features = "nCount_RNA", group.by = "HTO_maxID") + VlnPlot(singlet, features = "percent.mt", group.by = "HTO_maxID")
+    singlet@tools$mitochondrie_all + VlnPlot(singlet, features = "nFeature_RNA", group.by = "Condition") +  VlnPlot(singlet, features = "nCount_RNA", group.by = "Condition") + VlnPlot(singlet, features = "percent.mt", group.by = "Condition")
   })
   output$MT_FeatureScatter <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")})
   output$MT_FeatureScatter2 <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")})
@@ -329,10 +335,14 @@ shinyServer(function(input, output, session) {
   #  scrollY = '700px', paging = FALSE,scrollX = TRUE
   #))
 
-  output$dataTable = renderImage({
+  output$dataTable2 = renderImage({
     list(src = '/home/boris/Documents/analyse/sunburst2.png', contentType = 'image/png',width = 1100, height = 800,
          alt = "Alternate text")
   }, deleteFile = FALSE)
   
+  output$dataTable = renderPlotly({
+    plot_ly(singlet@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")),
+            type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%"))
+  })
 
 })
