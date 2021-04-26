@@ -139,7 +139,7 @@ shinyUI(dashboardPage(
       
       # 3D Reduction dimention 
       tabItem(tabName = "3D_RD",
-              radioButtons("metadata", "Metadata:",inline=T,c("seurat_clusters", "Phénotype", "Greffe", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase", "Condition")),
+              radioButtons("metadata", "Metadata:",inline=T,meta_variable),
               
               navbarPage("Reduction dimention",
                          tabPanel("PCA",

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  22 APR 2021 17:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  26 APR 2021 17:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -428,6 +428,9 @@ LaTeX Warning: Label `I1' multiply defined.
 
 LaTeX Warning: Label `I1' multiply defined.
 
+
+LaTeX Warning: Label `I1' multiply defined.
+
 )
 \openout1 = `ModÃ¨le.aux'.
 
@@ -552,15 +555,18 @@ Overfull \hbox (30.0pt too wide) in paragraph at lines 162--167
 []$[]$ 
  []
 
+
+Overfull \vbox (121.39362pt too high) has occurred while \output is active []
+
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.172 \item F
-             LINOVO : Follicular Lymphoma In Ovo [1
+l.169 \section
+              {Liste des abrÃ©viations utilisÃ©es} [1
 
 
 ]
-<Rlogo.png, id=105, 726.715pt x 563.10374pt>
+<Rlogo.png, id=115, 726.715pt x 563.10374pt>
 File: Rlogo.png Graphic file (type png)
 <use Rlogo.png>
 Package pdftex.def Info: Rlogo.png  used on input line 177.
@@ -600,135 +606,157 @@ Overfull \hbox (23.42807pt too wide) in paragraph at lines 454--454
 [][]\T1/cmr/bx/n/12 Identification des ressources et intéraction avec un cluster de calcul à haute perfomance. 
  []
 
-<figure/FL.png, id=216, 587.19376pt x 828.84656pt>
+<figure/FL.png, id=226, 587.19376pt x 828.84656pt>
 File: figure/FL.png Graphic file (type png)
 <use figure/FL.png>
 Package pdftex.def Info: figure/FL.png  used on input line 464.
 (pdftex.def)             Requested size: 469.75565pt x 663.07814pt.
 [11] [12 </home/boris/Bureau/scShiny/rapport/Rapport/figure/FL.png>]
+Overfull \hbox (15.68408pt too wide) in paragraph at lines 515--517
+[]\T1/cmr/m/n/12 Ainsi pour chaque patient, des objets Seurat sont créés à partir du chargement des matrices gènes/cellules
+ []
+
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [13]
-<figure/QC.png, id=233, 1501.61pt x 1138.2525pt>
+<figure/QC.png, id=243, 1501.61pt x 1138.2525pt>
 File: figure/QC.png Graphic file (type png)
 <use figure/QC.png>
-Package pdftex.def Info: figure/QC.png  used on input line 555.
-(pdftex.def)             Requested size: 420.44794pt x 318.70853pt.
+Package pdftex.def Info: figure/QC.png  used on input line 553.
+(pdftex.def)             Requested size: 405.44012pt x 307.33229pt.
  [14 </home/boris/Bureau/scShiny/rapport/Rapport/figure/QC.png>]
-<figure/sunburst.png, id=239, 2422.04875pt x 1174.3875pt>
+<figure/sunburst.png, id=249, 2422.04875pt x 1174.3875pt>
 File: figure/sunburst.png Graphic file (type png)
 <use figure/sunburst.png>
-Package pdftex.def Info: figure/sunburst.png  used on input line 575.
+Package pdftex.def Info: figure/sunburst.png  used on input line 573.
 (pdftex.def)             Requested size: 508.64526pt x 246.62865pt.
-<figure/sortie_brute.png, id=240, 2118.91624pt x 1163.34625pt>
+ [15 </home/boris/Bureau/scShiny/rapport/Rapport/figure/sunburst.png>]
+<figure/sortie_brute.png, id=255, 2118.91624pt x 1163.34625pt>
 File: figure/sortie_brute.png Graphic file (type png)
 <use figure/sortie_brute.png>
-Package pdftex.def Info: figure/sortie_brute.png  used on input line 594.
+Package pdftex.def Info: figure/sortie_brute.png  used on input line 595.
 (pdftex.def)             Requested size: 487.3405pt x 267.56401pt.
- [15 </home/boris/Bureau/scShiny/rapport/Rapport/figure/sunburst.png>]
-<figure/3D.png, id=246, 2111.89pt x 989.6975pt>
+<figure/3D.png, id=256, 2111.89pt x 989.6975pt>
 File: figure/3D.png Graphic file (type png)
 <use figure/3D.png>
-Package pdftex.def Info: figure/3D.png  used on input line 604.
+Package pdftex.def Info: figure/3D.png  used on input line 602.
 (pdftex.def)             Requested size: 485.72449pt x 227.62563pt.
-<figure/facteur.png, id=247, 2439.1125pt x 1081.03876pt>
+ [16 </home/boris/Bureau/scShiny/rapport/Rapport/figure/sortie_brute.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/3D.png>]
+<figure/PC.png, id=265, 1785.67125pt x 724.7075pt>
+File: figure/PC.png Graphic file (type png)
+<use figure/PC.png>
+Package pdftex.def Info: figure/PC.png  used on input line 617.
+(pdftex.def)             Requested size: 499.98454pt x 202.91672pt.
+<figure/facteur.png, id=266, 2439.1125pt x 1081.03876pt>
 File: figure/facteur.png Graphic file (type png)
 <use figure/facteur.png>
-Package pdftex.def Info: figure/facteur.png  used on input line 614.
+Package pdftex.def Info: figure/facteur.png  used on input line 635.
 (pdftex.def)             Requested size: 512.22874pt x 227.02484pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figure/B_ex_rchop.png, id=248, 2162.0775pt x 1108.14pt>
-File: figure/B_ex_rchop.png Graphic file (type png)
-<use figure/B_ex_rchop.png>
-Package pdftex.def Info: figure/B_ex_rchop.png  used on input line 624.
-(pdftex.def)             Requested size: 518.90921pt x 265.95903pt.
 
-Overfull \hbox (6.75961pt too wide) in paragraph at lines 624--625
- [][] 
+Overfull \hbox (2.11375pt too wide) in paragraph at lines 642--653
+\T1/cmr/m/n/12 viennent confirmer la clusterisation par phénotype en distanguant de la même manière les lymphocytes
  []
 
-[16 </home/boris/Bureau/scShiny/rapport/Rapport/figure/sortie_brute.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/3D.png>]
-<figure/B_ex_pg.png, id=258, 2181.14874pt x 1114.1625pt>
-File: figure/B_ex_pg.png Graphic file (type png)
-<use figure/B_ex_pg.png>
-Package pdftex.def Info: figure/B_ex_pg.png  used on input line 634.
-(pdftex.def)             Requested size: 514.73334pt x 262.93327pt.
+[17 </home/boris/Bureau/scShiny/rapport/Rapport/figure/PC.png>]
+<figure/B_ex_rchop.png, id=273, 2162.0775pt x 1108.14pt>
+File: figure/B_ex_rchop.png Graphic file (type png)
+<use figure/B_ex_rchop.png>
+Package pdftex.def Info: figure/B_ex_rchop.png  used on input line 669.
+(pdftex.def)             Requested size: 518.90921pt x 265.95903pt.
 
-Overfull \hbox (2.58374pt too wide) in paragraph at lines 634--635
+Overfull \hbox (6.75961pt too wide) in paragraph at lines 669--670
  [][] 
  []
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figure/B_ex_pg_FL12_chain.png, id=259, 1454.43375pt x 650.43pt>
+[18 </home/boris/Bureau/scShiny/rapport/Rapport/figure/facteur.png>]
+<figure/B_ex_pg.png, id=280, 2181.14874pt x 1114.1625pt>
+File: figure/B_ex_pg.png Graphic file (type png)
+<use figure/B_ex_pg.png>
+Package pdftex.def Info: figure/B_ex_pg.png  used on input line 682.
+(pdftex.def)             Requested size: 514.73334pt x 262.93327pt.
+
+Overfull \hbox (2.58374pt too wide) in paragraph at lines 682--683
+ [][] 
+ []
+
+[19 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_rchop.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_pg.png>]
+Overfull \hbox (1.95552pt too wide) in paragraph at lines 694--701
+\T1/cmr/m/n/12 cellulaires ou non, les ACP du patient FL12C1888 des conditions Excipient/RCHOP et Excipient/Pré-
+ []
+
+<figure/B_ex_rchop_FL12_chain.png, id=287, 1455.4375pt x 652.4375pt>
+File: figure/B_ex_rchop_FL12_chain.png Graphic file (type png)
+<use figure/B_ex_rchop_FL12_chain.png>
+Package pdftex.def Info: figure/B_ex_rchop_FL12_chain.png  used on input line 704.
+(pdftex.def)             Requested size: 509.41077pt x 228.35654pt.
+<figure/B_ex_pg_FL12_chain.png, id=288, 1454.43375pt x 650.43pt>
 File: figure/B_ex_pg_FL12_chain.png Graphic file (type png)
 <use figure/B_ex_pg_FL12_chain.png>
-Package pdftex.def Info: figure/B_ex_pg_FL12_chain.png  used on input line 644.
+Package pdftex.def Info: figure/B_ex_pg_FL12_chain.png  used on input line 711.
 (pdftex.def)             Requested size: 509.05945pt x 227.6539pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figure/B_ex_rchop_FL12_chain.png, id=260, 1455.4375pt x 652.4375pt>
-File: figure/B_ex_rchop_FL12_chain.png Graphic file (type png)
-<use figure/B_ex_rchop_FL12_chain.png>
-Package pdftex.def Info: figure/B_ex_rchop_FL12_chain.png  used on input line 651.
-(pdftex.def)             Requested size: 509.41077pt x 228.35654pt.
+[20 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_rchop_FL12_chain.png>]
+Overfull \hbox (1.89746pt too wide) in paragraph at lines 730--733
+\T1/cmr/m/n/12 identifier lorsque nous confrontront ce types de cellules aux références utiliser dans la littlérature. 
+ []
 
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-<figure/Expression.png, id=261, 1898.09125pt x 1057.9525pt>
+<figure/Expression.png, id=294, 1898.09125pt x 1057.9525pt>
 File: figure/Expression.png Graphic file (type png)
 <use figure/Expression.png>
-Package pdftex.def Info: figure/Expression.png  used on input line 661.
+Package pdftex.def Info: figure/Expression.png  used on input line 738.
 (pdftex.def)             Requested size: 531.46193pt x 296.22469pt.
 
-Overfull \hbox (19.31233pt too wide) in paragraph at lines 661--662
+Overfull \hbox (19.31233pt too wide) in paragraph at lines 738--739
  [][] 
  []
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figure/Enrichissement.png, id=262, 2343.75626pt x 1055.945pt>
+<figure/Enrichissement.png, id=295, 2343.75626pt x 1055.945pt>
 File: figure/Enrichissement.png Graphic file (type png)
 <use figure/Enrichissement.png>
-Package pdftex.def Info: figure/Enrichissement.png  used on input line 671.
+Package pdftex.def Info: figure/Enrichissement.png  used on input line 748.
 (pdftex.def)             Requested size: 515.62798pt x 232.30861pt.
 
-Overfull \hbox (3.47838pt too wide) in paragraph at lines 671--672
+Overfull \hbox (3.47838pt too wide) in paragraph at lines 748--749
  [][] 
  []
 
-[17 </home/boris/Bureau/scShiny/rapport/Rapport/figure/facteur.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_rchop.png>]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<figure/Got_hotspot.png, id=271, 713.66624pt x 554.07pt>
+<figure/Got_hotspot.png, id=296, 713.66624pt x 554.07pt>
 File: figure/Got_hotspot.png Graphic file (type png)
 <use figure/Got_hotspot.png>
-Package pdftex.def Info: figure/Got_hotspot.png  used on input line 682.
+Package pdftex.def Info: figure/Got_hotspot.png  used on input line 759.
 (pdftex.def)             Requested size: 285.46143pt x 221.62407pt.
 
-Overfull \hbox (3.77759pt too wide) in paragraph at lines 682--683
+Overfull \hbox (3.77759pt too wide) in paragraph at lines 759--760
  [][] 
  []
 
-<figure/GOT.png, id=272, 654.19406pt x 415.5525pt>
+<figure/GOT.png, id=297, 654.19406pt x 415.5525pt>
 File: figure/GOT.png Graphic file (type png)
 <use figure/GOT.png>
-Package pdftex.def Info: figure/GOT.png  used on input line 688.
+Package pdftex.def Info: figure/GOT.png  used on input line 765.
 (pdftex.def)             Requested size: 196.25972pt x 124.6667pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[18 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_pg.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_pg_FL12_chain.png>] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [19 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_rchop_FL12_chain.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/Expression.png>] [20 </home/boris/Bureau/scShiny/rapport/Rapport/figure/Enrichissement.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/Got_hotspot.png (PNG copy)> </home/boris/Bureau/scShiny/rapport/Rapport/figure/GOT.png (PNG copy)>] [21
+(/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.bbl [21 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_pg_FL12_chain.png>] [22 </home/boris/Bureau/scShiny/rapport/Rapport/figure/Expression.png> </home/boris/Bureau/scShiny/rapport/Rapport/figure/Enrichissement.png>] [23 </home/boris/Bureau/scShiny/rapport/Rapport/figure/Got_hotspot.png (PNG copy)> </home/boris/Bureau/scShiny/rapport/Rapport/figure/GOT.png (PNG copy)>] [24
 
-]) [22] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
+]) [25] (/home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
@@ -736,18 +764,18 @@ Package rerunfilecheck Info: File `ModÃ¨le.out' has not changed.
 (rerunfilecheck)             Checksum: 082059C526E7A8656AC7DAA7D52D5061;1310.
  ) 
 Here is how much of TeX's memory you used:
- 13099 strings out of 480954
- 192782 string characters out of 5907138
- 521316 words of memory out of 5000000
- 29998 multiletter control sequences out of 15000+600000
+ 13105 strings out of 480954
+ 192866 string characters out of 5907138
+ 522316 words of memory out of 5000000
+ 30003 multiletter control sequences out of 15000+600000
  418940 words of font info for 60 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  71i,9n,79p,564b,452s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2074.600pk>
-Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (23 pages, 5835222 bytes).
+Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (26 pages, 5907584 bytes).
 PDF statistics:
- 775 PDF objects out of 1000 (max. 8388607)
- 310 compressed objects within 4 object streams
+ 789 PDF objects out of 1000 (max. 8388607)
+ 326 compressed objects within 4 object streams
  100 named destinations out of 1000 (max. 500000)
- 158 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 163 words of extra memory for PDF output out of 10000 (max. 10000000)
 

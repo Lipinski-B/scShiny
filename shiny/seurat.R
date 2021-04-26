@@ -47,7 +47,7 @@ library(sunburstR)
 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 siege <- c("FL140304","FL12C1888")
-patient <- siege[1]
+patient <- siege[2]
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
 ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
@@ -279,8 +279,13 @@ visualitation <- function(singlet){
 
   ## -- Sunburst -- ## 
   met <- data.frame(
-    patient = singlet@meta.data$orig.ident, etat =  singlet@meta.data$Greffe, condition = singlet@meta.data$HTO_maxID, phénotype = singlet@meta.data$SingleR.calls, sub = singlet@meta.data$SingleR.calls.fine, phase = singlet@meta.data$Phase,
-    value = rep(1, length(singlet@meta.data$SingleR.calls)), stringsAsFactors = FALSE
+    patient = singlet@meta.data$orig.ident, 
+    etat = singlet@meta.data$Greffe, 
+    condition = singlet@meta.data$Condition, 
+    phénotype = singlet@meta.data$Phénotype, 
+    sub = singlet@meta.data$SingleR.calls.fine, 
+    phase = singlet@meta.data$Phase,  
+    value = rep(1, length(singlet@meta.data$orig.ident)), stringsAsFactors = FALSE
   )
   singlet@tools$sunburst <- make_sunburst_data(met)
   
@@ -552,7 +557,7 @@ DoHeatmap(all, features = top10$gene, group.by = "HTO_maxID") + NoLegend()
 # PCA
 DimPlot(all, reduction = "pca")
 print(all[["pca"]], dims = 1:10, nfeatures = 10)
-ElbowPlot(all, ndims = 50, reduction = "pca")
+ElbowPlot(all, ndims = 25, reduction = "pca")
 DimHeatmap(all, dims = 1:10, cells = 100, balanced = TRUE)
 VizDimLoadings(all, dims = 1:5, reduction = "pca")
 JackStrawPlot(all, dims = 1:15)

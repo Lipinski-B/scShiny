@@ -472,18 +472,16 @@ L'ensemble de nos scripts bash sont directement élaborés via ordonanceur pour 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsubsection*{Présentation des 2 patients}
-Le temps de préparation des librairies et du séquençage s'élevant jusqu'à 2 mois pour un patient, seulement 2 échantillons tumoraux de patients ont pu être séquencé et annalysé pour le moment : 
-les patients FL12C1888 et FL140304 issues du groupe de patient non répondeur au RCHOP. Chacun des 2 patients à subit a un moment donnée une rechute lié à la malaide même s'ils sont tout 2 traités au RCHOP.
-L'ensemble des analyses, résultats et discussions présent dans ce rapport s'élaborera seulement autour de ces 2 patients.   
-
-
+Le temps de préparation des librairies et du séquençage s'élevant jusqu'à 2 mois pour un patient, seuls 2 échantillons tumoraux de patients ont pu être séquencés et analysés pour le moment :
+les patients FL12C1888 et FL140304, issues du groupe de patients non répondeurs au RCHOP. Chacun des 2 patients a donc subi une rechute liée à la maladie même s'ils sont tous 2 traités au RCHOP.
+L'ensemble des analyses, résultats et discussions présents dans ce rapport s'élaborera seulement autour de ses 2 patients. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{La greffe introduit un biais de mort cellulaires confondue avec les effets du RCHOP.}
 %\subsubsection*{Alignement des lectures sur le génome de référence via CellRanger Count}
 
-Le point de départ de toutes analyses consiste pour chaque patient en l'alignement des lectures issus du séquençage la librarie mRNA sur le génome de référence vien CellRanger count.
-La figure 2 résume différentes informations issus des rapports élaborée par le programme en sortie de cette étape.
+Le point de départ de toutes analyses consiste pour chaque patient en l'alignement des lectures issues du séquençage la librarie mRNA sur le génome de référence vien CellRanger count.
+La figure 2 résume différentes informations issues des rapports élaborés par le programme en sortie de cette étape.
 
 \begin{figure}[h!]
 	\begin{center}
@@ -505,17 +503,17 @@ La figure 2 résume différentes informations issus des rapports élaborée par 
 	\label{I1}
 \end{figure}
 
-Comme attendu, nous avons dans les 2 cas un nombre de read séquencé aux alentours de 700 millions, dont plus de 85\% se retrouve alignés
+Comme attendu, nous avons dans les 2 cas un nombre de read séquencé aux alentours de 700 millions, dont plus de 85\% se retrouvent alignés
 sur le génome de référence. On obtient approximativement un rapport de 2 concernant le nombre de cellules estimé entre les 2 patients :
-10 376 pour le patient FL12C1888 contre 5 793 pour FL140304. Etant donnée l'équivalence du nombre de read retrouvé et 
-la différence du nombre de cellule estimé chez les 2 patients, il est normale d'obtenir un rapport inversement proportionnel
+10 376 pour le patient FL12C1888 contre 5 793 pour FL140304. Étant donnée l'équivalence du nombre de read retrouvé et 
+la différence du nombre de cellule estimé chez les 2 patients, il est normal d'obtenir un rapport inversement proportionnel
 concernant la moyenne des reads comptés par cellule, respectivement de 66 382 et de 128 371 pour FL12C1888 et FL140304.
-La médianne du nombre d'UMI par cellule, du nombre de gènes exprimés par cellule et le nombre total de gènes détectés sont quant
-à eux équivalents et tous assez élevés chez les 2 patients, indiquant une excelente qualité et quantité de matériel biologique
+La médiane du nombre d'UMI par cellule, du nombre de gènes exprimés par cellule et le nombre total de gènes détectés sont quant
+à eux équivalents et tous assez élevés chez les 2 patients, indiquant une excellente qualité et quantité de matériel biologique
 disponible pour réaliser au mieux les analyses qui suivent.
 
-Ainsi pour chaque patient, des objects Seurat sont créer à partir du chargement des matrices gènes/cellules issues de CellRanger, et les premières étapes du workflow sont appliquées.
-Le résultats des application de filtres cellulaires sur la base de mesures de contrôle de qualité pour chacun des patients est montré figure 3.
+Ainsi pour chaque patient, des objets Seurat sont créés à partir du chargement des matrices gènes/cellules issues de CellRanger, et les premières étapes du workflow sont appliquées.
+Le résultat des applications de filtres cellulaires sur la base de mesures de contrôle de qualité pour chacun des patients est montré figure 3.
 
 \begin{figure}[h!]
 	\begin{center}
@@ -536,10 +534,10 @@ Le résultats des application de filtres cellulaires sur la base de mesures de c
 	\label{I1}
 \end{figure}
 
-Au final pour les patients FL12C1888 et FL140304, on garde respectivement 70.12\% et et 50.5\% du nombre totale de cellules
-estimé par CellRanger count. La filtration basé sur la présence du nombre de cellule dans chaque soustrait un pourcentage
-de cellules équivalents pour chacun des 2 patients, représentant en moyenne une soustraction de 8.85\% issus du comptage de bille double 
-et une soustraction 3\% issus du comptage de bille vide. Ainsi en moyenne on garde 87.2\% de bille supportant l'inclusion d'une seule et unique cellule à l'intérieur. 
+Au final pour les patients FL12C1888 et FL140304, on garde respectivement 70.12\% et et 50.5\% du nombre total de cellule
+estimé par CellRanger count. La filtration basé sur la présence du nombre de cellule dans chaque bille supprime un taux
+de cellule équivalent pour chacun des 2 patients, représentant en moyenne une soustraction de 8.85\% issue du comptage de bille double 
+et une soustraction 3\% issue du comptage de bille vide. Ainsi en moyenne on garde 87.2\% de bille supportant l'inclusion d'une seule et unique cellule à l'intérieur. 
 Le pourcentage qui diffère le plus entre les 2 patients est celui du nombre de cellule morte soustraite, 
 représentatif de l'application du filtre gardant uniquement les cellules dont le pourcentage de lectures issus de 
 l'expression du génome mitochondrial correspondent à moins de 5\% des lecture totales.
@@ -552,23 +550,23 @@ La figure 4 indique visuellement la proportion de cellules gardé après applica
 
 \begin{figure}[h!]
 \centering 
-\includegraphics[scale=0.28]{figure/QC.png}
+\includegraphics[scale=0.27]{figure/QC.png}
 \caption{\small{Violin Plot représentant la distribution des cellules selon leur proportion à exprimé des lectures issus de l'expression du génome mitochondrial, dans chacunes des 3 conditions expérimentales, pour FL12C1888 à gauche et FL140304 à droite. Haut : distribution avant filtration ; Bas : distribition après filtration}}
 \label{I1}
 \end{figure}
 
-Sur les différent Violin Plot, on peut observer et confirmer la sauvegarde d'une grande proportion des cellules présentes dans nos objet Seurat initiaux, ce qui est un bon point.
+Sur les différents Violin Plot, on peut observer et confirmer la sauvegarde d'une grande proportion des cellules présentes dans nos objets Seurat initiaux, ce qui est un bon point.
 On peut aussi s'apercevoir que le seuil des 5\% supprime une plus grande partie de la distribution des cellules dans les conditions Excipient et RCHOP que dans la condition Pré-greffe.
-Les cellules soumises à une condition de greffe aurait tendance à mourir plus rapidement que les cellules non gréffées. 
-Une hypothèse serait de dire que le stress lié à la greffe impacte donc négativement les cellules, les amenants à mourir plus rapidement.
-Ce phénomène viendrait se confondre avec les effets néfaste des propriétés tumorales propre au lyphome folliculaire,
+Les cellules soumises à une condition de greffe auraient tendance à mourir plus rapidement que les cellules non greffées. 
+Une hypothèse serait de dire que le stress lié à la greffe impacte donc négativement les cellules, les amenant à mourir plus rapidement.
+Ce phénomène viendrait se confondre avec les effets néfastes des propriétés tumorales propre au lymphome folliculaire,
 et ajoute un premier biais sur l'évaluation des effets propre au RCHOP sur nos cellules.
 
 
 L'application des autres étapes du workflow nous permet d'obtenir des objets Seurat élaborés. 
-Cela nous a naturellement amené à construire des sunbursts à partir des information retrouvé dans les différents niveaux de métadonnées.
-Ainsi la figure 5 présente et quantifie les différentes populations cellulaires retrouvable dans chacunes des conditions expérimentales,
-après filtration de controle qualité.
+Cela nous a naturellement amené à construire des sunbursts à partir des informations retrouvées dans les différents niveaux de métadonnées.
+Ainsi la figure 5 présente et quantifie les différentes populations cellulaires retrouvables dans chacunes des conditions expérimentales,
+après filtration de contrôle qualité.
 
 \begin{figure}[h!]
 \centering 
@@ -577,82 +575,161 @@ après filtration de controle qualité.
 \label{I1}
 \end{figure}
 
-L'analyse des sunbursts indique pour chacun des patients la présence des cellule des différentes conditions expérimentales en proportion similaires.
-En effet, dans les 2 cas la majorité des cellules retrouvés sont des cellule issus de la condition pré-greffe, représentant grossièrement la premiere moitié des cellules.
-La seconde moitié est divisée équitablement entre les condition Excipient et RCHOP. Ainsi on retrouve des ratios de proportion de cellules à hauteur de 
-1:2 pour la condition pré-greffe, et de 1:4 pour les condition RCHOP et Excipient.
-Ce dernier point conforte l'hypothèse selon laquelle la greffe véhicule les cellules vers une mort cellulaire plus rapide.
-Plus précisément, il semblerait qu'un plus gand nombre de sous-types cellulaire soit retrouvable dans la condition pré-greffe, contrairement aux 2 autres conditions.
-En effet, les proportions des cellules types lymphocyte B, TCD4+ et TCD8+ sont assez grande pour être clairement notable en condition pré-greffe, 
-tandis que les populations cellulaire types lymphocyte TCD4+ et TCD8+ sont bien plus rares voire parfois inexistantes dans les 2 autres conditions.
+L'analyse des sunbursts indique pour chacun des patients la présence des cellules des différentes conditions expérimentales en proportion similaire.
+En effet, dans les 2 cas la majorité des cellules retrouvées sont des cellules issues de la condition pré-greffe, représentant approximativement la première moitié des cellules.
+La seconde moitié est divisée équitablement entre les conditions Excipient et RCHOP.
+Ce dernier point conforte l'hypothèse selon laquelle la greffe véhicule les cellules vers une expression du génome mitochondriale plus forte et donc vers une mort cellulaire plus rapide.
+De plus, il semblerait qu'un plus grand nombre de sous-types cellulaires soit retrouvable dans la condition pré-greffe, contrairement aux 2 autres conditions.
+Les proportions des cellules types lymphocyte B, TCD4+ et TCD8+ sont assez grandes pour être clairement notable en condition pré-greffe, 
+tandis que les populations cellulaires types lymphocyte TCD4+ et TCD8+ sont bien plus rares voire parfois inexistantes dans les 2 autres conditions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{Réduction de dimension + expression de gène :}
 \subparagraph*{sortie brute} 
+Les jeux de données des patients FL12C1888 et FL140304, respectivement composés à ce stade de 7 276 et 2 927 cellules,
+sont ensuite soumis aux étapes de normalisation, scalling, détection de 2000 gènes hautement variables, clusterisation et réduction de dimension. 
+Le résultat brute est montré par les analyses en composante principales de chacun des patients figure 6 et 7. 
+
 \begin{figure}[h!]
 \centering 
 \includegraphics[scale=0.23]{figure/sortie_brute.png}
-\caption{\small{PCA}}
+\caption{\small{ACP en 2 dimensions des patients FL12C1888 (gauche) et FL140304 (droite).}}
 \label{I1}
 \end{figure}
-		
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subparagraph*{en 3D}
 \begin{figure}[h!]
 \centering 
 \includegraphics[scale=0.23]{figure/3D.png}
-\caption{\small{PCA 3D}}
+\caption{\small{ACP en 3 dimension des patients FL12C1888 (gauche) et FL140304 (droite).}}
 \label{I1}
 \end{figure}
-	
+
+Bien que le nombre de cellule soit très différent, de nombreuses caractéristiques communes sont partagées entre les 2 patients sur l'espace de l'ACP.
+D'abord de grand nombre de cluster sont déterminé, tous se regroupant selon une même tendance. 
+En effet dans tout les cas, les 2 facteurs en composantes principales expliquant le plus de variabilité divises nos jeux de données 
+en rasseblant nos clusters selon 4 grands groupes différents, tous relativement positionné vers chaque coin de l'espace ACP en 2D.
+De plus, ces 2 facteurs expliquent une part de variabilité similaire pour chacun des patients avec en moyenne 9.546\% pour le PC1 et 6.675\% pour le PC2.
+Le 3e facteurs expliqant le plus de variabilité est relativement faible et très proche des facteurs suivants (figure 8), il demeure peu intéresseant 
+de s'attarder sur son interprétation pour le moment. 
+
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.28]{figure/PC.png}
+\caption{\small{Déviation standards des facteurs en composantes principales pour les patients FL12C1888 à gauche et FL140304 à droite.}}
+\label{I1}
+\end{figure}
+
+Ainsi il semblerait que ce soit majoritairement 2 caractéristiques qui sont communes aux jeux données qui distinguent et regroupent les cellules entre elles.
+Les 2 patients étant issus du même groupe expérimentale, ces observations réconfortent l'idée que le traitement bioinformatique appliqué est adéquat.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- \subparagraph*{Réduction avec les 2 PCA} 
+\subparagraph*{Explications des 2 facteurs PCA}
+
+Sur la bases des observations précédentes, les ACP ont été croisées avec les informations calculées et intégrées dans les métadonnées des mêmes objets Seurat.
+La figure 9 montre en partie les croisements réalisées, intérprétant au mieux les 2 premiers facteurs en composante principale qui expliquent en moyenne
+16.22\% de variabilité au sein de nos jeux de données.
+
 \begin{figure}[h!]
 \centering 
 \includegraphics[scale=0.21]{figure/facteur.png}
-\caption{\small{Explication des facteurs en composantes principales}}
+\caption{\small{Explication des 2 principaux facteurs en composantes principales pour les ACP des patients FL12C1888 (gauche) et FL140304 (droite).
+En haut : Superposition des métadonnées de condition et de phénotypes des cellules.
+En bat : Superposition des données d'expression des gènes CD3E et MS4A1, maqueurs propre aux lymphocytes T et lymphocytes B}}
 \label{I1}
 \end{figure}
-	
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subparagraph*{Réduction qu'avec les B : excipient / RCHOP}
+Les 2 axes des ACP s'expliquent assez clairement et de façon identique pour les 2 jeux de données. 
+Le premier facteur en composant principale distingue les cellules sur l'axe des X selon leur phénotype, et oppose la population des lymphocytes B avec l'ensemble des autres populations.
+Pour chaque cellule, l'expression de marqueur génétique propre aux différents phénotypes présents en majorité a été superposé afin d'assurer la cohérence entre phénotype et clusterisation.
+Ainsi l'expression observée des gènes CD3E et MS4A1, respectivement marqueurs propre aux lymphocytes T et lymphocytes B, viennent confirmer la clusterisation par phénotype 
+en distanguant de la même manière les lymphocytes B des autres cellules dans l'espace de l'ACP.
+Le second facteur quant à lui sépare sur l'axe des Y les cellules étant issus d'une condition impliquant une greffe sur embryon de poulet des cellules de la condition contrôle.
+Cet élément rejoind les conjectures émisent plus haut, suggérant une perturbation des cellules par la greffe elle même. 
+Bien que cette perturbation n'explique pas autant de variabilité que la distinction phénotypique, elle reste doublement importante. D'un côté elle interprète le second axe 
+explicatif de varibailité dans notre jeu de donnée et en plus, elle est non pas issus d'une variabilité biologique innérante au status tumorale des cellules
+mais relève plutot d'un évènement propre au modèle expérimentale mis en place. 
+Autrement dit, cette variabilité apporte une plus grande part de biais que d'explications sur nos résultats d'un point de vue biologique et oncologique, et nous éloigne de conjectures intéressantes.
+
+Il a donc été nécessaire de soustraire le biais de variation induit par la greffe dans nos jeux de données, afin de maximiser l'aqcuisition d'informations issues de variations purement biologique.
+Pour se faire, l'intérgalité des étapes de pré-traitemnt analytiques décrites ci-dessus ont été à nouveau réalisé sur 2 sous-jeux de données incluant uniquement des cellules appartenant à certaine condition. 
+Ainsi ont été confrontés 2 à 2 les populations cellulaires :
+\begin{itemize}
+\item Exipient contre RCHOP : toutes les cellules sont soumise à la greffe, afin d'observer les effets propore au RCHOP (figure 10).
+\item Exipient contre Pré-greffe : aucune n'est soumise au traitement, afin d'observer les effets propore à la greffe (figure 11).
+\end{itemize} 
+De plus uniquement les lymphocytes B ont été retennue dans ces sous-jeux de données, afin aussi de soustraire la variabilité uniquement expliqué par la distinction phénotypique
+et permettant de maximiser la profondeur des interprétations de variabilité.
+
+De ce fait, de nouvelles figures de réduction de dimension ont été élaboré. 
+Dans un premier temps, la confrontation des populations issues des conditions Excipient et RCHOP montrées figure 10 n'indique pas de dinstinction particulière entre lymphocyte B.
+
 \begin{figure}[h!]
 \centering 
 \includegraphics[scale=0.24]{figure/B_ex_rchop.png}
-\caption{\small{Réduction qu'avec les B : excipient / RCHOP}}
+\caption{\small{ACP en 2 dimensions des sous-jeux de données des patients FL12C1888 (gauche) et FL140304 (droite), comprenant uniquement les lymphocytes B dans les conditions Excipient et RCHOP.}}
 \label{I1}
 \end{figure}
 
+Aucun des 2 premiers facteurs en composante principales pour chacun des 2 patients dans ces sous-jeux de données nz se démarque drastiquement des autres, restant aux alentours des 5 à 6.1\%.
+La seule observation notable reste que sur l'ACP issus du patient FL12C1888 (figure 10, gauche), 
+le premier facteur en composant principale expliquant 6.11\% de variabilité semble diviser la populations de lymphocyte B en 2 groupes relativement distinct.
+ 
+Dans un second temps, les mêmes conjectures peuvent être élaborer à partir des l'ACP relatives à la confrontation des populations issues des conditions Excipient et Pré-greffe figure 11.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subparagraph*{réduction qu'avec les B : excipient / pré-greffe}
 \begin{figure}[h!]
 \centering 
 \includegraphics[scale=0.236]{figure/B_ex_pg.png}
-\caption{\small{Réduction qu'avec les B : excipient / pré-greffe}}
+\caption{\small{ACP en 2 dimensions des sous-jeux de données des patients FL12C1888 (gauche) et FL140304 (droite), comprenant uniquement les lymphocytes B dans les conditions Excipient et Pré-greffe.}}
 \label{I1}
 \end{figure}
 
+Ici, on retrouve clairement l'effet de la greffe, qui vient interprêter le premier facteur en composantes principales explquant entre 7.51\% et 8.07\% selon les jeux de données considérés.
+Cet axe suffis à lui même pour clusteriser les lymphocytes B du patient FL140304 (figure 11, droite) en seulement 2 groupes, aucune autre disnctinction ou interprétation n'est notable sur cette ACP.
+Cependant, il n'en est pas de même pour le patient FL12C1888 (figure 11, gauche), où se retrouve ici 4 groupes de cellules bien distincts. 
+Une autre caractéristique cellulaire semble venir expliquer une part de la variabilité de ce jeu de donnée à hauteur de 6.35\%, part qui ne relève ni du phénotype ni des conséquence de l'effet de la greffe.
+Cette caractéristique divise à nouveau la population des lymphcytes B, de la même manière que le premier facteur en composant principale divise les cellules en 2 groupes sur l'ACP 
+comprenant uniquement les cellules des conditions Excipient et RCHOP, qui plus est avec un pourcentage d'explication très similaire.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subparagraph*{Explication du facteur de division des B pour patient FL12C1888}
-\begin{figure}[h!]
-\centering 
-\includegraphics[scale=0.35]{figure/B_ex_pg_FL12_chain.png}
-\caption{\small{Explication du facteur de division des B pour patient FL12C1888 : excipient / pré-greffe}}
-\label{I1}
-\end{figure}
+Afin de pouvoir interpréter ces facteurs et observer s'ils dépendent des mêmes charactéristiques cellulaires ou non, les ACP du patient FL12C1888 des conditions Excipient/RCHOP et 
+Excipient/Pré-greffe ont été croisé avec un maximum de métadonnée présentes dans le sous-jeu de données.
+Bien qu'aucune interprétation précise n'émane clairement de l'ensemble des croisements effectuée, il semble que les informations issus des librarie VDJ puisse jouer sur ces facteurs.
+En effet, quelque soit le sous jeu de données considéré, les propriétés biologiques caractérisant les différentes population polyclonales à l'intérieur de la population des 
+lymphocytes B semblent venir expliquer la part de variabilité pour le PC1 condition Excipient/RCHOP et pour le PC2 condition Excipient/Pré-greffe.
+Le meilleur exemple illustrant cette hypothèse repose sur le croisement des informations entre l'expression des gènes codant pour les différentes chaines des immunoglobulines et 
+les 2 ACP d'intérets, figure 12 et 13.
 
 \begin{figure}[h!]
 \centering 
 \includegraphics[scale=0.35]{figure/B_ex_rchop_FL12_chain.png}
-\caption{\small{Explication du facteur de division des B pour patient FL12C1888 : excipient / RCHOP}}
+\caption{\small{Explication du premier facteur en composantes principales divisant la population des lymphocytes B pour le patient FL12C1888 : condition Excipient / RCHOP.}}
 \label{I1}
 \end{figure}
 
+\begin{figure}[h!]
+\centering 
+\includegraphics[scale=0.35]{figure/B_ex_pg_FL12_chain.png}
+\caption{\small{Explication du second facteur en composantes principales divisant la population des lymphocytes B pour le patient FL12C1888 : condition Excipient / Pré-greffe.}}
+\label{I1}
+\end{figure}
+
+Lorsque que l'ACP est filtrée de sorte à ne montrer que les cellules dont nous savons depuis la librarie VDJ l'expression prédominante parmis les gènes des chaînes légères kappa (IGK),
+lambda (IGL) et chaînes lourdes heavy (IGH), le plus petit des clusters reste observable dans les 2 sous-jeu de données. 
+Le plus gros cluster disparait par faute d'information à ce sujet pour les cellules concerné.
+Ainsi l'interprétation de ces 2 axes semble être de même nature, relatant visiblement d'une classification catégorielle selon si oui ou non nous savons techniquement
+quelle chaine est prédominante dans la cellule, plutot que d'un phénomène biologique à proprement parler. 
+En d'autre termes, si la cellule peut être considérée comme IGH, IGK, IGL ou NA conformément aux bases de données utilisées comme références,
+alors les cellules appartiennent au plus petit des 2 clusters, si non, alors elles appartiennent au plus grand.
+
+L'incapacité à determiner ce type d'informations pour les différents lymphocytes B peut relever de prblème tout aussi bien technique que biologique.
+Il peut tout aussi bien s'agir d'un problème de séquençage ou d'un problème de préparation de librairie. 
+Cependant il peut aussi s'agir d'une accuulation de mutation présente dans les gènes d'intérets et donc aucun identification cornforme aux références utilisé connues n'est possible.
+Ce dernier point peut potentiellement être révélateur d'un comportement cellulaire unique et propore aux propriété tumorale en relation avec l'apparition de lymphome folliculaire.
+D'autant plus qu'il semble au premier abord bizarre de ne pas avoir l'informations pour une majorité de lymphocytes B et ceux dans 2 jeux de données à la fois.
+
+Etant donnée que les cellules extraites des patients sont umorales, il se peux toute aussi bien que des mutation ancienne soit apparues tôt dans la phylogénies des B,
+partageant cette mutation avec un grand pourcentage des lymphocytes B de la populations et éloignant ces mêmes cellules des phénotypes et génotypes standards des lymphocytes 
+à tels point qu'il n'est plus possible de les identifier lorsque nous confrontront ce types de cellules aux références utiliser dans la littlérature.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -- -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{Expression de gènes}
