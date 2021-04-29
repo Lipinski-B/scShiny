@@ -46,7 +46,7 @@ shinyUI(dashboardPage(
       # Métadonnées
       tabItem(tabName = "metadata",
               h2("Visualisation des métadonnées"),
-              plotlyOutput('dataTable', width = "100%",  height = "650px")
+              plotlyOutput('dataTable', width = "100%",  height = "1200px")
       ),
       
       # Read data

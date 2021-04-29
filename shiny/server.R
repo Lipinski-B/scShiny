@@ -3,7 +3,6 @@ colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5F
 shinyServer(function(input, output, session) {
   #################################################################################################
   observeEvent(input$actBtnPatient,{
-    cat(str(input$patient))
     rm(list = ls())
     load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
   })
@@ -14,19 +13,19 @@ shinyServer(function(input, output, session) {
       singlet <<- all
     }
     if(input$Conditions == "Excipient/RCHOP"){
-      singlet <<- C1
-    }
-    if(input$Conditions == "Excipient/Pré-greffe"){
       singlet <<- C2
     }
+    if(input$Conditions == "Excipient/Pré-greffe"){
+      singlet <<- JGE
+    }
     if(input$Conditions == "B:All"){
-      singlet <<- allB
+      singlet <<- JGM
     }
     if(input$Conditions == "B:Excipient/RCHOP"){
-      singlet <<- B1
+      singlet <<- MI_WT
     }
     if(input$Conditions == "B:Excipient/Pré-greffe"){
-      singlet <<- B2
+      singlet <<- MI_MU
     }
     return(singlet)
   })
@@ -186,7 +185,7 @@ shinyServer(function(input, output, session) {
   
   #################################################################################################
   ## -- FeaturePlot -- ## 
-  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "pca", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend() & theme(title = element_text(size=25))})
+  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "pca", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend() & theme(title = element_text(size=20))})
   output$FeaturePlot_UMAP <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "umap", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
   output$FeaturePlot_TSNE <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "tsne", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
   output$feature_other <- renderPlotly({FeaturePlot(singlet, features = "CD19", interactive = T)})
@@ -195,10 +194,10 @@ shinyServer(function(input, output, session) {
   ## -- PCA -- ##
   output$PCA <- renderPlot({
     plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
-    plots & theme(title = element_text(size=25),
+    plots & theme(title = element_text(size=20),
                   legend.position = "top",
-                  legend.title = element_text(size=20),
-                  legend.text = element_text(size=20)
+                  legend.title = element_text(size=15),
+                  legend.text = element_text(size=15)
                   ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
   })
   output$D_PCA <- renderPlotly({

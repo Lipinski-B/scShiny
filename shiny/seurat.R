@@ -8,42 +8,53 @@ library("TENxBUSData")
 library("simpleSingleCell") # for scRNA storage & manipulation
 library("scater") # for QC control
 library("scran") # analysis pipeline
-library("Seurat")
+
 library("uwot") # UMAP dim-red
 library("DropletUtils") #utility functions for handling single-cell (RNA-seq)
 library("AnnotationHub") # ensbl query
 library("AnnotationDbi") # ensbl query
 library("sctransform") # sc normalization,
-library("SingleR")
+
 library("velocyto.R")
 library(Matrix)
 library(stringr)
-library(celldex)
+
 library(scRNAseq)
-library(CellSIUS)
+
 require(RColorBrewer)
 library(ggplot2)
 library(rowr)
-library(shiny)
-library(shinyjs)
+#library(shiny)
+#library(shinyjs)
 library(grid)
 library(gridExtra)
-library(shinydashboard)
+#library(shinydashboard)
 library(Signac)
 library(ape)
 library(plotly)
 library(lemon)
-library(scone)
+#library(scone)
 suppressPackageStartupMessages(library(escape))
 suppressPackageStartupMessages(library(dittoSeq))
-library(shinyWidgets)
-library(monocle)
+#library(shinyWidgets)
+
 library(cowplot)
 library(clues)
 library(dplyr)
 library(cellrangerRkit)
 library(treemap)
+
+
+
+
+library("Seurat")
+library(monocle)
 library(sunburstR)
+library(celldex)
+library("SingleR")
+library(CellSIUS)
+
+
 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 siege <- c("FL140304","FL12C1888")
