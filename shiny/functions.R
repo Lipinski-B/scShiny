@@ -206,7 +206,7 @@ visualitation <- function(singlet, maximum=2500, percent_mt=5){
   #singlet <- ScoreJackStraw(singlet, dims = 1:20)
   
   ## -- FindAllMarkers -- ## 
-  singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+  #singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
   #singlet@commands[["FindAllMarkers"]] <- merge(singlet@commands[["FindAllMarkers"]], annotations, by.x="gene", by.y="gene_name")
   #singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
   
@@ -224,3 +224,7 @@ seurat_subset <- function(singlet, item, sub_item, maximum_sub=2500, percent_mt_
   sub_singlet <- visualitation(sub_singlet, maximum=maximum_sub, percent_mt=percent_mt_sub)
   return(sub_singlet)
 }
+
+
+
+#all1 <- seurat_subset(all,"Condition",c("JG-MCL1", "JG-Excipient"), 4000, 10)

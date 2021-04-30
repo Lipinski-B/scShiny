@@ -2,11 +2,33 @@
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
 shinyServer(function(input, output, session) {
   #################################################################################################
-  observeEvent(input$actBtnPatient,{
-    singlet <<- seurat_subset(singlet, input$Subgroup, tosub())
+  observeEvent(input$actBtnPatient,{    
+    show_modal_spinner(
+      spin = "semipolar",
+      color = "deepskyblue",
+      text = "Please wait..."
+    ) # show the modal window
+    singlet <<- seurat_subset(singlet, input$Subgroup, c(tosub()), as.integer(input$maximum), as.integer(input$percent_mt))
+    remove_modal_spinner() # remove it when done
+    
+
+    
+    sendSweetAlert(
+      session = session,
+      title = "Done !",
+      text = "Le subsample a bien été crée !",
+      type = "success"
+    )
   })
+  
   observeEvent(input$resetPatient,{
     singlet <<- all
+    sendSweetAlert(
+      session = session,
+      title = "Done !",
+      text = "Tous les subsamples ont été supprimé !",
+      type = "success"
+    )
   })
 
   heatmap <- reactive({
@@ -96,7 +118,7 @@ shinyServer(function(input, output, session) {
     return(plot.data)
   })
   rv <- reactiveValues(
-    hallmark = all@tools$hallmarks,
+    hallmark = singlet@tools$hallmarks,
     order = NULL
   )
 
@@ -105,7 +127,7 @@ shinyServer(function(input, output, session) {
     for(i in 1:length(metadata)){
       for(j in 1:length(List[[metadata[i]]])){
         if(metadata[i] %in% input$Subgroup){
-          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("p",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))  
+          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("p",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))
         }
       }
       fluidRow()
@@ -279,18 +301,18 @@ shinyServer(function(input, output, session) {
   
   # -- Enrichissement de gène -- ##
   observeEvent(input$actBtnVisualisation,{
-    if(length(input$numSelector)==0){rv$hallmark <- all@tools$hallmarks}
+    if(length(input$numSelector)==0){rv$hallmark <- singlet@tools$hallmarks}
     else{rv$hallmark <- input$numSelector}
     rv$order <- input$hallmark_order
   })
   observeEvent(input$Subsets,{
-    rv$hallmark <- all@tools$hallmarks
+    rv$hallmark <- singlet@tools$hallmarks
     rv$order <-NULL}, ignoreNULL = FALSE)
   output$hallmark_Heatmap <- renderPlot({
     singlet@meta.data$active.idents <- singlet@active.ident
     
     if(is.null(rv$order)){
-      dittoHeatmap(singlet, genes = NULL, metas = all@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
+      dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
                    annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
     } else{
       dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
