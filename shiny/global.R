@@ -2,19 +2,16 @@ library(Seurat)
 library(monocle)
 library(escape)
 library(dittoSeq)
-
 library(plotly)
 library(dplyr)
-
 library(shiny)
 library(shinyjs)
 library(shinyWidgets)
 library(shinydashboard)
 library(dashboardthemes)
 
-
-load(file = paste0("/home/boris/Documents/analyse/singlet_BTG1.RData"))
-meta_variable <- c("seurat_clusters", "Condition", "Phénotype", "Phase", "K29Q", "L37M", "M11I", "pGln45")
+source(file = "functions.R")
+load(file = paste0("/home/boris/Documents/analyse/singlet_testFL140304.RData"))
 
 metadata <- c()
 for(i in 1:length(colnames(all@meta.data))){if (length(levels(as.factor(all@meta.data[[i]]))) > 1 && length(levels(as.factor(all@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(all@meta.data[[1]])))==F ){metadata <- c(metadata, colnames(all@meta.data)[i])}}
@@ -24,10 +21,7 @@ for(i in 1:length(metadata) ){List[[metadata[i]]] <- levels(as.factor(all@meta.d
 
 singlet <- all
 
-#meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
-#annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
-#colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
-#hallmark = all@tools$hallmarks
+
 
 #invisible(lapply(paste0("package:", names(sessionInfo()$otherPkgs)), detach, character.only = TRUE, unload = TRUE))
 
@@ -63,3 +57,8 @@ singlet <- all
 #library("scran") # analysis pipeline
 #library(ggplot2)
 #library(gridExtra)
+
+#meta_variable <- c("seurat_clusters", "HTO_maxID", "Greffe", "SingleR.calls", "clonotype_id","chain", "v_gene", "d_gene", "j_gene","c_gene", "cdr3", "Phase")
+#meta_variable <- c("seurat_clusters", "Condition", "Phénotype", "Phase", "K29Q", "L37M", "M11I", "pGln45")
+#annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
+#hallmark = all@tools$hallmarks

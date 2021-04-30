@@ -3,34 +3,12 @@ colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5F
 shinyServer(function(input, output, session) {
   #################################################################################################
   observeEvent(input$actBtnPatient,{
-    rm(list = ls())
-    load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
+    singlet <<- seurat_subset(singlet, input$Subgroup, tosub())
   })
-  
+  observeEvent(input$resetPatient,{
+    singlet <<- all
+  })
 
-  data <- reactive({
-    if(input$Conditions == "All"){
-      singlet <<- all
-    }
-    if(input$Conditions == "Excipient/RCHOP"){
-      singlet <<- C2
-    }
-    if(input$Conditions == "Excipient/Pré-greffe"){
-      singlet <<- JGE
-    }
-    if(input$Conditions == "B:All"){
-      singlet <<- JGM
-    }
-    if(input$Conditions == "B:Excipient/RCHOP"){
-      singlet <<- MI_WT
-    }
-    if(input$Conditions == "B:Excipient/Pré-greffe"){
-      singlet <<- MI_MU
-    }
-    return(singlet)
-  })
-  
-  
   heatmap <- reactive({
     top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
@@ -61,7 +39,7 @@ shinyServer(function(input, output, session) {
     return(singlet)
   })
   tokeep <- reactive({
-    singlet <- data()
+    #singlet <- data()
     singlet2 <- singlet
     for (l in split()) {
       Idents(singlet2) <- l
@@ -89,6 +67,22 @@ shinyServer(function(input, output, session) {
     return(singlet2)
   })
   
+  sub <- reactive({
+    v <- c()
+    for(i in 1:length(metadata)){if(metadata[i] %in% input$Subgroup){v = c(v, as.character(metadata[i]))}}
+    return(v)
+  })
+  tosub <- reactive({
+    for (l in sub()) {
+      Idents(singlet) <- l
+      tokeep <- levels(Idents(singlet))
+      t <- c()
+      for (i in tokeep){t <- c(t, as.character(input[[paste0("p",i)]]))}
+      tokeep <- tokeep[tokeep %in% t]
+    }
+    return(tokeep)
+  })
+  
   singlet2 <- reactive({
     singlet2 <- singlet
     singlet2 <- RunUMAP(singlet2, reduction = "pca", dims = 1:40, n.components = 3L)
@@ -106,6 +100,18 @@ shinyServer(function(input, output, session) {
     order = NULL
   )
 
+  output$Dynamic_Sub_Spe <- renderUI({
+    choice <- list()
+    for(i in 1:length(metadata)){
+      for(j in 1:length(List[[metadata[i]]])){
+        if(metadata[i] %in% input$Subgroup){
+          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("p",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))  
+        }
+      }
+      fluidRow()
+    }
+    return(choice)
+  })
   output$Dynamic_Group_Spe <- renderUI({
     choice <- list()
     for(i in 1:length(metadata)){
