@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  26 APR 2021 17:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.6)  2 MAY 2021 19:57
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -706,10 +706,6 @@ Package pdftex.def Info: figure/B_ex_pg_FL12_chain.png  used on input line 711.
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [20 </home/boris/Bureau/scShiny/rapport/Rapport/figure/B_ex_rchop_FL12_chain.png>]
-Overfull \hbox (1.89746pt too wide) in paragraph at lines 730--733
-\T1/cmr/m/n/12 identifier lorsque nous confrontront ce types de cellules aux références utiliser dans la littlérature. 
- []
-
 <figure/Expression.png, id=294, 1898.09125pt x 1057.9525pt>
 File: figure/Expression.png Graphic file (type png)
 <use figure/Expression.png>
@@ -772,7 +768,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  71i,9n,79p,564b,452s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk> </home/boris/.TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2074.600pk>
-Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (26 pages, 5907584 bytes).
+Output written on /home/boris/Bureau/scShiny/rapport/Rapport/ModÃ¨le.pdf (26 pages, 5907187 bytes).
 PDF statistics:
  789 PDF objects out of 1000 (max. 8388607)
  326 compressed objects within 4 object streams
