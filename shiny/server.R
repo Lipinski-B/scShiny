@@ -9,7 +9,7 @@ shinyServer(function(input, output, session) {
       text = "Please wait..."
     ) # show the modal window
     singlet <<- seurat_subset(singlet, input$Subgroup, c(tosub()), as.integer(input$maximum), as.integer(input$percent_mt))
-    remove_modal_spinner() # remove it when done
+
     
 
     
@@ -19,6 +19,7 @@ shinyServer(function(input, output, session) {
       text = "Le subsample a bien été crée !",
       type = "success"
     )
+    remove_modal_spinner() # remove it when done
   })
   
   observeEvent(input$resetPatient,{
@@ -36,7 +37,7 @@ shinyServer(function(input, output, session) {
     return(top10)
   })
   FeaturesVariable <- reactive({
-    annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
+    annotations <- read.csv("/home/boris/Bureau/scShiny/document/annotation_FindAllMarkers.csv")
     fv <- annotations[which(annotations$gene_name %in% heatmap()$gene),] 
     fv <- fv[order(fv$gene_name),] 
     return(fv)

@@ -9,42 +9,21 @@ library(dittoSeq)
 library(stringr)
 library(dplyr)
 
+source(file = "/home/boris/Bureau/scShiny/shiny/functions.R")
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
+
 siege <- c("FL140304","FL12C1888")
 patient <- siege[2]
-#load(file = paste0("/home/boris/Documents/analyse/singlet_test", patient,".RData"))
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## CREATION DE L'OBJECT SEURAT + DEMULTIPLEXAGE                                                                                  ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ########
-## -- Workflow -- ##
-source(file = "/home/boris/Bureau/scShiny/shiny/functions.R")
+## -- Workflow -- ## 
 all <- processing(patient)
 
+save(all, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
+save(all, file = paste0(patient,"/R/singlet_",patient,".RData"))
 
-## -- Extraction des conditions -- ##
-#C1 <- seurat_subset(all, "Condition", c("Excipient","RCHOP")) 
-#C2 <- seurat_subset(all, "Condition", c("Excipient","Pré-greffe")) 
-#allB <- seurat_subset(all, "Phénotype", "B cells") 
-#B1 <- seurat_subset(C1, "Phénotype", "B cells") 
-#B2 <- seurat_subset(C2, "Phénotype", "B cells") 
-
-save(all, file = paste0("/home/boris/Documents/analyse/singlet_test",patient,".RData"))
-
-
-
-
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-######## Other                                                                                                                         ######## 
-######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## ######## 
-## -- Save -- ##
-save(all, C1, C2, allB, B1, B2, file = paste0("/home/boris/Documents/analyse/singlet_",patient,".RData"))
-write.csv(all@meta.data, file = paste0("/home/boris/Documents/analyse/metadata_matrix_",patient,".csv"))
-write.csv(as.matrix(all[["RNA"]]@counts), file = paste0("/home/boris/Documents/analyse/count_matrix_", patient,".csv"))
-
-save(all, C1, C2, allB, B1, B2, file = paste0(patient,"/R/singlet_",patient,".RData"))
-write.csv(all@meta.data, file = paste0(patient,"/R/metadata_matrix_",patient,".csv"))
-write.csv(as.matrix(all[["RNA"]]@counts), file = paste0(patient,"/R/count_matrix_", patient,".csv"))
+#all[["RNA"]]@counts
+#all@meta.data
 
 ## -- Summary metadata -- ## 
 result=list()
@@ -286,7 +265,7 @@ DoHeatmap(all, features = top10$gene, group.by = "HTO_maxID") + NoLegend()
 
 # PCA
 Idents(all2)<-"seurat_clusters"
-DimPlot(all2, reduction = "pca")
+DimPlot(singlet, reduction = "pca")
 print(all[["pca"]], dims = 1:10, nfeatures = 10)
 ElbowPlot(all, ndims = 25, reduction = "pca")
 DimHeatmap(all, dims = 1:10, cells = 100, balanced = TRUE)
@@ -322,9 +301,12 @@ annotations_finale <- annotations[which(annotations$gene_name %in% top10),]
 RidgePlot(all, features = c("PCNA", "TOP2A", "MCM6", "MKI67"), ncol = 2)
 
 # Verification Expression marqueurs B_T
-feature <-c("MS4A1", "CD19", "CD79A", "CD79B")
+feature <-c("IGHM", "IGHG1")
 FeaturePlot(all, features = feature, cols = RColorBrewer::brewer.pal(6,"YlOrBr"), combine = TRUE, blend = TRUE) & NoAxes() & NoLegend()
-FeaturePlot(all, features = feature, split.by = "Phase")
+
+all1 <- subset(all, subset=IGHM>1)
+
+FeaturePlot(all1, features = feature , reduction='pca')#, split.by = "Phase")
 FeaturePlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='umap')
 FeaturePlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), reduction='tsne')
 VlnPlot(all, features = c("MS4A1", "CD19", "CD79A", "CD79B"), group.by = "HTO_classification")

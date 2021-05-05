@@ -12,7 +12,7 @@ library(shinydashboard)
 library(dashboardthemes)
 
 source(file = "functions.R")
-load(file = paste0("/home/boris/Documents/analyse/singlet_test_BTG1.RData"))
+load(file = paste0("/home/boris/Documents/analyse/singlet_FL12C1888.RData"))
 
 metadata <- c()
 for(i in 1:length(colnames(all@meta.data))){if (length(levels(as.factor(all@meta.data[[i]]))) > 1 && length(levels(as.factor(all@meta.data[[i]]))) < 25 && is.numeric(levels(as.factor(all@meta.data[[1]])))==F ){metadata <- c(metadata, colnames(all@meta.data)[i])}}
@@ -21,7 +21,11 @@ List <- list()
 for(i in 1:length(metadata) ){List[[metadata[i]]] <- levels(as.factor(all@meta.data[[metadata[i]]]))}
 
 singlet <- all
-singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Phénotype", "Phase", "K29Q", "L37M", "M11I", "pGln45")
+
+#Idents(singlet) <- "Phénotype"
+#singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+
+#singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Phénotype", "Phase")#, "K29Q", "L37M", "M11I", "pGln45")
 
 #invisible(lapply(paste0("package:", names(sessionInfo()$otherPkgs)), detach, character.only = TRUE, unload = TRUE))
 
