@@ -68,8 +68,8 @@ metadata <- function(singlet){
   
   
   ##### -- GoT  -- ##### 
-  load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
-  singlet <- AddMetaData(object = singlet, metadata = GOT)
+  #load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
+  #singlet <- AddMetaData(object = singlet, metadata = GOT)
   
   
   ##### -- Phase cycle -- #### 
@@ -175,6 +175,7 @@ seurat_object <- function(patient){
   
   # Association : cellules / échantillons
   hashtag <- HTODemux(hashtag, assay = "HTO", positive.quantile = 0.99)
+  table(hashtag$HTO_maxID)  
   table(hashtag$HTO_classification.global)                                      # Result
   
   Idents(hashtag)<- 'HTO_classification.global'
@@ -182,14 +183,14 @@ seurat_object <- function(patient){
   singlet <- subset(hashtag, idents = "Singlet")
   colnames(singlet@meta.data)[which(colnames(singlet@meta.data)=="HTO_maxID")] <- "Condition"
   
+  singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
+  singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "Condition")
+  
   return(singlet)
 }
 visualitation <- function(singlet, maximum=2500, percent_mt=5){
   ## -- QC filtres-- ##
-  singlet <- all
   Idents(singlet)<-"seurat_clusters"
-  singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
-  singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "Condition")
   singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < maximum & percent.mt < percent_mt)            # QC Filter : tester 15%
   
   ## -- Pre-processing  -- ##
@@ -220,7 +221,6 @@ processing <- function(patient){
   singlet <- metadata(singlet)
   return(singlet)
 }
-
 seurat_subset <- function(singlet, item, sub_item, maximum_sub=2500, percent_mt_sub=5, subset=NULL, expression=NULL){
   Idents(singlet) <- item
   #if(is.null(subset)){sub_singlet <- subset(singlet, idents = sub_item)}else{sub_singlet <- subset(singlet, idents = sub_item, subset= subsets > expression)}
@@ -228,12 +228,9 @@ seurat_subset <- function(singlet, item, sub_item, maximum_sub=2500, percent_mt_
   sub_singlet <- visualitation(sub_singlet, maximum=maximum_sub, percent_mt=percent_mt_sub)
   return(sub_singlet)
 }
-
-
-#gene_subset <- function(singlet, gene, expr){
-#  expr <- FetchData(object = singlet, vars = gene)
-#  sub_singlet <- singlet[, which(x = expr > 1)]
-#  return(sub_singlet)
-#}
-
-#singlet1 <- gene_subset(singlet, "IGHM", 20000000)
+gene_subset <- function(singlet, gene, expression, maximum_sub=2500, percent_mt_sub=5){
+  expr <- FetchData(object = singlet, vars = gene)
+  sub_singlet <- singlet[, which(x = expr > expression)]
+  sub_singlet <- visualitation(sub_singlet, maximum=maximum_sub, percent_mt=percent_mt_sub)
+  return(sub_singlet)
+}

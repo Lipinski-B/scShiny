@@ -13,10 +13,10 @@ shinyUI(dashboardPage(
       menuItem("Analyses", startExpanded = F,
         menuSubItem("Réduction de dimension",       tabName = "readData", icon = icon("poll")),
         menuSubItem("3D Visualisation",             tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
-        menuSubItem("Analyses PCA",                 tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
+        #menuSubItem("Analyses PCA",                 tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
         menuSubItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
-        menuSubItem("Trajectoires évolutives",      tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
-        menuSubItem("Analyses mitochondriales",     tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")))
+        #menuSubItem("Trajectoires évolutives",      tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+        menuSubItem("Analyses QC",     tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")))
     )
   ),
   
@@ -37,56 +37,69 @@ shinyUI(dashboardPage(
       # Chargement
       tabItem(tabName = "Chargement",
               h1("Lecture des données"),
-              HTML("Additional text to disply only when menuItem tab One is selected \n"),
-              fileInput("dataFile",label = NULL,buttonLabel = "Browse...", placeholder = "No file selected"),
-              selectInput("patient", "Sélectionnez le patient : ", choices = c("hFL_180008B","hFL_130337", "FL12C1888", "FL140304"), selected = F),
+              #HTML("Additional text to disply only when menuItem tab One is selected \n"),
+              #fileInput("dataFile",label = NULL, buttonLabel = "Parcourir...", placeholder = "Aucun patient sélectionné", accept = ".RData"),
+              
+              selectInput("patient", "Sélectionnez le patient : ", choices = c("", "FL12C1888", "FL140304", "FL08G0293", "FULL"), selected = NULL, selectize = F),
               
               h5("Sub sampling : "),
-              column(2,wellPanel(radioButtons(inputId = "Subgroup", label = NULL, choices = metadata, selected = F))),
-              
-              
-              
+              h6("Par expression de gène : "),
+              column(1,align="right",checkboxGroupInput("subFeatures", NULL, choices = list("Features" = "Features"), selected = 0)),
+  
               conditionalPanel(
-                condition = "input.Subgroup",
-                column(2,wellPanel(uiOutput("Dynamic_Sub_Spe"))),
-
-                textInput("maximum", "Nombre de gène max :", value = "2500", width = NULL, placeholder = NULL),
-                textInput("percent_mt", "Pourcentage seuil d'expression mitochondriale :", value = "5", width = NULL, placeholder = NULL),
-                br(),
-                column(2,div(actionButton(inputId = "actBtnPatient", label = "Subset",icon = icon("play") ), align = "left",style = "margin-bottom: 10px;", style = "margin-top: -10px;")),
-                br(),
-                column(12,div(actionButton(inputId = "resetPatient", label = "Reset",icon = icon("play") ),align = "left",style = "margin-bottom: 10px;", style = "margin-top: -10px;"))
+                condition = "input.subFeatures == 'Features' ",
+                fluidRow(column(6,selectInput('Svariables', NULL, NULL, selectize=TRUE, selected = NULL))),
+                fluidRow(column(10,textInput("Seuil_variables", "Expression supérieur à :", value = "1", width = NULL, placeholder = NULL))),
               ),
               
               
               
+              fluidRow(),
+              h6("Par condition : "),
+              fluidRow(),
+              column(2,wellPanel(radioButtons(inputId = "Subgroup", label = NULL, choices = metadata, selected = F))),
+              
+              
+              conditionalPanel(
+                condition = "input.Subgroup || input.subFeatures == 'Features'",
+                column(2,wellPanel(uiOutput("Dynamic_Sub_Spe"))),
+                textInput("maximum", "Nombre maximal de gènes exprimé :", value = "2500", width = NULL, placeholder = NULL),
+                textInput("percent_mt", "Pourcentage seuil d'expression mitochondriale :", value = "5", width = NULL, placeholder = NULL),
+              ),
+              
+              fluidRow(),
+              column(2,div(actionButton(inputId = "actBtnPatient", label = "Subset",icon = icon("play") ), align = "left",style = "margin-bottom: 10px;", style = "margin-top: -10px;")),
+              br(),
+              column(12,div(actionButton(inputId = "resetPatient", label = "Reset",icon = icon("play") ),align = "left",style = "margin-bottom: 10px;", style = "margin-top: -10px;"))
+              
+
 
       ),
 
       # Métadonnées
       tabItem(tabName = "metadata",
               h2("Visualisation des métadonnées"),
-              plotlyOutput('dataTable', width = "100%",  height = "1200px")
+              plotlyOutput('dataTable', width = "100%",  height = "600px")
       ),
       
       # Read data
       tabItem(tabName = "readData",
               
-              a(
-                href = "https://www.dublinbus.ie/RTPI/Sources-of-Real-Time-Information/",
-                "Bus stop numbers can be found here.",
-                target = "_blank"
-              ),
-              br(),
-              h3("Custom URL"),
-              p("A custom URL can be used to pre select choices when loading the app. Use the button below to create a URL for the choices currently selected."),
+              #a(
+              #  href = "https://www.dublinbus.ie/RTPI/Sources-of-Real-Time-Information/",
+              #  "Bus stop numbers can be found here.",
+              #  target = "_blank"
+              #),
+              #br(),
+              #h3("Custom URL"),
+              #p("A custom URL can be used to pre select choices when loading the app. Use the button below to create a URL for the choices currently selected."),
               
               
                
               # Paramètre
               sidebarLayout(
                 sidebarPanel(
-                  h4("Parameters : "),
+                  h4("Paramètres : "),
                   br(),
                   
                   
@@ -119,12 +132,10 @@ shinyUI(dashboardPage(
                   fluidRow(),
               ),
               mainPanel(
-                  
-                  #radioButtons("Conditions","Conditions : ", inline=T, c("All","Excipient/Pré-greffe","Excipient/RCHOP", "B:All", "B:Excipient/Pré-greffe","B:Excipient/RCHOP")),
                   # Visualisation
-                  navbarPage("Reduction dimention",
+                  navbarPage("Reduction de dimension",
                              tabPanel("PCA",
-                                      plotOutput("PCA", width = "100%",  height = "650px"),
+                                      plotOutput("PCA", width = "100%",  height = "500px"),
                                       uiOutput("feature_pca")
                              ),
                              tabPanel("UMAP",
@@ -146,7 +157,7 @@ shinyUI(dashboardPage(
                   fluidRow(),
                   conditionalPanel(
                     condition = "input.Features == 'Features' ",
-                    fluidRow(column(6,uiOutput('variables'))),
+                    fluidRow(column(6,selectInput('variables', 'Choices', NULL, multiple=TRUE, selectize=TRUE))),
                   ),
                   #Other
                   #column(11,h3("File preview"),dataTableOutput(outputId = "preview")),
@@ -182,7 +193,7 @@ shinyUI(dashboardPage(
               fluidRow(),
               conditionalPanel(
                 condition = "input.DFeatures == 'Features'",
-                fluidRow(column(6,uiOutput('Dvariables'))),
+                fluidRow(column(6,selectInput('Dvariables', 'Choices', NULL, selectize=TRUE, selected = NULL))),
               ),
       ),
       
@@ -217,7 +228,7 @@ shinyUI(dashboardPage(
                          tabPanel("Ordering", 
                                   radioGroupButtons(inputId = "color_order", label = "Color by :", choices = singlet@tools$meta_variable, justified = TRUE, checkIcon = list(yes = icon("ok",lib = "glyphicon"))),
                                   fluidRow(),
-                                  uiOutput("DDvariables"),
+                                  selectInput('DDvariables', 'Choices', NULL, selectize=TRUE, multiple=TRUE, selected = NULL),
                                   uiOutput("DDorder_trajectory")
                          )
                          
@@ -236,7 +247,7 @@ shinyUI(dashboardPage(
                          tabPanel("Enrichissement Fonctionnel",
                                   tabsetPanel(
                                   tabPanel("Heatmap",
-                                            plotOutput("hallmark_Heatmap", width = "100%",  height = "900px"),
+                                            plotOutput("hallmark_Heatmap", width = "100%",  height = "800px"),
                                             fluidRow(),
                                             column(1,align="right",checkboxGroupInput("Subsets", NULL, choices = list("Subsets" = "Subsets"), selected = 0)),
                                             
@@ -256,12 +267,12 @@ shinyUI(dashboardPage(
                                             )
                                             ),
                                   tabPanel("VlnPlot",
-                                            plotOutput("hallmark_VlnPlot", width = "100%",  height = "1000px"),
+                                            plotOutput("hallmark_VlnPlot", width = "100%",  height = "800px"),
                                             fluidRow(),
                                             wellPanel(h4("Group by :"),
-                                                      pickerInput(inputId = "hallmark_order_vln",label = "Choices : ", choices = singlet@tools$hallmarks),
+                                                      pickerInput(inputId = "hallmark_order_vln",label = "Hallmarks : ", choices = singlet@tools$hallmarks),
                                                       fluidRow(),
-                                                      pickerInput(inputId = "metadata_order_vln",label = "Choices : ", choices = singlet@tools$meta_variable)
+                                                      pickerInput(inputId = "metadata_order_vln",label = "Métadonnées : ", choices = singlet@tools$meta_variable)
                                             )
                                             ),
                                   tabPanel("Hex Density", 

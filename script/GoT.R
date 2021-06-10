@@ -2,12 +2,12 @@ library(stringr)
 library(plyr)
 library(ggplot2)
 
-patient <- "BTG1_pGln45"
+patient <- "FL140304"
 setwd(paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/"))
 
 got <- function(hotspot, colname, patient){
-  BC <- read.table(paste0("/home/boris/Documents/lipinskib/BTG1/data/GOT/barcodes/patients/BC_AC.txt"))
-  #BC <- read.table(paste0("/home/boris/Documents/lipinskib/flinovo/data/",patient,"/GOT/barcodes/barcodes.txt"))
+  #BC <- read.table(paste0("/home/boris/Documents/lipinskib/BTG1/data/GOT/barcodes/patients/BC_AC.txt"))
+  BC <- read.table(paste0("/home/boris/Documents/lipinskib/flinovo/data/",patient,"/GOT/barcodes/barcodes.txt"))
   result <- cbind(hotspot[,17],hotspot[,18],hotspot[,19], hotspot[,19])
   rownames(result) <- unique(unlist(str_split(hotspot[,1],";")))
   colnames(result) <- c("WT","MUT", colname,"SUM")
@@ -43,6 +43,7 @@ got <- function(hotspot, colname, patient){
 }
 vlnp <- function(hotspot,mutation){
   PAT <- c("FL12C1888", "FL140304")
+  PAT <- c("FL140304")
   e <- NULL
   for (i in 1:length(PAT)) {
     patient <- PAT[i]
@@ -56,64 +57,15 @@ vlnp <- function(hotspot,mutation){
       name=c(rep("10X",length(figure1[,1])),rep("10X Targeted",length(figure2[,1])),rep("GoT",length(figure3[,1]))), 
       sum=c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum)),
       patien=rep(paste0(patient,": ",round((length(figure3$name)/length(gt$tomerge[,1]))*100,2)," % genotyping"),length(c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum)))),
-      hotspot=rep(mutation, length(c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum))))
+      #patien=rep(patient,length(c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum)))),
+      #hotspot=rep(mutation, length(c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum)))),
+      hotspot=rep(paste0(mutation,": ",round((length(figure3$name)/length(gt$tomerge[,1]))*100,2)," % genotyping"), length(c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum))))
     )
     
     e <- rbind(e, m)
   }
   return(e)
 }
-
-##################################################################################################################################################################
-######### BTG1 #########
-########################
-AC_BTG1_K29Q <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/AC/K29Q/BTG1_K29Q.summTable.txt", header = T), "AC_BTG1_K29Q")
-AC_BTG1_L37M <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/AC/L37M/BTG1_L37M.summTable.txt", header = T), "AC_BTG1_L37M")
-AC_BTG1_M11I <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/AC/M11I/BTG1_M11I.summTable.txt", header = T), "AC_BTG1_M11I")
-AC_BTG1_pGln45 <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/AC/pGln45/BTG1_pGln45.summTable.txt", header = T), "AC_BTG1_pGln45")
-
-JG_BTG1_K29Q <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/JG/K29Q/BTG1_K29Q.summTable.txt", header = T), "JG_BTG1_K29Q")
-JG_BTG1_L37M <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/JG/L37M/BTG1_L37M.summTable.txt", header = T), "JG_BTG1_L37M")
-JG_BTG1_M11I <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/JG/M11I/BTG1_M11I.summTable.txt", header = T), "JG_BTG1_M11I")
-JG_BTG1_pGln45 <- got(read.table("/home/boris/Documents/lipinskib/BTG1/result/GOT/result/JG/pGln45/BTG1_pGln45.summTable.txt", header = T), "JG_BTG1_pGln45")
-
-GOT<- cbind(AC_BTG1_K29Q[["tomerge"]], AC_BTG1_L37M[["tomerge"]], AC_BTG1_M11I[["tomerge"]], AC_BTG1_pGln45[["tomerge"]], JG_BTG1_K29Q[["tomerge"]], JG_BTG1_L37M[["tomerge"]], JG_BTG1_M11I[["tomerge"]], JG_BTG1_pGln45[["tomerge"]])
-rownames(GOT) <-paste0(rownames(GOT),"-1")
-#save(GOT, file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
-
-
-df2 <- data.frame(hotspot=rep(c("AC_BTG1_K29Q", "AC_BTG1_L37M", "AC_BTG1_M11I",  "AC_BTG1_pGln45", "JG_BTG1_K29Q", "JG_BTG1_L37M", "JG_BTG1_M11I", "JG_BTG1_pGln45"), each=4), 
-                  condition=rep(c("AMB", "None", "WT"),8),
-                  frequence=c(round((table(GOT[,4])/length(GOT[,1]))*100,2),round((table(GOT[,5])/length(GOT[,1]))*100,2),round((table(GOT[,6])/length(GOT[,1]))*100,2),round((table(GOT[,7])/length(GOT[,1]))*100,2), round((table(GOT[,8])/length(GOT[,1]))*100,2), round((table(GOT[,9])/length(GOT[,1]))*100,2),round((table(GOT[,11])/length(GOT[,1]))*100,2),round((table(GOT[,12])/length(GOT[,1]))*100,2)))
-
-p <- ggplot(data=df2, aes(x=hotspot, y=frequence, fill=condition)) + geom_bar(stat="identity", color="black", position=position_dodge()) + theme_minimal()
-p + scale_fill_manual(values=c('#999999','#E69F00'))
-p + scale_fill_brewer(palette="Blues")
-
-#patien=rep(patient,length(c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum)))),
-AC_BTG1_L37M <- vlnp("CD79B","CD79B")
-
-a <- rbind(cd79B, bcl2, ezh2)
-
-ggplot(ezh2, aes(x=name,y=sum)) +
-  geom_violin(trim = FALSE) +
-  annotate("rect", xmin=1.5, xmax=Inf, ymin=0, ymax=Inf, alpha=0.2, fill="red") + annotate("rect", xmin=0.41, xmax=1.5, ymin=0, ymax=Inf, alpha=0.2, fill="blue")+
-  geom_violin(trim = FALSE) + geom_boxplot(width=.03, outlier.size=0, fill="grey60") + stat_summary(fun.y=median, geom="point", fill="white", shape=21, size=2) +
-  xlab("") + ylab("UMI counts per cell") + scale_y_continuous(breaks = seq(0,64,4), trans = "log2") + labs(title="EZH2 GoT: ") + theme(plot.title = element_text(hjust = 0.5)) + theme(axis.text = element_text(colour = "black"))+
-  theme(panel.background = element_rect(colour = "grey70", size = 2, linetype = "solid"),panel.grid.major = element_line(size = 0.9, linetype = 'solid', colour = "white"),panel.grid.minor = element_line(size = 0.5, linetype = 'solid', colour = "white"))+
-  facet_grid(hotspot ~ patien)
-
-
-
-
-
-
-
-
-
-
-
-
 
 ##################################################################################################################################################################
 ######### Flinovo #########
@@ -138,65 +90,37 @@ rownames(GOT) <-paste0(rownames(GOT),"-1")
 ##################################################################################################################################################################
 ######### Violin plot #########
 ###############################
-
-
-#patien=rep(patient,length(c(as.numeric(figure1[,2]),as.numeric(figure2[,2]),as.numeric(figure3$sum)))),
 cd79B <- vlnp("CD79B","CD79B")
 bcl2 <- vlnp("BCL2", "BCL2_K22K")
 ezh2 <- vlnp("EZH2","EZH2_A682G_1")
 
 a <- rbind(cd79B, bcl2, ezh2)
 
-ggplot(ezh2, aes(x=name,y=sum)) +
+ggplot(a, aes(x=name,y=sum)) +
   geom_violin(trim = FALSE) +
   annotate("rect", xmin=1.5, xmax=Inf, ymin=0, ymax=Inf, alpha=0.2, fill="red") + annotate("rect", xmin=0.41, xmax=1.5, ymin=0, ymax=Inf, alpha=0.2, fill="blue")+
   geom_violin(trim = FALSE) + geom_boxplot(width=.03, outlier.size=0, fill="grey60") + stat_summary(fun.y=median, geom="point", fill="white", shape=21, size=2) +
-  xlab("") + ylab("UMI counts per cell") + scale_y_continuous(breaks = seq(0,64,4), trans = "log2") + labs(title="EZH2 GoT: ") + theme(plot.title = element_text(hjust = 0.5)) + theme(axis.text = element_text(colour = "black"))+
+  xlab("") + ylab("UMI counts per cell") + scale_y_continuous(breaks = seq(0,250,20), trans = "log2") + labs(title="HOTSPOT GoT: ") + theme(plot.title = element_text(hjust = 0.5)) + theme(axis.text = element_text(colour = "black"))+
   theme(panel.background = element_rect(colour = "grey70", size = 2, linetype = "solid"),panel.grid.major = element_line(size = 0.9, linetype = 'solid', colour = "white"),panel.grid.minor = element_line(size = 0.5, linetype = 'solid', colour = "white"))+
-  facet_grid(hotspot ~ patien)
+  facet_grid(~hotspot)
 
 
 ##################################################################################################################################################################
-######### Histograme 1 #########
-################################
-VLNP<- rbind(BCL2_L23L[["sum"]], BCL2_K22K[["sum"]], CD79B_Y696H[["sum"]], EZH2_A682G_1[["sum"]], 
-             EZH2_A682G_2[["sum"]], EZH2_A692V_1[["sum"]], EZH2_A692V_2[["sum"]], EZH2_Y646C[["sum"]], 
-             EZH2_Y646F[["sum"]], EZH2_Y646H[["sum"]], EZH2_Y646N[["sum"]], EZH2_Y646S[["sum"]])
+######### Histograme #########
+##############################
+histo <- data.frame(hotspot=c(rep("BCL2_L23L",length(table( useNA = "always",BCL2_L23L[[1]]))),rep("BCL2_K22K",length(table(useNA = "always", BCL2_K22K[[1]]))),
+                              rep("CD79B_Y196H",length(table(useNA = "always", CD79B[[1]]))),rep("EZH2_A682G",length(table(useNA = "always", EZH2_A682G_1[[1]]))),
+                              rep("EZH2_A692V",length(table(useNA = "always", EZH2_A692V_1[[1]]))),
+                              rep("EZH2_Y646C",length(table(useNA = "always", EZH2_Y646C[[1]]))),
+                              rep("EZH2_Y646F",length(table(useNA = "always", EZH2_Y646F[[1]]))),rep("EZH2_Y646H",length(table(useNA = "always", EZH2_Y646H[[1]]))),
+                              rep("EZH2_Y646N",length(table(useNA = "always", EZH2_Y646N[[1]]))),rep("EZH2_Y646S",length(table(useNA = "always", EZH2_Y646S[[1]])))),
+                    Génotype=c(names(table(useNA = "always", BCL2_L23L[[1]])),names(table(useNA = "always", BCL2_K22K[[1]])),names(table(useNA = "always", CD79B[[1]])),names(table(useNA = "always", EZH2_A682G_1[[1]])),
+                                names(table(useNA = "always", EZH2_A692V_1[[1]])), names(table(useNA = "always", EZH2_Y646C[[1]])),
+                                names(table(useNA = "always", EZH2_Y646F[[1]])),names(table(useNA = "always", EZH2_Y646H[[1]])),names(table(useNA = "always", EZH2_Y646N[[1]])),names(table(useNA = "always", EZH2_Y646S[[1]]))), 
+                    frequence=c(round((table(useNA = "always", GOT[,1])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,2])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,3])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,4])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,6])/length(GOT[,1]))*100,2),
+                                round((table(useNA = "always", GOT[,8])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,9])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,10])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,11])/length(GOT[,1]))*100,2),round((table(useNA = "always", GOT[,12])/length(GOT[,1]))*100,2)))
 
-ggplot(VLNP, aes(x=hotspot,y=sum)) + 
-  geom_violin(trim = FALSE) +
-  geom_boxplot(width=.1, outlier.size=0, fill="grey50") +
-  stat_summary(fun.y=median, geom="point", fill="white", shape=21, size=4) +
-  xlab("Hotspot") +
-  ylab("Number of UMI/Cell") +
-  theme(axis.text = element_text(colour = "black"))# Violin plot basicp
-
-
-
-df2 <- data.frame(hotspot=rep(c("EZH2_A682G_1", "EZH2_A682G_2", "EZH2_A692V_1",  "EZH2_A692V_2", "EZH2_Y646C", "EZH2_Y646F", "EZH2_Y646N", "EZH2_Y646S"), each=4), 
-                  condition=rep(c("AMB", "MUT", "None", "WT"),8),
-                  frequence=c(round((table(GOT[,4])/length(GOT[,1]))*100,2),
-                              round((table(GOT[,5])/length(GOT[,1]))*100,2), 
-                              round((table(GOT[,6])/length(GOT[,1]))*100,2), 
-                              round((table(GOT[,7])/length(GOT[,1]))*100,2), 
-                              round((table(GOT[,8])/length(GOT[,1]))*100,2), 
-                              round((table(GOT[,9])/length(GOT[,1]))*100,2),
-                              round((table(GOT[,11])/length(GOT[,1]))*100,2),
-                              round((table(GOT[,12])/length(GOT[,1]))*100,2)))
-
-p <- ggplot(data=df2, aes(x=hotspot, y=frequence, fill=condition)) + geom_bar(stat="identity", color="black", position=position_dodge()) + theme_minimal()
-p + scale_fill_manual(values=c('#999999','#E69F00'))
-p + scale_fill_brewer(palette="Blues")
-
-#Histograme 2
-df3 <- data.frame(hotspot=rep(c("BCL2_L23L", "BCL2_K22K", "CD79B_Y696H",  "EZH2_Y646H"), each=3),
-                  condition=rep(c("AMB", "None", "WT"),4),
-                  frequence=c(
-                    round((table(GOT[,1])/length(GOT[,1]))*100,2),
-                    round((table(GOT[,2])/length(GOT[,1]))*100,2),
-                    round((table(GOT[,3])/length(GOT[,1]))*100,2),
-                    round((table(GOT[,10])/length(GOT[,1]))*100,2)))
-
-p <- ggplot(data=df3, aes(x=hotspot, y=frequence, fill=condition)) + geom_bar(stat="identity", color="black", position=position_dodge())+ theme_minimal()
-p + scale_fill_manual(values=c('#999999','#E69F00'))
-p + scale_fill_brewer(palette="Blues")
+ggplot(data=histo, aes(x=hotspot, y=frequence, fill=Génotype)) + 
+  geom_bar(stat="identity", color="black", position=position_dodge()) + labs(title="Génotypage du transcriptome") +
+  xlab("Mutation") + ylab("Fréquence des génotypes") +
+  theme_minimal() + scale_fill_manual(values=c('#250000','#E69F00', '#999999'))# + scale_fill_brewer(palette="Blues")

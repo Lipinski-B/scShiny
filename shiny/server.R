@@ -1,5 +1,6 @@
 # server.R
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
+jscode <- "shinyjs.refresh = function() { location.reload(); }"
 shinyServer(function(input, output, session) {
   #################################################################################################
   observeEvent(input$actBtnPatient,{    
@@ -8,20 +9,28 @@ shinyServer(function(input, output, session) {
       color = "deepskyblue",
       text = "Please wait..."
     ) # show the modal window
-    singlet <<- seurat_subset(singlet, input$Subgroup, c(tosub()), as.integer(input$maximum), as.integer(input$percent_mt))
-
     
-
+    if(nchar(as.character(input$patient))>0){
+      load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
+      singlet <<- all
+    }
+    
+    if(length(input$Subgroup)>0){
+      singlet <<- seurat_subset(singlet, input$Subgroup, c(tosub()), as.integer(input$maximum), as.integer(input$percent_mt))
+    }
+    
+    if(length(input$subFeatures)>0){
+      singlet <<- gene_subset(singlet, input$Svariables, as.integer(input$Seuil_variables))
+    }
     
     sendSweetAlert(
       session = session,
       title = "Done !",
-      text = "Le subsample a bien été crée !",
+      text = "Le subsample a bien été créé !",
       type = "success"
     )
     remove_modal_spinner() # remove it when done
   })
-  
   observeEvent(input$resetPatient,{
     singlet <<- all
     sendSweetAlert(
@@ -31,7 +40,7 @@ shinyServer(function(input, output, session) {
       type = "success"
     )
   })
-
+  
   heatmap <- reactive({
     top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
@@ -122,7 +131,7 @@ shinyServer(function(input, output, session) {
     hallmark = singlet@tools$hallmarks,
     order = NULL
   )
-
+  
   output$Dynamic_Sub_Spe <- renderUI({
     choice <- list()
     for(i in 1:length(metadata)){
@@ -161,7 +170,7 @@ shinyServer(function(input, output, session) {
   })
   
   D3feature <- reactive({
-    gene_feature <- input$in7
+    gene_feature <- input$Dvariables
     singlet2 <- singlet2()
     all_feature <- rownames(as.matrix(singlet2[["RNA"]]@counts))
     plot.data <- FetchData(object = singlet2, vars = c(all_feature, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"), slot = 'data')
@@ -169,9 +178,9 @@ shinyServer(function(input, output, session) {
     plot.data$label <- paste(rownames(plot.data)," - ", plot.data[[gene_feature]], sep="")
     return(plot.data)
   })
-  output$Dfeature_pca = renderUI({if(length(input$in7)>0){plotlyOutput("DFeaturePlot_PCA", width = "100%",  height = "800px")}})
-  output$Dfeature_umap = renderUI({if(length(input$in7)>0){plotlyOutput("DFeaturePlot_UMAP", width = "100%",  height = "800px")}})
-  output$Dfeature_tsne = renderUI({if(length(input$in7)>0){plotlyOutput("DFeaturePlot_TSNE", width = "100%",  height = "800px")}})
+  output$Dfeature_pca = renderUI({if(length(input$Dvariables)>0){plotlyOutput("DFeaturePlot_PCA", width = "100%",  height = "800px")}})
+  output$Dfeature_umap = renderUI({if(length(input$Dvariables)>0){plotlyOutput("DFeaturePlot_UMAP", width = "100%",  height = "800px")}})
+  output$Dfeature_tsne = renderUI({if(length(input$Dvariables)>0){plotlyOutput("DFeaturePlot_TSNE", width = "100%",  height = "800px")}})
   
   output$DFeaturePlot_PCA <- renderPlotly({
     plot_ly(data = D3feature(), x = ~PC_1, y = ~PC_2, z = ~PC_3, 
@@ -201,33 +210,32 @@ shinyServer(function(input, output, session) {
     ) #%>% layout(title=gene_feature)
   })
   
+  updateSelectizeInput(session, 'Svariables', choices = feature, server = TRUE)
+  updateSelectizeInput(session, 'variables', choices = feature, server = TRUE)
+  updateSelectizeInput(session, 'Dvariables', choices = feature, server = TRUE)
+  updateSelectizeInput(session, 'DDvariables', choices = feature, server = TRUE)
   
-  feature <- reactive({row.names(as.matrix(singlet[["RNA"]]@counts))})
-  output$variables = renderUI({selectInput('in6', 'Choices', feature(), multiple=TRUE, selectize=TRUE)})
-  output$Dvariables = renderUI({selectInput('in7', 'Choices', feature(), selectize=TRUE, selected = NULL)})
-  output$feature_pca = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_PCA", width = "100%",  height = "650px")}})
-  output$feature_umap = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_UMAP", width = "100%",  height = "650px")}})
-  output$feature_tsne = renderUI({if(length(input$in6)>0){plotOutput("FeaturePlot_TSNE", width = "100%",  height = "650px")}})
+  output$feature_pca = renderUI({if(length(input$variables)>0){plotOutput("FeaturePlot_PCA", width = "100%",  height = "500px")}})
+  output$feature_umap = renderUI({if(length(input$variables)>0){plotOutput("FeaturePlot_UMAP", width = "100%",  height = "650px")}})
+  output$feature_tsne = renderUI({if(length(input$variables)>0){plotOutput("FeaturePlot_TSNE", width = "100%",  height = "650px")}})
   
-  output$DDvariables = renderUI({selectInput('in8', 'Choices', feature(), selectize=TRUE, multiple=TRUE, selected = NULL)})
-  output$DDorder_trajectory = renderUI({if(length(input$in8)>0){plotOutput("order_trajectory", width = "100%",  height = "1000px")}})
+  output$DDorder_trajectory = renderUI({if(length(input$DDvariables)>0){plotOutput("order_trajectory", width = "100%",  height = "1000px")}})
   
   #################################################################################################
   ## -- FeaturePlot -- ## 
-  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "pca", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend() & theme(title = element_text(size=20))})
-  output$FeaturePlot_UMAP <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "umap", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
-  output$FeaturePlot_TSNE <- renderPlot({FeaturePlot(tokeep(), features = input$in6, reduction = "tsne", split.by = split(), pt.size = 2, combine = T) & NoAxes() & NoLegend()})
+  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$variables, reduction = "pca", split.by = split(), pt.size = 1, combine = T, ncol = 2) & NoAxes() & NoLegend() & theme(title = element_text(size=15))})
+  output$FeaturePlot_UMAP <- renderPlot({FeaturePlot(tokeep(), features = input$variables, reduction = "umap", split.by = split(), pt.size = 1, combine = T) & NoAxes() & NoLegend()})
+  output$FeaturePlot_TSNE <- renderPlot({FeaturePlot(tokeep(), features = input$variables, reduction = "tsne", split.by = split(), pt.size = 1, combine = T) & NoAxes() & NoLegend()})
   output$feature_other <- renderPlotly({FeaturePlot(singlet, features = "CD19", interactive = T)})
-  
   
   ## -- PCA -- ##
   output$PCA <- renderPlot({
-    plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
+    plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 1)
     plots & theme(title = element_text(size=20),
                   legend.position = "top",
-                  legend.title = element_text(size=15),
-                  legend.text = element_text(size=15)
-                  ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
+                  legend.title = element_text(size=10),
+                  legend.text = element_text(size=10)
+    ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
   })
   output$D_PCA <- renderPlotly({
     plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3, 
@@ -235,13 +243,12 @@ shinyServer(function(input, output, session) {
             type = "scatter3d", mode = "markers", 
             marker = list(size = 3, width=2),
             text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata,
-                                                      scene = list(
-                                                        xaxis = list(title = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")),
-                                                        yaxis = list(title = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %")),
-                                                        zaxis = list(title = paste0("PCA 3 : ", round(Stdev(singlet[["pca"]])[3],2), " %"))
-                                                      ))
+                                                                                    scene = list(
+                                                                                      xaxis = list(title = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")),
+                                                                                      yaxis = list(title = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %")),
+                                                                                      zaxis = list(title = paste0("PCA 3 : ", round(Stdev(singlet[["pca"]])[3],2), " %"))
+                                                                                    ))
   })
-  
   
   ## -- UMAP -- ##
   output$UMAP <- renderPlot({
@@ -255,7 +262,6 @@ shinyServer(function(input, output, session) {
             marker = list(size = 3, width=2),
             text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata) 
   })
-  
   
   ## -- TSNE -- ##
   output$TSNE <- renderPlot({
@@ -274,7 +280,6 @@ shinyServer(function(input, output, session) {
   ## -- Heatmap -- ##
   output$Heatmap <- renderPlot({DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()})
   output$Heatmap_feature <- renderPrint({print(singlet@commands[["FindAllMarkers"]])})
-
   
   ## -- Mitochondrie Figure -- ##
   output$MT_VlnPlot <- renderPlot({
@@ -283,7 +288,6 @@ shinyServer(function(input, output, session) {
   output$MT_FeatureScatter <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")})
   output$MT_FeatureScatter2 <- renderPlot({FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")})
   
-  
   ## -- The 50 most highly variable genes -- ##
   output$top50 <- renderPlot({
     VariableFeaturePlot(singlet)
@@ -291,14 +295,12 @@ shinyServer(function(input, output, session) {
   })
   output$Variable_feature <- renderPrint({print(FeaturesVariable())})
   
-  
   # -- PCA Figure -- ##
   output$PCA10 <- renderPrint({print(singlet[["pca"]], dims = 1:10, nfeatures = 10)})
   output$ElbowPlot <- renderPlot({ElbowPlot(singlet, ndims = 50, reduction = "pca")})
   output$DimHeatmap <- renderPlot({DimHeatmap(singlet, dims = 1:10, cells = 100, balanced = TRUE)})
   output$VizDimLoadings <- renderPlot({VizDimLoadings(singlet, dims = 1:5, reduction = "pca")})
   output$JackStrawPlot <- renderPlot({JackStrawPlot(singlet, dims = 1:15)})
-  
   
   # -- Enrichissement de gène -- ##
   observeEvent(input$actBtnVisualisation,{
@@ -320,8 +322,14 @@ shinyServer(function(input, output, session) {
                    annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)
     }  
   })
+  
+  
   output$hallmark_VlnPlot <- renderPlot({
-    dittoPlot(singlet, input$hallmark_order_vln, group.by = input$metadata_order_vln) + scale_fill_manual(values = colorblind_vector(20))})
+    dittoPlot(singlet, input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
+  
+  
+  
+  
   output$hallmark_HD <- renderPlot({
     dittoScatterHex(singlet,x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + 
       theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
@@ -338,7 +346,6 @@ shinyServer(function(input, output, session) {
   #pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 
   #masterPCAPlot(ES2, PCx = "PC1", PCy = "PC2", top.contribution = 10)
   #})
-  
   
   ## -- Monocle -- ##
   output$cell_trajectory <- renderPlot({
@@ -359,18 +366,10 @@ shinyServer(function(input, output, session) {
     ) 
   })
   
-  #output$dataTable = DT::renderDataTable({singlet@meta.data}, options = list(
-  #  scrollY = '700px', paging = FALSE,scrollX = TRUE
-  #))
-
-  output$dataTable2 = renderImage({
-    list(src = '/home/boris/Documents/analyse/sunburst2.png', contentType = 'image/png',width = 1100, height = 800,
-         alt = "Alternate text")
-  }, deleteFile = FALSE)
-  
+  ## -- Sunburst -- ##
   output$dataTable = renderPlotly({
     plot_ly(singlet@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")),
             type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%"))
   })
-
+  
 })
