@@ -123,7 +123,7 @@ shinyServer(function(input, output, session) {
   })
   
   D3plot <- reactive({
-    plot.data <- FetchData(object = singlet2(), vars = c(meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
+    plot.data <- FetchData(object = singlet2(), vars = c(singlet@tools$meta_variable, "PC_1", "PC_2", "PC_3", "tSNE_1", "tSNE_2", "tSNE_3", "UMAP_1", "UMAP_2", "UMAP_3"))
     plot.data$label <- paste(rownames(plot.data))
     return(plot.data)
   })
@@ -223,14 +223,14 @@ shinyServer(function(input, output, session) {
   
   #################################################################################################
   ## -- FeaturePlot -- ## 
-  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$variables, reduction = "pca", split.by = split(), pt.size = 1, combine = T, ncol = 2) & NoAxes() & NoLegend() & theme(title = element_text(size=15))})
+  output$FeaturePlot_PCA <- renderPlot({FeaturePlot(tokeep(), features = input$variables, reduction = "pca", split.by = split(), pt.size = 1, combine = T, ncol = 2) & NoAxes() & NoLegend() & theme(title = element_text(size=20))})
   output$FeaturePlot_UMAP <- renderPlot({FeaturePlot(tokeep(), features = input$variables, reduction = "umap", split.by = split(), pt.size = 1, combine = T) & NoAxes() & NoLegend()})
   output$FeaturePlot_TSNE <- renderPlot({FeaturePlot(tokeep(), features = input$variables, reduction = "tsne", split.by = split(), pt.size = 1, combine = T) & NoAxes() & NoLegend()})
   output$feature_other <- renderPlotly({FeaturePlot(singlet, features = "CD19", interactive = T)})
   
   ## -- PCA -- ##
   output$PCA <- renderPlot({
-    plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 1)
+    plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
     plots & theme(title = element_text(size=20),
                   legend.position = "top",
                   legend.title = element_text(size=10),
@@ -368,8 +368,62 @@ shinyServer(function(input, output, session) {
   
   ## -- Sunburst -- ##
   output$dataTable = renderPlotly({
-    plot_ly(singlet@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")),
-            type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%"))
+    plot_ly(all@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")),
+            type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%", "\nTotal : " ,singlet@tools$sunburst$values))
   })
   
+  ## -- Clonotype -- ##
+  output$VDJ_Clonotype = renderPlotly({
+    plot_ly(x = all@tools$Clonotype[[1]], y = all@tools$Clonotype[[2]], name = "Info", type = "bar", 
+            hovertemplate = paste0('Clonotype : %{x}\n', "Proportion : ", round(all@tools$vloupe$proportion[1:5],3)*100,
+                          "% \nType : ", all@tools$vloupe$type[1:5], 
+                          "\nIsotype : ", all@tools$vloupe$igh_c_genes[1:5], 
+                          "\nHeavy : ", all@tools$vloupe$V_lourde[1:5], " / ", all@tools$vloupe$D_lourde[1:5], " / ", all@tools$vloupe$J_lourde[1:5], 
+                          "\nLight : ", all@tools$vloupe$V_legere[1:5], " / ", all@tools$vloupe$J_legere[1:5])
+    ) %>% layout(title='Frequencies of the mains clonotypes')
+  })
+  
+  ## -- VDJ -- ##
+  output$V = renderPlotly({
+    plot_ly(x = all@tools$V[[1]], y = all@tools$V[[2]], name = "Clonotype", type = "bar") %>% 
+      layout(title='Frequencies V genes : Heavy and Lights chains', xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
+  })
+  
+  output$D = renderPlotly({
+    plot_ly(x = all@tools$D[[1]], y = all@tools$D[[2]], name = "Clonotype", type = "bar") %>% 
+      layout(title='Frequencies D genes : Heavy chain',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
+  })
+  
+  output$J = renderPlotly({
+    plot_ly(x = all@tools$J[[1]], y = all@tools$J[[2]], name = "Clonotype", type = "bar") %>% 
+      layout(title='Frequencies J genes : Heavy and Lights chains',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
+  })
+  
+  ## -- Heavy chain -- ##
+  output$VDJ_Heavy = renderPlotly({
+    plot_ly(x = all@tools$Heavy[[1]], y = all@tools$Heavy[[2]], name = "Heavy Chain", type = "bar",
+            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(all@tools$Heavy[[2]]/sum(all@tools$Heavy[[2]]),3)*100,"%")) %>%  
+      layout(title='Frequencies Heavy Chain' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
+  })
+  
+  output$VDJ_DHeavy = renderPlotly({
+    plot_ly(x = all@tools$Isotype[[1]], y = all@tools$Isotype[[2]], name = "Heavy Chain", type = "bar",
+            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(all@tools$Isotype[[2]]/sum(all@tools$Isotype[[2]]),3)*100,"%")) %>%  
+      layout(title='Frequencies Heavy Chain with details' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
+  })
+  
+  
+  ## -- Light chain -- ##
+  output$VDJ_Light = renderPlotly({
+    plot_ly(x = all@tools$Light[[1]], y = all@tools$Light[[2]], name = "Light Chain", type = "bar",
+            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(all@tools$Light[[2]]/sum(all@tools$Light[[2]]),3)*100,"%")) %>% 
+      layout(title='Frequencies Light Chain')
+  })
+  
+  output$VDJ_DLight = renderPlotly({
+    plot_ly(x = all@tools$Type[[1]], y = all@tools$Type[[2]], name = "Clonotype", type = "bar",
+            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(all@tools$Type[[2]]/sum(all@tools$Type[[2]]),3)*100,"%")) %>% 
+      layout(title='Frequencies Light Chain with details')
+  })
+
 })

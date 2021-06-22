@@ -1,3 +1,16 @@
+#global.R
+#FL09 : réponse modéré
+
+#all@meta.data$SingleR.calls.fine<- all@meta.data$d_gene <- all@meta.data[70] <- all@meta.data$v_gene <- all@meta.data$j_gene <- all@meta.data$c_gene <- all@meta.data$old.ident <- all@meta.data$BCL2_L23L <- all@meta.data$BCL2_K22K <- all@meta.data$CD79B_Y696H <- all@meta.data$EZH2_A682G_1 <- all@meta.data$EZH2_A682G_2  <- all@meta.data$EZH2_A692V_1  <- all@meta.data$EZH2_A692V_2  <- all@meta.data$EZH2_Y646S  <- all@meta.data$EZH2_Y646N  <- all@meta.data$EZH2_Y646H  <- all@meta.data$EZH2_Y646F  <- all@meta.data$EZH2_Y646C <- NULL
+
+#annotations <- read.csv("/home/boris/Bureau/scShiny/annotation_FindAllMarkers.csv")
+#Idents(singlet) <- "Phénotype"
+#singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+#invisible(lapply(paste0("package:", names(sessionInfo()$otherPkgs)), detach, character.only = TRUE, unload = TRUE))
+
+
+
+#seurat.R
 save(all, file = paste0(patient,"/R/singlet_",patient,".RData")) #all[["RNA"]]@counts
 
 

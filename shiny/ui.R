@@ -13,10 +13,11 @@ shinyUI(dashboardPage(
       menuItem("Analyses", startExpanded = F,
         menuSubItem("Réduction de dimension",       tabName = "readData", icon = icon("poll")),
         menuSubItem("3D Visualisation",             tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
-        #menuSubItem("Analyses PCA",                 tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
+        #menuSubItem("Analyses PCA",                tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
         menuSubItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
-        #menuSubItem("Trajectoires évolutives",      tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
-        menuSubItem("Analyses QC",     tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")))
+        #menuSubItem("Trajectoires évolutives",     tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+        menuSubItem("Analyses QC",                  tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
+        menuSubItem("Analyses VDJ",                 tabName = "VDJ", icon = icon("leaf", lib = "glyphicon")))
     )
   ),
   
@@ -40,7 +41,7 @@ shinyUI(dashboardPage(
               #HTML("Additional text to disply only when menuItem tab One is selected \n"),
               #fileInput("dataFile",label = NULL, buttonLabel = "Parcourir...", placeholder = "Aucun patient sélectionné", accept = ".RData"),
               
-              selectInput("patient", "Sélectionnez le patient : ", choices = c("", "FL12C1888", "FL140304", "FL08G0293", "FULL"), selected = NULL, selectize = F),
+              selectInput("patient", "Sélectionnez le patient : ", choices = c("", "FL12C1888", "FL140304", "FL08G0293", "FL09C1164", "FULL"), selected = NULL, selectize = F),
               
               h5("Sub sampling : "),
               h6("Par expression de gène : "),
@@ -135,7 +136,7 @@ shinyUI(dashboardPage(
                   # Visualisation
                   navbarPage("Reduction de dimension",
                              tabPanel("PCA",
-                                      plotOutput("PCA", width = "100%",  height = "500px"),
+                                      plotOutput("PCA", width = "100%",  height = "650px"),
                                       uiOutput("feature_pca")
                              ),
                              tabPanel("UMAP",
@@ -305,6 +306,34 @@ shinyUI(dashboardPage(
                                   tabPanel("Top", verbatimTextOutput("Variable_feature")))
                          )
               )
-      )  
+      ),
+      
+      # VDJ
+      tabItem(tabName = "VDJ",
+              navbarPage("Choose : ",
+                         tabPanel("Clonotype", plotlyOutput("VDJ_Clonotype", width = "100%",  height = "500px")),
+                         tabPanel("Heavy", plotlyOutput("VDJ_Heavy", width = "100%",  height = "500px"),
+                                  
+                                  column(1,align="right",checkboxGroupInput("heavy_details", NULL, choices = list("Details" = "Details"), selected = 0)),
+                                  conditionalPanel(
+                                    condition = "input.heavy_details == 'Details' ",
+                                    br(),
+                                    plotlyOutput("VDJ_DHeavy", width = "100%",  height = "500px"))
+                                  
+                                  ),
+                         tabPanel("Lights", plotlyOutput("VDJ_Light", width = "100%",  height = "500px"),
+                                  
+                                  column(1,align="right",checkboxGroupInput("light_details", NULL, choices = list("Details" = "Details"), selected = 0)),
+                                  conditionalPanel(
+                                    condition = "input.light_details == 'Details' ",
+                                    br(),
+                                    plotlyOutput("VDJ_DLight", width = "100%",  height = "500px"))
+                                  
+                                  ),
+                         tabPanel("V", plotlyOutput("V", width = "100%",  height = "500px")),
+                         tabPanel("D", plotlyOutput("D", width = "100%",  height = "500px")),
+                         tabPanel("J", plotlyOutput("J", width = "100%",  height = "500px"))
+              ),
+      )
     ))
 ))
