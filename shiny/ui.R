@@ -6,19 +6,48 @@ shinyUI(dashboardPage(
   ########################## Menu ##########################
   dashboardSidebar(
     sidebarMenu(
-      menuItem(text = "Lecture", startExpanded = T,
-        menuSubItem("Chargement des données",       tabName = "Chargement", icon = icon("readme")),
-        menuSubItem("Métadonnées",                  tabName = "metadata", icon = icon("poll"))),
+      br(),
+      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164"), selected = "FL08G0293", selectize = F),
+      actionButton(inputId = "actBtnPatient1", label = "Submit",icon = icon("play"), width ='87%'),
+      #submitButton("Submit", width = 230),
+      br(),
       
+
+      
+      column(1,h4("Information :", style="color:white")),
+      br(), 
+      br(), 
+      column(1,textOutput("nb_tot_cell")),
+      br(),
+      column(1,textOutput("nb_b_cell")),
+      br(),
+      column(1,textOutput("nb_other_cell")),
+      br(),
+      br(), 
+      column(1,textOutput("nb_Controle_cell")),
+      br(),
+      column(1,textOutput("nb_Excipient_cell")),
+      br(),
+      column(1,textOutput("nb_RCHOP_cell")),
+      br(),
+      br(),
+      verbatimTextOutput("nb_clonotype_cell"),
+
       menuItem("Analyses", startExpanded = F,
+        menuSubItem("Chargement des données",       tabName = "Chargement", icon = icon("readme")),
+        menuSubItem("Métadonnées",                  tabName = "metadata", icon = icon("poll")),
         menuSubItem("Réduction de dimension",       tabName = "readData", icon = icon("poll")),
         menuSubItem("3D Visualisation",             tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
         #menuSubItem("Analyses PCA",                tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
         menuSubItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
         #menuSubItem("Trajectoires évolutives",     tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
-        menuSubItem("Analyses QC",                  tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
-        menuSubItem("Analyses VDJ",                 tabName = "VDJ", icon = icon("leaf", lib = "glyphicon")))
+        menuSubItem("Controle Qualité",             tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
+        menuSubItem("Analyses VDJ",                 tabName = "VDJ", icon = icon("cog", lib = "glyphicon")))
     )
+
+    
+
+
   ),
   
   ########################## Body ##########################
@@ -37,22 +66,17 @@ shinyUI(dashboardPage(
     tabItems(
       # Chargement
       tabItem(tabName = "Chargement",
-              h1("Lecture des données"),
+              h1("Subsample :"),
+
               #HTML("Additional text to disply only when menuItem tab One is selected \n"),
               #fileInput("dataFile",label = NULL, buttonLabel = "Parcourir...", placeholder = "Aucun patient sélectionné", accept = ".RData"),
+                
+              #selectInput("patient", "Sélectionnez le patient : ", choices = c("", "FL12C1888", "FL140304", "FL08G0293", "FL09C1164", "FULL"), selected = NULL, selectize = F),
               
-              selectInput("patient", "Sélectionnez le patient : ", choices = c("", "FL12C1888", "FL140304", "FL08G0293", "FL09C1164", "FULL"), selected = NULL, selectize = F),
-              
-              h5("Sub sampling : "),
-              h6("Par expression de gène : "),
-              column(1,align="right",checkboxGroupInput("subFeatures", NULL, choices = list("Features" = "Features"), selected = 0)),
-  
-              conditionalPanel(
-                condition = "input.subFeatures == 'Features' ",
-                fluidRow(column(6,selectInput('Svariables', NULL, NULL, selectize=TRUE, selected = NULL))),
-                fluidRow(column(10,textInput("Seuil_variables", "Expression supérieur à :", value = "1", width = NULL, placeholder = NULL))),
+              box("Sub sampling : ", width = 2, solidHeader = T, collapsible = T,
+                selectInput('Svariables', "Gène : ", NULL, selectize=TRUE, selected = NULL),
+                textInput("Seuil_variables", "Expression supérieur à :", value = "1", width = NULL, placeholder = NULL),
               ),
-              
               
               
               fluidRow(),
@@ -310,30 +334,29 @@ shinyUI(dashboardPage(
       
       # VDJ
       tabItem(tabName = "VDJ",
-              navbarPage("Choose : ",
-                         tabPanel("Clonotype", plotlyOutput("VDJ_Clonotype", width = "100%",  height = "500px")),
-                         tabPanel("Heavy", plotlyOutput("VDJ_Heavy", width = "100%",  height = "500px"),
-                                  
-                                  column(1,align="right",checkboxGroupInput("heavy_details", NULL, choices = list("Details" = "Details"), selected = 0)),
-                                  conditionalPanel(
-                                    condition = "input.heavy_details == 'Details' ",
-                                    br(),
-                                    plotlyOutput("VDJ_DHeavy", width = "100%",  height = "500px"))
-                                  
-                                  ),
-                         tabPanel("Lights", plotlyOutput("VDJ_Light", width = "100%",  height = "500px"),
-                                  
-                                  column(1,align="right",checkboxGroupInput("light_details", NULL, choices = list("Details" = "Details"), selected = 0)),
-                                  conditionalPanel(
-                                    condition = "input.light_details == 'Details' ",
-                                    br(),
-                                    plotlyOutput("VDJ_DLight", width = "100%",  height = "500px"))
-                                  
-                                  ),
-                         tabPanel("V", plotlyOutput("V", width = "100%",  height = "500px")),
-                         tabPanel("D", plotlyOutput("D", width = "100%",  height = "500px")),
-                         tabPanel("J", plotlyOutput("J", width = "100%",  height = "500px"))
-              ),
+               box("Clonotype", width = 12, plotlyOutput("VDJ_Clonotype", width = "100%",  height = "400px")),
+               box("Heavy", width = 7, plotlyOutput("VDJ_Heavy", width = "100%",  height = "400px"),
+                        
+                        column(1,align="right",checkboxGroupInput("heavy_details", NULL, choices = list("Details" = "Details"), selected = 0)),
+                        conditionalPanel(
+                          condition = "input.heavy_details == 'Details' ",
+                          br(),
+                          plotlyOutput("VDJ_DHeavy", width = "100%",  height = "400px"))
+                        
+                        ),
+               box("Lights", width = 5, plotlyOutput("VDJ_Light", width = "100%",  height = "400px"),
+                        
+                        column(1,align="right",checkboxGroupInput("light_details", NULL, choices = list("Details" = "Details"), selected = 0)),
+                        conditionalPanel(
+                          condition = "input.light_details == 'Details' ",
+                          br(),
+                          plotlyOutput("VDJ_DLight", width = "100%",  height = "400px"))
+                        
+                        ),
+               fluidRow(
+                 box("V", width = 4, plotlyOutput("V", width = "100%",  height = "400px")),
+                 box("D", width = 4, plotlyOutput("D", width = "100%",  height = "400px")),
+                 box("J", width = 4, plotlyOutput("J", width = "100%",  height = "400px")))
       )
     ))
 ))
