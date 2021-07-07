@@ -39,7 +39,7 @@ metadata <- function(singlet){
   names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
   singlet <- AddMetaData(singlet, ES)
   singlet@tools$hallmarks <- names(ES)
-  singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "clonotype_id", "Phase", "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")# c("seurat_clusters", "Condition", "Phénotype", "Phase", "K29Q", "L37M", "M11I", "pGln45")
+  singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "clonotype_id", "Phase")#, "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")# c("seurat_clusters", "Condition", "Phénotype", "Phase", "K29Q", "L37M", "M11I", "pGln45")
   
   
   ##### -- VDJ -- ##### 
@@ -197,11 +197,7 @@ seurat_object <- function(patient){
   
   return(singlet)
 }
-visualitation <- function(singlet, maximum=2500, percent_mt=5){
-  ## -- QC filtres-- ##
-  Idents(singlet)<-"seurat_clusters"
-  singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < maximum & percent.mt < percent_mt)            # QC Filter : tester 15%
-  
+visualitation <- function(singlet){
   ## -- Pre-processing  -- ##
   singlet <- NormalizeData(singlet, normalization.method = "LogNormalize", scale.factor = 10000) 
   singlet <- FindVariableFeatures(singlet, selection.method = "vst", nfeatures = 2000)
@@ -230,20 +226,31 @@ processing <- function(patient){
   singlet <- metadata(singlet)
   return(singlet)
 }
-seurat_subset <- function(singlet, item, sub_item, maximum_sub=2500, percent_mt_sub=5, subset=NULL, expression=NULL){
+
+
+seurat_subset <- function(singlet, item, sub_item){
   Idents(singlet) <- item
-  #if(is.null(subset)){sub_singlet <- subset(singlet, idents = sub_item)}else{sub_singlet <- subset(singlet, idents = sub_item, subset= subsets > expression)}
   sub_singlet <- subset(singlet, idents = sub_item)
-  sub_singlet <- visualitation(sub_singlet, maximum=maximum_sub, percent_mt=percent_mt_sub)
+  sub_singlet <- visualitation(sub_singlet)
   return(sub_singlet)
 }
-gene_subset <- function(singlet, gene, expression, maximum_sub=2500, percent_mt_sub=5){
+gene_subset <- function(singlet, gene, expression){
   expr <- FetchData(object = singlet, vars = gene)
   sub_singlet <- singlet[, which(x = expr > expression)]
-  sub_singlet <- visualitation(sub_singlet, maximum=maximum_sub, percent_mt=percent_mt_sub)
+  sub_singlet <- visualitation(sub_singlet)
   return(sub_singlet)
 }
-
+QC_subset <- function(singlet, maximum_sub, percent_mt_sub){
+  
+  if(maximum_sub==""){maximum_sub = 10000}
+  if(percent_mt_sub==""){percent_mt_sub = 50}
+  
+  ## -- QC filtres-- ##
+  Idents(singlet)<-"seurat_clusters"
+  sub_singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < maximum_sub & percent.mt < percent_mt_sub)            # QC Filter : tester 15%
+  sub_singlet <- visualitation(sub_singlet)
+  return(sub_singlet)
+}
 
 
 seurat_object_namanm <- function(i){
@@ -377,6 +384,3 @@ metadata_namnam <- function(singlet){
   
   return(singlet)
 }
-
-
-

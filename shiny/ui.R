@@ -34,15 +34,15 @@ shinyUI(dashboardPage(
       verbatimTextOutput("nb_clonotype_cell"),
 
       menuItem("Analyses", startExpanded = F,
-        menuSubItem("Chargement des données",       tabName = "Chargement", icon = icon("readme")),
         menuSubItem("Métadonnées",                  tabName = "metadata", icon = icon("poll")),
-        menuSubItem("Réduction de dimension",       tabName = "readData", icon = icon("poll")),
-        menuSubItem("3D Visualisation",             tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
+        menuSubItem("Réduction de dimension",       tabName = "readData", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
+        #menuSubItem("3D Visualisation",             tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
         #menuSubItem("Analyses PCA",                tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
         menuSubItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
         #menuSubItem("Trajectoires évolutives",     tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
         menuSubItem("Controle Qualité",             tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
-        menuSubItem("Analyses VDJ",                 tabName = "VDJ", icon = icon("cog", lib = "glyphicon")))
+        menuSubItem("Analyses VDJ",                 tabName = "VDJ", icon = icon("readme")),
+        menuSubItem("Subsamples",      tabName = "Chargement", icon = icon("cog")))
     )
 
     
@@ -59,7 +59,7 @@ shinyUI(dashboardPage(
         font-family: "system-ui", Times, "Times New Roman", serif;
         font-weight: italic;
         font-size: 36px;
-      }
+      
     '))),
     
     ## -- Page -- ##
@@ -75,22 +75,22 @@ shinyUI(dashboardPage(
               
               box("Sub sampling : ", width = 2, solidHeader = T, collapsible = T,
                 selectInput('Svariables', "Gène : ", NULL, selectize=TRUE, selected = NULL),
-                textInput("Seuil_variables", "Expression supérieur à :", value = "1", width = NULL, placeholder = NULL),
+                textInput("Seuil_variables", "Expression supérieur à :", value = NULL, width = NULL, placeholder = NULL),
               ),
               
               
               fluidRow(),
               h6("Par condition : "),
+              
               fluidRow(),
               column(2,wellPanel(radioButtons(inputId = "Subgroup", label = NULL, choices = metadata, selected = F))),
               
               
-              conditionalPanel(
-                condition = "input.Subgroup || input.subFeatures == 'Features'",
-                column(2,wellPanel(uiOutput("Dynamic_Sub_Spe"))),
-                textInput("maximum", "Nombre maximal de gènes exprimé :", value = "2500", width = NULL, placeholder = NULL),
-                textInput("percent_mt", "Pourcentage seuil d'expression mitochondriale :", value = "5", width = NULL, placeholder = NULL),
-              ),
+              
+              column(2,wellPanel(uiOutput("Dynamic_Sub_Spe"))),
+              textInput("maximum", "Nombre maximal de gènes exprimé :", value = NULL, width = NULL, placeholder = NULL),
+              textInput("percent_mt", "Pourcentage seuil d'expression mitochondriale :", value = NULL, width = NULL, placeholder = NULL),
+            
               
               fluidRow(),
               column(2,div(actionButton(inputId = "actBtnPatient", label = "Subset",icon = icon("play") ), align = "left",style = "margin-bottom: 10px;", style = "margin-top: -10px;")),
@@ -103,8 +103,20 @@ shinyUI(dashboardPage(
 
       # Métadonnées
       tabItem(tabName = "metadata",
-              h2("Visualisation des métadonnées"),
-              plotlyOutput('dataTable', width = "100%",  height = "600px")
+              h1("Présentation du patient et métadonnées : "),
+              splitLayout(cellWidths=c("35%","65%"),
+                          
+                          verticalLayout(fluid = T,
+                            tags$head(tags$style(HTML('.shiny-split-layout>div {overflow: hidden;}')),),
+                            verbatimTextOutput("nb_clonotype_cell2"),
+                            br(),
+                            br(),
+                            HTML('<center><img src="bcr.png" width="400"></center>')),
+                plotlyOutput('dataTable', width = "100%",  height = "800px")
+                
+              ),
+              
+              
       ),
       
       # Read data

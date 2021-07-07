@@ -11,12 +11,13 @@ setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 
 ## -- Loading -- ## 
 siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293")
-patient <- siege[2]
+patient <- siege[4]
 #load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
 ## -- Workflow -- ## 
 all <- processing(patient)
 save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+
 
 ## -- Méta patient -- ##
 P1 <- all ; rownames(P1@meta.data) <- paste0("FL14_",rownames(P1@meta.data))

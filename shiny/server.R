@@ -3,8 +3,8 @@ colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5F
 jscode <- "shinyjs.refresh = function() { location.reload(); }"
 shinyServer(function(input, output, session) {
   #################################################################################################
-  sortie <- eventReactive(input$actBtnPatient1,{singlet})
-  
+  sortie <- eventReactive(c(input$actBtnPatient1,input$actBtnPatient) ,{singlet})
+
   observeEvent(input$actBtnPatient1,{    
     show_modal_spinner(
       spin = "semipolar",
@@ -38,13 +38,12 @@ shinyServer(function(input, output, session) {
       load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
       singlet <<- all
     }
+    sortie()
+    if(length(input$Subgroup)>0){singlet <<- seurat_subset(singlet, input$Subgroup, c(tosub()))}
+    if(length(input$subFeatures)>0){singlet <<- gene_subset(singlet, input$Svariables, as.integer(input$Seuil_variables))}
     
-    if(length(input$Subgroup)>0){
-      singlet <<- seurat_subset(singlet, input$Subgroup, c(tosub()), as.integer(input$maximum), as.integer(input$percent_mt))
-    }
-    
-    if(length(input$subFeatures)>0){
-      singlet <<- gene_subset(singlet, input$Svariables, as.integer(input$Seuil_variables))
+    if(length(input$maximum)>0 || length(input$percent_mt)>0){
+      singlet <<- QC_subset(singlet, maximum_sub=input$maximum, percent_mt_sub=input$percent_mt)
     }
     
     sendSweetAlert(
@@ -165,7 +164,7 @@ shinyServer(function(input, output, session) {
   })
   output$nb_b_cell <- renderText({
     sortie()
-    return(paste("B cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))
+    return(paste("B ce.lls : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))
     ))
   })
   output$nb_other_cell <- renderText({
@@ -173,26 +172,41 @@ shinyServer(function(input, output, session) {
     return(paste("\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))
     ))
   })
-  
   output$nb_Controle_cell <- renderText({
     sortie()
     return(paste("\nControle : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Pré-greffe"]))
     ))
   })
-  
   output$nb_Excipient_cell <- renderText({
     sortie()
     return(paste("\nExcipient : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Excipient"]))
     ))
   })
-  
   output$nb_RCHOP_cell <- renderText({
     sortie()
     return(paste("\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"]))
     ))
   })
-  
-  
+  output$nb_clonotype_cell2 <- renderText({
+    sortie()
+    return(
+      paste0(
+        "Numbre total de cellule détectée : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype)))),
+        "\n\nB cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
+        "\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
+        
+        "\n\nControle : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Pré-greffe"])),
+        "\nExcipient : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Excipient"])),
+        "\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"])),
+        
+        "\n\nClonotype majoritaire :", 
+             "\n Proportion : \t", round(singlet@tools$vloupe$proportion[1],3)*100,
+             "% \n Type : \t", singlet@tools$vloupe$type[1], 
+             "\n Isotype : \t", singlet@tools$vloupe$igh_c_genes[1], 
+             "\n Heavy : \t", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1], 
+             "\n Light : \t", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1], "\n")
+    )
+  })
   output$nb_clonotype_cell <- renderText({
     sortie()
     return(
@@ -204,8 +218,18 @@ shinyServer(function(input, output, session) {
              "\n Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1])
     )
   })
-
-  
+  output$H_clonotype_cell <- renderText({
+    sortie()
+    return(
+      paste0("Heavy : ", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1])
+    )
+  })
+  output$L_clonotype_cell <- renderText({
+    sortie()
+    return(
+      paste0("Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1])
+    )
+  })
   
   output$Dynamic_Sub_Spe <- renderUI({
     choice <- list()
@@ -391,24 +415,26 @@ shinyServer(function(input, output, session) {
   
   # -- Enrichissement de gène -- ##
   observeEvent(input$actBtnVisualisation,{
-    if(length(input$numSelector)==0){rv$hallmark <- singlet@tools$hallmarks}
+    if(length(input$numSelector)==0){rv$hallmark <- sortie()@tools$hallmarks}
     else{rv$hallmark <- input$numSelector}
     rv$order <- input$hallmark_order
   })
   observeEvent(input$Subsets,{
-    rv$hallmark <- singlet@tools$hallmarks
+    rv$hallmark <- sortie()@tools$hallmarks
     rv$order <-NULL}, ignoreNULL = FALSE)
+  
   output$hallmark_Heatmap <- renderPlot({
-    singlet@meta.data$active.idents <- singlet@active.ident
-    
+    singlet@meta.data$active.idents <- sortie()@active.ident
+    singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "clonotype_id", "Phase")
     if(is.null(rv$order)){
       dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
                    annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
-    } else{
-      dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
-                   annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)
+    }else{
+      dittoHeatmap(sortie(), genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
+                   annot.by = sortie()@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)
     }  
   })
+  
   output$hallmark_VlnPlot <- renderPlot({
     dittoPlot(sortie() , input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
   output$hallmark_HD <- renderPlot({
@@ -451,7 +477,7 @@ shinyServer(function(input, output, session) {
   ## -- Sunburst -- ##
   output$dataTable = renderPlotly({
     plot_ly(sortie()@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")),
-            type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%", "\nTotal : " ,singlet@tools$sunburst$values))
+            type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%", "\nTotal : " ,singlet@tools$sunburst$values)) 
   })
   
   ## -- Clonotype -- ##
