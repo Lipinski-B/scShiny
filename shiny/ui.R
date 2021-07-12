@@ -42,7 +42,10 @@ shinyUI(dashboardPage(
         #menuSubItem("Trajectoires évolutives",     tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
         menuSubItem("Controle Qualité",             tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
         menuSubItem("Analyses VDJ",                 tabName = "VDJ", icon = icon("readme")),
-        menuSubItem("Subsamples",      tabName = "Chargement", icon = icon("cog")))
+        menuSubItem("Subsamples",      tabName = "Chargement", icon = icon("cog"))),
+      menuItem("Méta-Analyses", startExpanded = F,
+        menuSubItem("VDJ",                  tabName = "metadata_VDJ", icon = icon("poll")),
+        menuSubItem("Cellules",                  tabName = "metadata_cell", icon = icon("poll")))
     )
 
     
@@ -369,6 +372,25 @@ shinyUI(dashboardPage(
                  box("V", width = 4, plotlyOutput("V", width = "100%",  height = "400px")),
                  box("D", width = 4, plotlyOutput("D", width = "100%",  height = "400px")),
                  box("J", width = 4, plotlyOutput("J", width = "100%",  height = "400px")))
+      ), 
+      # metadata VDJ
+      tabItem(tabName = "metadata_VDJ",
+              fluidRow(
+                box("", width = 6, plotlyOutput("FL08_VDJ", width = "100%",  height = "600px")),
+                box("", width = 6, plotlyOutput("FL09_VDJ", width = "100%",  height = "600px"))),
+              fluidRow(
+                box("", width = 6, plotlyOutput("FL12_VDJ", width = "100%",  height = "600px")),
+                box("", width = 6, plotlyOutput("FL14_VDJ", width = "100%",  height = "600px")))
+
+      ),
+      # metadata cell
+      tabItem(tabName = "metadata_cell",
+              fluidRow(
+                box("", width = 6, plotlyOutput("FL08_Meta", width = "100%",  height = "600px")),
+                box("", width = 6, plotlyOutput("FL09_Meta", width = "100%",  height = "600px"))),
+              fluidRow(
+                box("", width = 6, plotlyOutput("FL12_Meta", width = "100%",  height = "600px")),
+                box("", width = 6, plotlyOutput("FL14_Meta", width = "100%",  height = "600px")))
       )
     ))
 ))

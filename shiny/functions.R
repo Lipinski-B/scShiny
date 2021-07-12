@@ -67,7 +67,7 @@ metadata <- function(singlet){
   
   
   ##### -- GoT  -- ##### 
-  load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/GOT/result/", patient, "_GoT.Rdata"))
+  load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/R/", patient, "_GoT.Rdata"))
   singlet <- AddMetaData(object = singlet, metadata = GOT)
   
   

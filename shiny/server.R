@@ -529,4 +529,46 @@ shinyServer(function(input, output, session) {
             hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Type[[2]]/sum(singlet@tools$Type[[2]]),3)*100,"%")) %>% 
       layout(title='Frequencies Light Chain with details', yaxis =list(title="Number of cells"))
   })
+  
+  
+  
+  
+  
+  
+  ## -- Méta-VDJ -- ##
+  output$FL08_VDJ = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL08G0293_VDJ.RData")
+    e
+  })
+  output$FL09_VDJ = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL09C1164_VDJ.RData")
+    e
+  })
+  output$FL12_VDJ = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL12C1888_VDJ.RData")
+    e
+  })
+  output$FL14_VDJ = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL140304_VDJ.RData")
+    e
+  })
+  
+  output$FL08_Meta = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL08G0293_VDJ.RData")
+    f
+  })
+  output$FL09_Meta = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL09C1164_VDJ.RData")
+    f
+  })
+  output$FL12_Meta = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL12C1888_VDJ.RData")
+    f
+  })
+  output$FL14_Meta = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL140304_VDJ.RData")
+    f
+  })
+  
+  
 })
