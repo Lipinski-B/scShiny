@@ -5,6 +5,8 @@ shinyServer(function(input, output, session) {
   #################################################################################################
   sortie <- eventReactive(c(input$actBtnPatient1,input$actBtnPatient) ,{singlet})
 
+
+  
   observeEvent(input$actBtnPatient1,{    
     show_modal_spinner(
       spin = "semipolar",
@@ -27,6 +29,8 @@ shinyServer(function(input, output, session) {
     
     
   })
+  
+  
   observeEvent(input$actBtnPatient,{    
     show_modal_spinner(
       spin = "semipolar",
@@ -64,6 +68,8 @@ shinyServer(function(input, output, session) {
     )
   })
   
+  
+
   heatmap <- reactive({
     top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
@@ -569,6 +575,19 @@ shinyServer(function(input, output, session) {
     load(file = "/home/boris/Bureau/scShiny/shiny/www/FL140304_VDJ.RData")
     f
   })
+
+  output$PDF_report <- downloadHandler(
+    filename = function() {paste0("rapport_", input$patient,".pdf")},
+    content = function(file) {file.copy(paste0("www/",input$patient,"/rapport_", input$patient,".pdf"), file)}
+  )
   
+  output$HTML_report <- downloadHandler(
+    filename = function() {paste0("rapport_", input$patient,".html")},
+    content = function(file) {file.copy(paste0("www/",input$patient,"/rapport_", input$patient,".html"), file)}
+  )
   
+  output$Word_report <- downloadHandler(
+    filename = function() {paste0("rapport_", input$patient,".docx")},
+    content = function(file) {file.copy(paste0("www/",input$patient,"/rapport_", input$patient,".docx"), file)}
+  )
 })

@@ -7,7 +7,7 @@ shinyUI(dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       br(),
-      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164"), selected = "FL08G0293", selectize = F),
+      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164"), selected = "FL08G0293", selectize = T),
       actionButton(inputId = "actBtnPatient1", label = "Submit",icon = icon("play"), width ='87%'),
       #submitButton("Submit", width = 230),
       br(),
@@ -36,16 +36,17 @@ shinyUI(dashboardPage(
       menuItem("Analyses", startExpanded = F,
         menuSubItem("Métadonnées",                  tabName = "metadata", icon = icon("poll")),
         menuSubItem("Réduction de dimension",       tabName = "readData", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
-        #menuSubItem("3D Visualisation",             tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
+        #menuSubItem("3D Visualisation",            tabName = "3D_RD", icon = icon("indent-right", lib = "glyphicon")),
         #menuSubItem("Analyses PCA",                tabName = "PCA_facteurs", icon = icon("lock", lib = "glyphicon")),
         menuSubItem("Expression et enrichissement", tabName = "hallmark", icon = icon("calendar")),
         #menuSubItem("Trajectoires évolutives",     tabName = "monocle", icon = icon("sort-by-attributes-alt", lib = "glyphicon")),
         menuSubItem("Controle Qualité",             tabName = "mitochondrie", icon = icon("leaf", lib = "glyphicon")),
         menuSubItem("Analyses VDJ",                 tabName = "VDJ", icon = icon("readme")),
-        menuSubItem("Subsamples",      tabName = "Chargement", icon = icon("cog"))),
+        menuSubItem("Subsamples",                   tabName = "Chargement", icon = icon("cog"))),
       menuItem("Méta-Analyses", startExpanded = F,
-        menuSubItem("VDJ",                  tabName = "metadata_VDJ", icon = icon("poll")),
-        menuSubItem("Cellules",                  tabName = "metadata_cell", icon = icon("poll")))
+        menuSubItem("VDJ",                          tabName = "metadata_VDJ", icon = icon("poll")),
+        menuSubItem("Cellules",                     tabName = "metadata_cell", icon = icon("poll")),
+        menuSubItem("scRepertoir",                  tabName = "metadata_scRepertoir", icon = icon("poll")))
     )
 
     
@@ -76,32 +77,34 @@ shinyUI(dashboardPage(
                 
               #selectInput("patient", "Sélectionnez le patient : ", choices = c("", "FL12C1888", "FL140304", "FL08G0293", "FL09C1164", "FULL"), selected = NULL, selectize = F),
               
-              box("Sub sampling : ", width = 2, solidHeader = T, collapsible = T,
-                selectInput('Svariables', "Gène : ", NULL, selectize=TRUE, selected = NULL),
-                textInput("Seuil_variables", "Expression supérieur à :", value = NULL, width = NULL, placeholder = NULL),
-              ),
-              
-              
-              fluidRow(),
-              h6("Par condition : "),
-              
-              fluidRow(),
-              column(2,wellPanel(radioButtons(inputId = "Subgroup", label = NULL, choices = metadata, selected = F))),
-              
-              
-              
-              column(2,wellPanel(uiOutput("Dynamic_Sub_Spe"))),
-              textInput("maximum", "Nombre maximal de gènes exprimé :", value = NULL, width = NULL, placeholder = NULL),
-              textInput("percent_mt", "Pourcentage seuil d'expression mitochondriale :", value = NULL, width = NULL, placeholder = NULL),
-            
-              
-              fluidRow(),
-              column(2,div(actionButton(inputId = "actBtnPatient", label = "Subset",icon = icon("play") ), align = "left",style = "margin-bottom: 10px;", style = "margin-top: -10px;")),
-              br(),
-              column(12,div(actionButton(inputId = "resetPatient", label = "Reset",icon = icon("play") ),align = "left",style = "margin-bottom: 10px;", style = "margin-top: -10px;"))
-              
 
-
+              fluidRow(),
+              
+              fluidRow(
+                column(width = 6,
+                  box("Metadata filters : ", width = 12, solidHeader = T, collapsible = T,
+                    br(),br(),
+                    column(6,wellPanel(radioButtons(inputId = "Subgroup", label = NULL, choices = metadata, selected = F))),
+                    column(6,wellPanel(uiOutput("Dynamic_Sub_Spe")))
+                )),
+              
+                column(width = 3,
+                  box("QC filters : ", width = 12, solidHeader = T, collapsible = T,
+                    textInput("maximum", "Nombre maximal de gènes exprimé :", value = NULL, width = NULL, placeholder = NULL),
+                    textInput("percent_mt", "Pourcentage seuil d'expression mitochondriale :", value = NULL, width = NULL, placeholder = NULL)
+                  ),
+                  
+                  fluidRow(),
+                  box("Gene expression filter : ", width = 12, solidHeader = T, collapsible = T,
+                    selectInput('Svariables', "Gène : ", NULL, selectize=TRUE, selected = NULL),
+                    textInput("Seuil_variables", "Expression supérieur à :", value = NULL, width = NULL, placeholder = NULL),
+                  ),
+                  
+                  fluidRow(),
+                  div(actionButton(inputId = "actBtnPatient", label = "Subset",icon = icon("play") ), align = "left", style = "margin-bottom: 10px;", style = "margin-top: -10px;"),
+                  div(actionButton(inputId = "resetPatient", label = "Reset",icon = icon("play") ),align = "left", style = "margin-bottom: 10px;", style = "margin-top: -10px;"),
+                  
+              ))
       ),
 
       # Métadonnées
@@ -118,7 +121,10 @@ shinyUI(dashboardPage(
                 plotlyOutput('dataTable', width = "100%",  height = "800px")
                 
               ),
-              
+
+              downloadButton("PDF_report", "PDF report"),
+              downloadButton("HTML_report", "HTML report"),
+              downloadButton("Word_report", "Word report")
               
       ),
       
@@ -373,6 +379,9 @@ shinyUI(dashboardPage(
                  box("D", width = 4, plotlyOutput("D", width = "100%",  height = "400px")),
                  box("J", width = 4, plotlyOutput("J", width = "100%",  height = "400px")))
       ), 
+      
+      
+      ############################################################################################
       # metadata VDJ
       tabItem(tabName = "metadata_VDJ",
               fluidRow(
@@ -391,6 +400,19 @@ shinyUI(dashboardPage(
               fluidRow(
                 box("", width = 6, plotlyOutput("FL12_Meta", width = "100%",  height = "600px")),
                 box("", width = 6, plotlyOutput("FL14_Meta", width = "100%",  height = "600px")))
+      ),
+      # metadata scRepertoir
+      tabItem(tabName = "metadata_scRepertoir",
+              navbarPage("Figure : ",
+                         tabPanel("Homeostasis",
+                                  HTML('<left><img src="scRepertoir/clonalHomeostasis.png" width="1000"></left>')),
+                         tabPanel("Proportion",
+                                  HTML('<left><img src="scRepertoir/clonalProportion.png" width="900"></left>')),
+                         tabPanel("Contig length",
+                                  HTML('<left><img src="scRepertoir/lengthContig.png" width="900"></left>')),
+                         tabPanel("Contig quant",
+                                  HTML('<left><img src="scRepertoir/quantContig_output.png" width="700"></left>')))
+              
       )
     ))
 ))

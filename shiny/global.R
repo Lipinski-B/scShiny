@@ -1,4 +1,4 @@
-.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.0') )
+.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
 library(Seurat)
 library(monocle)
 library(escape)
@@ -20,4 +20,3 @@ for(i in 1:length(colnames(all@meta.data))){if (length(levels(as.factor(all@meta
 for(i in 1:length(metadata) ){List[[metadata[i]]] <- levels(as.factor(all@meta.data[[metadata[i]]]))}
 all@tools$meta_variable <- c("seurat_clusters","Condition","Greffe","Phénotype","clonotype_id","Phase")   #c("dd","a") #si objet namnam
 singlet <- all
-
