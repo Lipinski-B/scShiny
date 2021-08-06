@@ -8,6 +8,35 @@
 #singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
 #invisible(lapply(paste0("package:", names(sessionInfo()$otherPkgs)), detach, character.only = TRUE, unload = TRUE))
 
+##### -- identification des cellules -- ##### 
+# DB: DatabaseImmuneCellExpressionData()
+#hpca.se <- celldex::DatabaseImmuneCellExpressionData()
+#results <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.main)
+#results.fine <- SingleR(test = as.SingleCellExperiment(singlet), ref = hpca.se, labels = hpca.se$label.fine)
+
+#singlet$SingleR.pruned.calls <- results$pruned.labels
+#singlet$SingleR.calls <- results$labels
+#singlet$SingleR.pruned.calls.fine <- results.fine$pruned.labels
+#singlet$SingleR.calls.fine <- results.fine$labels
+
+
+# DB: BlueprintEncodeData()
+#singlet$SingleR.pruned.calls.blueprint <- results$pruned.labels
+#singlet$SingleR.pruned.calls.blueprint.fine <- results.blueprint.fine$pruned.labels
+
+
+#singlet <- RunSPCA(singlet, features = VariableFeatures(singlet), ndims.print = 1:10, nfeatures.print = 30, graph = singlet@graphs[["RNA_snn"]])# Reduction dimension
+## -- Ohter PCA analysis -- ## 
+#singlet <- JackStraw(singlet, num.replicate = 100, reduction = "pca")
+#singlet <- ScoreJackStraw(singlet, dims = 1:20)
+
+
+
+
+## -- FindAllMarkers -- ## 
+singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+#singlet@commands[["FindAllMarkers"]] <- merge(singlet@commands[["FindAllMarkers"]], annotations, by.x="gene", by.y="gene_name")
+#singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
 
 
 #seurat.R

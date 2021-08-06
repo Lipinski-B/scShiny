@@ -7,7 +7,7 @@ shinyUI(dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       br(),
-      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164"), selected = "FL08G0293", selectize = T),
+      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164", "all"), selected = "FL08G0293", selectize = T),
       actionButton(inputId = "actBtnPatient1", label = "Submit",icon = icon("play"), width ='87%'),
       #submitButton("Submit", width = 230),
       br(),
@@ -99,6 +99,9 @@ shinyUI(dashboardPage(
                     selectInput('Svariables', "Gène : ", NULL, selectize=TRUE, selected = NULL),
                     textInput("Seuil_variables", "Expression supérieur à :", value = NULL, width = NULL, placeholder = NULL),
                   ),
+                  
+                  fluidRow(),
+                  radioButtons(inputId = "combo", label = "Combinaison to analyse :", choiceNames = c("Excipient/RCHOP", "Pré-greffe/RCHOP", "Excipient/Pré-greffe"), choiceValues = c("EX_RCHOP","PG_RCHOP","PG_EX"),selected = F),
                   
                   fluidRow(),
                   div(actionButton(inputId = "actBtnPatient", label = "Subset",icon = icon("play") ), align = "left", style = "margin-bottom: 10px;", style = "margin-top: -10px;"),
@@ -284,16 +287,67 @@ shinyUI(dashboardPage(
       # Hallmark
       tabItem(tabName = "hallmark",
               navbarPage("Analyses : ",
-                         tabPanel("Expression",
+                         tabPanel("Expression Différentielle",
                                   tabsetPanel(
-                                  tabPanel("Heatmap", plotOutput("Heatmap", width = "100%",  height = "1200px")),
-                                  tabPanel("Info ", verbatimTextOutput("Heatmap_feature")))
+                                    tabPanel("Heatmap",
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         h3("RCHOP vs Excipient :"),
+                                                         h3("Pré-greffe vs Excipient :")),
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         plotOutput("DE_Heatmap_RE", width = "95%",  height = "1200px"),
+                                                         plotOutput("DE_Heatmap_PE", width = "95%",  height = "1200px"))),
+                                    tabPanel("RidgePlot",
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         h3("RCHOP vs Excipient :"),
+                                                         h3("Pré-greffe vs Excipient :")),
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         plotOutput("DE_RidgePlot_RE", width = "95%",  height = "1200px"),
+                                                         plotOutput("DE_RidgePlot_PE", width = "95%",  height = "1200px"))),
+                                    tabPanel("VlnPlot",
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         h3("RCHOP vs Excipient :"),
+                                                         h3("Pré-greffe vs Excipient :")),
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         plotOutput("DE_VlnPlot_RE", width = "95%",  height = "1200px"),
+                                                         plotOutput("DE_VlnPlot_PE", width = "95%",  height = "1200px"))),
+                                    tabPanel("DotPlot",
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         h3("RCHOP vs Excipient :"),
+                                                         h3("Pré-greffe vs Excipient :")),
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         plotOutput("DE_DotPlot_RE", width = "95%",  height = "600px"),
+                                                         plotOutput("DE_DotPlot_PE", width = "95%",  height = "600px"))),
+                                    tabPanel("Info",
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         h3("RCHOP vs Excipient :"),
+                                                         h3("Pré-greffe vs Excipient :")),
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         verbatimTextOutput("DE_info_RE"),
+                                                         verbatimTextOutput("DE_info_PE"))),
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    tabPanel("Seurat Standard", 
+                                             plotOutput("Heatmap", width = "100%",  height = "1200px"),
+                                             verbatimTextOutput("Heatmap_feature"))
+                                    )
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
                          ),
                          
                          tabPanel("Enrichissement Fonctionnel",
                                   tabsetPanel(
                                   tabPanel("Heatmap",
-                                            plotOutput("hallmark_Heatmap", width = "100%",  height = "800px"),
+                                            plotOutput("hallmark_Heatmap", width = "100%",  height = "1200px"),
                                             fluidRow(),
                                             column(1,align="right",checkboxGroupInput("Subsets", NULL, choices = list("Subsets" = "Subsets"), selected = 0)),
                                             

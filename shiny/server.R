@@ -3,7 +3,7 @@ colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5F
 jscode <- "shinyjs.refresh = function() { location.reload(); }"
 shinyServer(function(input, output, session) {
   #################################################################################################
-  sortie <- eventReactive(c(input$actBtnPatient1,input$actBtnPatient) ,{singlet})
+  sortie <- eventReactive(c(input$actBtnPatient1,input$actBtnPatient, input$resetPatient) ,{singlet})
 
 
   
@@ -43,12 +43,16 @@ shinyServer(function(input, output, session) {
       singlet <<- all
     }
     sortie()
+    
     if(length(input$Subgroup)>0){singlet <<- seurat_subset(singlet, input$Subgroup, c(tosub()))}
     if(length(input$subFeatures)>0){singlet <<- gene_subset(singlet, input$Svariables, as.integer(input$Seuil_variables))}
+    if(nchar(as.character(input$maximum))>0 || nchar(as.character(input$percent_mt))>0){singlet <<- QC_subset(singlet, maximum_sub=input$maximum, percent_mt_sub=input$percent_mt)}
     
-    if(length(input$maximum)>0 || length(input$percent_mt)>0){
-      singlet <<- QC_subset(singlet, maximum_sub=input$maximum, percent_mt_sub=input$percent_mt)
+    if(length(input$combo)>0){
+      load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,"_",input$combo,".RData"))
+      singlet <<- all
     }
+    
     
     sendSweetAlert(
       session = session,
@@ -71,7 +75,7 @@ shinyServer(function(input, output, session) {
   
 
   heatmap <- reactive({
-    top10 <- singlet@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
+    top10 <- sortie()@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
   })
   FeaturesVariable <- reactive({
@@ -170,7 +174,7 @@ shinyServer(function(input, output, session) {
   })
   output$nb_b_cell <- renderText({
     sortie()
-    return(paste("B ce.lls : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))
+    return(paste("B cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))
     ))
   })
   output$nb_other_cell <- renderText({
@@ -383,12 +387,60 @@ shinyServer(function(input, output, session) {
   })
   
   ## -- Heatmap -- ##
+  output$DE_Heatmap_RE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    DoHeatmap(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
+  })
+  output$DE_RidgePlot_RE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    RidgePlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20], ncol = 4) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+  })
+  output$DE_VlnPlot_RE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    VlnPlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20], sort = T) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+  })
+  output$DE_DotPlot_RE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    DotPlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20]) + RotatedAxis()
+  })
+  
+  output$DE_Heatmap_PE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    DoHeatmap(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:50], size = 3)
+  })
+  output$DE_RidgePlot_PE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    RidgePlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20], ncol = 4) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+  })
+  output$DE_VlnPlot_PE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    VlnPlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20], sort = T) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+  })
+  output$DE_DotPlot_PE <- renderPlot({
+    sortie()
+    Idents(singlet)<-"Condition"
+    DotPlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20]) + RotatedAxis()
+  })
+
+  
+  
+  output$DE_info_RE <- renderPrint({print(sortie()@tools$DE_RE)})
+  output$DE_info_PE <- renderPrint({print(sortie()@tools$DE_PE)})
+  
+  
+  
   output$Heatmap <- renderPlot({
-    DoHeatmap(sortie(), features = heatmap()$gene, group.by = "Condition") + NoLegend()
+    sortie()
+    DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()
   })
-  output$Heatmap_feature <- renderPrint({
-    print(sortie()@commands[["FindAllMarkers"]])
-  })
+  output$Heatmap_feature <- renderPrint({print(sortie()@commands[["FindAllMarkers"]])})
   
   ## -- Mitochondrie Figure -- ##
   output$MT_VlnPlot <- renderPlot({
@@ -430,14 +482,15 @@ shinyServer(function(input, output, session) {
     rv$order <-NULL}, ignoreNULL = FALSE)
   
   output$hallmark_Heatmap <- renderPlot({
-    singlet@meta.data$active.idents <- sortie()@active.ident
-    singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "clonotype_id", "Phase")
+    sortie()
+    singlet@meta.data$active.idents <- singlet@active.ident
+    singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "Phase", "orig.ident") # "clonotype_id",
     if(is.null(rv$order)){
       dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
                    annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
     }else{
-      dittoHeatmap(sortie(), genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
-                   annot.by = sortie()@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)
+      dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
+                   annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)
     }  
   })
   
