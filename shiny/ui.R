@@ -7,7 +7,7 @@ shinyUI(dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       br(),
-      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164", "all"), selected = "FL08G0293", selectize = T),
+      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164","FL02G095","FL05G0330","all"), selected = "FL08G0293", selectize = T),
       actionButton(inputId = "actBtnPatient1", label = "Submit",icon = icon("play"), width ='87%'),
       #submitButton("Submit", width = 230),
       br(),
@@ -443,7 +443,10 @@ shinyUI(dashboardPage(
                 box("", width = 6, plotlyOutput("FL09_VDJ", width = "100%",  height = "600px"))),
               fluidRow(
                 box("", width = 6, plotlyOutput("FL12_VDJ", width = "100%",  height = "600px")),
-                box("", width = 6, plotlyOutput("FL14_VDJ", width = "100%",  height = "600px")))
+                box("", width = 6, plotlyOutput("FL14_VDJ", width = "100%",  height = "600px"))),
+              fluidRow(
+                box("", width = 6, plotlyOutput("FL02_VDJ", width = "100%",  height = "600px")),
+                box("", width = 6, plotlyOutput("FL05_VDJ", width = "100%",  height = "600px"))),
 
       ),
       # metadata cell
@@ -453,7 +456,10 @@ shinyUI(dashboardPage(
                 box("", width = 6, plotlyOutput("FL09_Meta", width = "100%",  height = "600px"))),
               fluidRow(
                 box("", width = 6, plotlyOutput("FL12_Meta", width = "100%",  height = "600px")),
-                box("", width = 6, plotlyOutput("FL14_Meta", width = "100%",  height = "600px")))
+                box("", width = 6, plotlyOutput("FL14_Meta", width = "100%",  height = "600px"))),
+              fluidRow(
+                box("", width = 6, plotlyOutput("FL02_Meta", width = "100%",  height = "600px")),
+                box("", width = 6, plotlyOutput("FL05_Meta", width = "100%",  height = "600px"))),
       ),
       # metadata scRepertoir
       tabItem(tabName = "metadata_scRepertoir",

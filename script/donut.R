@@ -33,8 +33,8 @@ data %>% plot_ly(labels = ~clonotype, values = ~frequency) %>%
                 yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 
-
 siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293")
+siege <- c("FL02G095","FL05G0330")
 
 for (patient in siege) {
   load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/VDJ.RData"))

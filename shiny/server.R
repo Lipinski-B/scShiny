@@ -611,6 +611,14 @@ shinyServer(function(input, output, session) {
     load(file = "/home/boris/Bureau/scShiny/shiny/www/FL140304_VDJ.RData")
     e
   })
+  output$FL02_VDJ = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL02G095_VDJ.RData")
+    e
+  })
+  output$FL05_VDJ = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL05G0330_VDJ.RData")
+    e
+  })
   
   output$FL08_Meta = renderPlotly({
     load(file = "/home/boris/Bureau/scShiny/shiny/www/FL08G0293_VDJ.RData")
@@ -626,6 +634,15 @@ shinyServer(function(input, output, session) {
   })
   output$FL14_Meta = renderPlotly({
     load(file = "/home/boris/Bureau/scShiny/shiny/www/FL140304_VDJ.RData")
+    f
+  })
+  
+  output$FL02_Meta = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL02G095_VDJ.RData")
+    f
+  })
+  output$FL05_Meta = renderPlotly({
+    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL05G0330_VDJ.RData")
     f
   })
 
