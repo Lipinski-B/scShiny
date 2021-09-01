@@ -3,13 +3,13 @@
 # Example R code to install packages if not already installed
 #
 
-my_packages = c("Seurat") #"plotly","dplyr","shiny","shinyjs","shinybusy","shinyWidgets","shinydashboard","dashboardthemes")
+my_packages = c("plotly","dplyr","shiny","shinyjs","shinybusy","shinyWidgets","shinydashboard","dashboardthemes")#"Seurat") 
 
 
 install_if_missing = function(p) {
   if (p %in% rownames(installed.packages()) == FALSE) {
     helpers.installPackages(p)
-    BiocManager::install("monocle","escape","dittoSeq")
+    #BiocManager::install("monocle","escape","dittoSeq")
   }
 }
 

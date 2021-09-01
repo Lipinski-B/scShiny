@@ -1,5 +1,5 @@
 .libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
-library(Seurat)
+#library(Seurat)
 #library(monocle)
 #library(escape)
 #library(dittoSeq)
