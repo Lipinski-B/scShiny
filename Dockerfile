@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y \
 
 # install R packages required escape monocle future
 # (change it depending on the packages you need)
-RUN R -e "install.packages(c('Seurat','stringr','plotly','dplyr','shiny','shinyjs','shinybusy','shinydashboard','dashboardthemes','SeuratObject','shinyWidgets'), repos='http://cran.rstudio.com/')"
-RUN R -e "BiocManager::install(c('dittoSeq', 'celldex', 'SingleR'))"
+RUN R -e "install.packages(c('plotly','shiny','shinydashboard','dashboardthemes','shinyWidgets'), repos='http://cran.rstudio.com/')"
+#RUN R -e "BiocManager::install(c('dittoSeq', 'celldex', 'SingleR'))"
 
 # Copy configuration files into the Docker image
 COPY shiny-server.conf  /etc/shiny-server/shiny-server.conf
