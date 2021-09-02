@@ -1,11 +1,11 @@
 library(Seurat)
 library(celldex)
 library(SingleR)
-library(escape)
+#library(escape)
 library(dittoSeq)
 library(stringr)
 library(dplyr)
-library(future)
+#library(future)
 
 #plan("multiprocess", workers = 6)
 
