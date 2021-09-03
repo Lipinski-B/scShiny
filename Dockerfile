@@ -28,6 +28,6 @@ EXPOSE 1024
 # Copy further configuration files into the Docker image
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN ["chmod", "+x", "/usr/bin/shiny-server.sh"]
-USER shiny
 CMD ["/usr/bin/shiny-server.sh"]
 
+RUN P=$(id -u) ; printf "run_as u$P;" >> /etc/shiny-server/shiny-server.conf
