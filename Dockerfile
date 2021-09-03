@@ -1,8 +1,6 @@
 # get shiny server plus tidyverse packages image
 FROM rocker/shiny-verse:latest
 
-
-
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
     sudo \
@@ -12,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libcairo2-dev \
     libxt-dev \
     libssl-dev \
-    libssh2-1-dev nano sudo
+    libssh2-1-dev nano
 
 # install R packages required escape monocle future
 # (change it depending on the packages you need)
@@ -30,6 +28,6 @@ EXPOSE 1024
 # Copy further configuration files into the Docker image
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN ["chmod", "+x", "/usr/bin/shiny-server.sh"]
-CMD ["sudo /usr/bin/shiny-server.sh"]
-
 USER shiny
+CMD ["/usr/bin/shiny-server.sh"]
+
