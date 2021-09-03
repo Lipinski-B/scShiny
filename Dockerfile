@@ -1,7 +1,7 @@
 # get shiny server plus tidyverse packages image
 FROM rocker/shiny-verse:latest
 
-USER shiny
+
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
@@ -31,3 +31,5 @@ EXPOSE 1024
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN ["chmod", "+x", "/usr/bin/shiny-server.sh"]
 CMD ["/usr/bin/shiny-server.sh"]
+
+USER shiny
