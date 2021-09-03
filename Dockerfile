@@ -23,7 +23,7 @@ COPY /app /srv/shiny-server/
 RUN rm /srv/shiny-server/index.html
 
 # Make the ShinyApp available at port 80
-EXPOSE 1024
+EXPOSE 8080
 EXPOSE $PORT
 
 # Copy further configuration files into the Docker image
