@@ -29,5 +29,3 @@ EXPOSE 1024
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN ["chmod", "+x", "/usr/bin/shiny-server.sh"]
 CMD ["/usr/bin/shiny-server.sh"]
-
-RUN P=$(id -u) ; printf "run_as u$P;" >> /etc/shiny-server/shiny-server.conf
