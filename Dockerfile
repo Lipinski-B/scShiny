@@ -1,6 +1,10 @@
 # get shiny server plus tidyverse packages image
 FROM rocker/shiny-verse:latest
 
+RUN useradd -ms /bin/bash shiny
+USER shiny
+WORKDIR /home/shiny
+
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
     sudo \
@@ -23,7 +27,7 @@ COPY /app /srv/shiny-server/
 RUN rm /srv/shiny-server/index.html
 
 # Make the ShinyApp available at port 80
-EXPOSE 80
+EXPOSE 1024
 
 # Copy further configuration files into the Docker image
 COPY shiny-server.sh /usr/bin/shiny-server.sh
