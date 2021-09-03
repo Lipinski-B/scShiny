@@ -1,9 +1,7 @@
 # get shiny server plus tidyverse packages image
 FROM rocker/shiny-verse:latest
 
-RUN useradd -ms /bin/bash shiny
 USER shiny
-WORKDIR /home/shiny
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
