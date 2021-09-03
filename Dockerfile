@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libcairo2-dev \
     libxt-dev \
     libssl-dev \
-    libssh2-1-dev
+    libssh2-1-dev nano
 
 # install R packages required escape monocle future
 # (change it depending on the packages you need)
