@@ -1,4 +1,4 @@
-.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
+#.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
 library(Seurat)
 library(dittoSeq)
 library(plotly)
