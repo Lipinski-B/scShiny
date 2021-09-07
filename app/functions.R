@@ -1,13 +1,4 @@
-#library(Seurat)
-#library(celldex)
-#library(SingleR)
-#library(escape)
-#library(dittoSeq)
-#library(stringr)
-#library(dplyr)
-#library(future)
-
-#plan("multiprocess", workers = 6)
+source(file = "package.R")
 
 ## -- Worflow -- ##
 metadata <- function(singlet){  

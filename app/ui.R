@@ -12,25 +12,13 @@ shinyUI(dashboardPage(
       #submitButton("Submit", width = 230),
       br(),
       
-
-      
-      column(1,h4("Information :", style="color:white")),
-      br(), 
-      br(), 
-      column(1,textOutput("nb_tot_cell")),
-      br(),
-      column(1,textOutput("nb_b_cell")),
-      br(),
-      column(1,textOutput("nb_other_cell")),
-      br(),
-      br(), 
-      column(1,textOutput("nb_Controle_cell")),
-      br(),
-      column(1,textOutput("nb_Excipient_cell")),
-      br(),
-      column(1,textOutput("nb_RCHOP_cell")),
-      br(),
-      br(),
+      column(1,h4("Information :", style="color:white")),br(),br(), 
+      column(1,textOutput("nb_tot_cell")),br(),
+      column(1,textOutput("nb_b_cell")),br(),
+      column(1,textOutput("nb_other_cell")),br(),br(), 
+      column(1,textOutput("nb_Controle_cell")),br(),
+      column(1,textOutput("nb_Excipient_cell")),br(),
+      column(1,textOutput("nb_RCHOP_cell")),br(),br(),
       verbatimTextOutput("nb_clonotype_cell"),
 
       menuItem("Analyses", startExpanded = F,
@@ -48,42 +36,28 @@ shinyUI(dashboardPage(
         menuSubItem("Cellules",                     tabName = "metadata_cell", icon = icon("poll")),
         menuSubItem("scRepertoir",                  tabName = "metadata_scRepertoir", icon = icon("poll")))
     )
-
-    
-
-
   ),
   
   ########################## Body ##########################
   dashboardBody(
     ## -- Thème -- ##
     shinyDashboardThemes(theme = "blue_gradient"),
-    tags$head(tags$style(HTML('
-      .main-header .logo {
-        font-family: "system-ui", Times, "Times New Roman", serif;
-        font-weight: italic;
-        font-size: 36px;
-      
-    '))),
+    tags$head(tags$style(HTML('.main-header .logo {font-family: "system-ui", Times, "Times New Roman", serif;font-weight: italic;font-size: 36px;'))),
     
     ## -- Page -- ##
-    tabItems(
-      # Chargement
+    tabItems(# Chargement
       tabItem(tabName = "Chargement",
               h1("Subsample :"),
 
               #HTML("Additional text to disply only when menuItem tab One is selected \n"),
               #fileInput("dataFile",label = NULL, buttonLabel = "Parcourir...", placeholder = "Aucun patient sélectionné", accept = ".RData"),
-                
               #selectInput("patient", "Sélectionnez le patient : ", choices = c("", "FL12C1888", "FL140304", "FL08G0293", "FL09C1164", "FULL"), selected = NULL, selectize = F),
               
-
               fluidRow(),
               
               fluidRow(
                 column(width = 6,
-                  box("Metadata filters : ", width = 12, solidHeader = T, collapsible = T,
-                    br(),br(),
+                  box("Metadata filters : ", width = 12, solidHeader = T, collapsible = T,br(),br(),
                     column(6,wellPanel(radioButtons(inputId = "Subgroup", label = NULL, choices = metadata, selected = F))),
                     column(6,wellPanel(uiOutput("Dynamic_Sub_Spe")))
                 )),
@@ -106,29 +80,22 @@ shinyUI(dashboardPage(
                   fluidRow(),
                   div(actionButton(inputId = "actBtnPatient", label = "Subset",icon = icon("play") ), align = "left", style = "margin-bottom: 10px;", style = "margin-top: -10px;"),
                   div(actionButton(inputId = "resetPatient", label = "Reset",icon = icon("play") ),align = "left", style = "margin-bottom: 10px;", style = "margin-top: -10px;"),
-                  
               ))
       ),
 
       # Métadonnées
       tabItem(tabName = "metadata",
               h1("Présentation du patient et métadonnées : "),
-              splitLayout(cellWidths=c("35%","65%"),
-                          
-                          verticalLayout(fluid = T,
+              splitLayout(cellWidths=c("35%","65%"),verticalLayout(fluid = T,
                             tags$head(tags$style(HTML('.shiny-split-layout>div {overflow: hidden;}')),),
-                            verbatimTextOutput("nb_clonotype_cell2"),
-                            br(),
-                            br(),
+                            verbatimTextOutput("nb_clonotype_cell2"),br(),br(),
                             HTML('<center><img src="bcr.png" width="400"></center>')),
                 plotlyOutput('dataTable', width = "100%",  height = "800px")
-                
               ),
 
               downloadButton("PDF_report", "PDF report"),
               downloadButton("HTML_report", "HTML report"),
               downloadButton("Word_report", "Word report")
-              
       ),
       
       # Read data
@@ -143,23 +110,16 @@ shinyUI(dashboardPage(
               #h3("Custom URL"),
               #p("A custom URL can be used to pre select choices when loading the app. Use the button below to create a URL for the choices currently selected."),
               
-              
-               
               # Paramètre
               sidebarLayout(
-                sidebarPanel(
-                  h4("Paramètres : "),
-                  br(),
-                  
-                  
+                sidebarPanel(h4("Paramètres : "),br(),
+                             
                   # Group by choice
                   materialSwitch(inputId = "SwitchGroup", label = "Group by", value = F, status = "primary", inline = T),
-                  conditionalPanel(
-                      condition = "input.SwitchGroup == true ",
+                  conditionalPanel(condition = "input.SwitchGroup == true ",
                       column(6,wellPanel(checkboxGroupInput(inputId = "Groupes", label = NULL, choices = metadata, selected = F))),
                       column(6,wellPanel(uiOutput("Dynamic_Group_Spe"))),
                       ),
-              
   
                   # Split by choice
                   fluidRow(),
@@ -183,21 +143,10 @@ shinyUI(dashboardPage(
               mainPanel(
                   # Visualisation
                   navbarPage("Reduction de dimension",
-                             tabPanel("PCA",
-                                      plotOutput("PCA", width = "100%",  height = "650px"),
-                                      uiOutput("feature_pca")
-                             ),
-                             tabPanel("UMAP",
-                                      plotOutput("UMAP", width = "100%",  height = "650px"),
-                                      uiOutput("feature_umap")
-                             ),
-                             tabPanel("TSNE",
-                                      plotOutput("TSNE", width = "100%",  height = "650px"),
-                                      uiOutput("feature_tsne")
-                             ),
-                             tabPanel("Other",
-                                      plotlyOutput("feature_other", width = "100%",  height = "650px")
-                             )
+                             tabPanel("PCA",plotOutput("PCA", width = "100%",  height = "650px"),uiOutput("feature_pca")),
+                             tabPanel("UMAP",plotOutput("UMAP", width = "100%",  height = "650px"),uiOutput("feature_umap")),
+                             tabPanel("TSNE",plotOutput("TSNE", width = "100%",  height = "650px"),uiOutput("feature_tsne")),
+                             tabPanel("Other",plotlyOutput("feature_other", width = "100%",  height = "650px"))
                   ),
                   
                   fluidRow(),
@@ -222,18 +171,9 @@ shinyUI(dashboardPage(
               radioButtons("metadata", "Metadata:",inline=T,singlet@tools$meta_variable),
               
               navbarPage("Reduction dimention",
-                         tabPanel("PCA",
-                                  plotlyOutput("D_PCA", width = "100%",  height = "800px"),
-                                  uiOutput("Dfeature_pca")
-                                ),
-                         tabPanel("UMAP",
-                                  plotlyOutput("D_UMAP", width = "100%",  height = "800px"),
-                                  uiOutput("Dfeature_umap")
-                                  ),
-                         tabPanel("TSNE",
-                                  plotlyOutput("D_TSNE", width = "100%",  height = "800px"),
-                                  uiOutput("Dfeature_tsne")
-                                  )
+                         tabPanel("PCA",plotlyOutput("D_PCA", width = "100%",  height = "800px"),uiOutput("Dfeature_pca")),
+                         tabPanel("UMAP",plotlyOutput("D_UMAP", width = "100%",  height = "800px"),uiOutput("Dfeature_umap")),
+                         tabPanel("TSNE",plotlyOutput("D_TSNE", width = "100%",  height = "800px"),uiOutput("Dfeature_tsne"))
               ),
               
               fluidRow(),
@@ -317,6 +257,13 @@ shinyUI(dashboardPage(
                                              splitLayout(cellWidths=c("50%","50%"),
                                                          plotOutput("DE_DotPlot_RE", width = "95%",  height = "600px"),
                                                          plotOutput("DE_DotPlot_PE", width = "95%",  height = "600px"))),
+                                    tabPanel("Linear",
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         h3("RCHOP vs Excipient :"),
+                                                         h3("Pré-greffe vs Excipient :")),
+                                             splitLayout(cellWidths=c("50%","50%"),
+                                                         plotOutput("Linear_RE", width = "95%",  height = "600px"),
+                                                         plotOutput("Linear_PE", width = "95%",  height = "600px"))),
                                     tabPanel("Info",
                                              splitLayout(cellWidths=c("50%","50%"),
                                                          h3("RCHOP vs Excipient :"),
@@ -324,26 +271,13 @@ shinyUI(dashboardPage(
                                              splitLayout(cellWidths=c("50%","50%"),
                                                          verbatimTextOutput("DE_info_RE"),
                                                          verbatimTextOutput("DE_info_PE"))),
-                                    
-                                    
-                                    
-                                    
-                                    
-                                    
-                                    
+
                                     tabPanel("Seurat Standard", 
                                              plotOutput("Heatmap", width = "100%",  height = "1200px"),
                                              verbatimTextOutput("Heatmap_feature"))
                                     )
                                   
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
                          ),
-                         
                          tabPanel("Enrichissement Fonctionnel",
                                   tabsetPanel(
                                   tabPanel("Heatmap",
@@ -377,7 +311,6 @@ shinyUI(dashboardPage(
                                             ),
                                   tabPanel("Hex Density", 
                                             plotOutput("hallmark_HD", width = "100%",  height = "1000px"),
-                                            
                                             wellPanel(h4("Group by :"),
                                                       pickerInput(inputId = "hallmark_order_X",label = "X : ", choices = singlet@tools$hallmarks),
                                                       fluidRow(),
@@ -388,7 +321,6 @@ shinyUI(dashboardPage(
                                             ),
                                   tabPanel("Ridge Plot", 
                                             plotOutput("hallmark_RP", width = "100%",  height = "1000px"),
-                                            
                                             wellPanel(h4("Group by :"),
                                                       pickerInput(inputId = "hallmark_order_RP", label = "Hallmark : ", choices = singlet@tools$hallmarks),
                                                       fluidRow(),
@@ -411,29 +343,22 @@ shinyUI(dashboardPage(
       tabItem(tabName = "VDJ",
                box("Clonotype", width = 12, plotlyOutput("VDJ_Clonotype", width = "100%",  height = "400px")),
                box("Heavy", width = 7, plotlyOutput("VDJ_Heavy", width = "100%",  height = "400px"),
-                        
                         column(1,align="right",checkboxGroupInput("heavy_details", NULL, choices = list("Details" = "Details"), selected = 0)),
                         conditionalPanel(
-                          condition = "input.heavy_details == 'Details' ",
-                          br(),
+                          condition = "input.heavy_details == 'Details' ", br(),
                           plotlyOutput("VDJ_DHeavy", width = "100%",  height = "400px"))
-                        
                         ),
                box("Lights", width = 5, plotlyOutput("VDJ_Light", width = "100%",  height = "400px"),
-                        
                         column(1,align="right",checkboxGroupInput("light_details", NULL, choices = list("Details" = "Details"), selected = 0)),
                         conditionalPanel(
-                          condition = "input.light_details == 'Details' ",
-                          br(),
+                          condition = "input.light_details == 'Details' ", br(),
                           plotlyOutput("VDJ_DLight", width = "100%",  height = "400px"))
-                        
                         ),
                fluidRow(
                  box("V", width = 4, plotlyOutput("V", width = "100%",  height = "400px")),
                  box("D", width = 4, plotlyOutput("D", width = "100%",  height = "400px")),
                  box("J", width = 4, plotlyOutput("J", width = "100%",  height = "400px")))
-      ), 
-      
+      ),
       
       ############################################################################################
       # metadata VDJ
@@ -464,15 +389,10 @@ shinyUI(dashboardPage(
       # metadata scRepertoir
       tabItem(tabName = "metadata_scRepertoir",
               navbarPage("Figure : ",
-                         tabPanel("Homeostasis",
-                                  HTML('<left><img src="scRepertoir/clonalHomeostasis.png" width="1000"></left>')),
-                         tabPanel("Proportion",
-                                  HTML('<left><img src="scRepertoir/clonalProportion.png" width="900"></left>')),
-                         tabPanel("Contig length",
-                                  HTML('<left><img src="scRepertoir/lengthContig.png" width="900"></left>')),
-                         tabPanel("Contig quant",
-                                  HTML('<left><img src="scRepertoir/quantContig_output.png" width="700"></left>')))
-              
+                         tabPanel("Homeostasis",HTML('<left><img src="scRepertoir/clonalHomeostasis.png" width="1000"></left>')),
+                         tabPanel("Proportion",HTML('<left><img src="scRepertoir/clonalProportion.png" width="900"></left>')),
+                         tabPanel("Contig length",HTML('<left><img src="scRepertoir/lengthContig.png" width="900"></left>')),
+                         tabPanel("Contig quant",HTML('<left><img src="scRepertoir/quantContig_output.png" width="700"></left>')))
       )
     ))
 ))

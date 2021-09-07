@@ -4,39 +4,19 @@ jscode <- "shinyjs.refresh = function() { location.reload(); }"
 shinyServer(function(input, output, session) {
   #################################################################################################
   sortie <- eventReactive(c(input$actBtnPatient1,input$actBtnPatient, input$resetPatient) ,{singlet})
-
-
   
   observeEvent(input$actBtnPatient1,{    
-    show_modal_spinner(
-      spin = "semipolar",
-      color = "deepskyblue",
-      text = "Please wait..."
-    ) # show the modal window
-    
+    show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     if(nchar(as.character(input$patient))>0){
       load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
       singlet <<- all
     }
-    
-    sendSweetAlert(
-      session = session,
-      title = "Done !",
-      type = "success"
-    )
+    sendSweetAlert(session = session,title = "Done !",type = "success")
     shinyjs::runjs("window.scrollTo(0, 50)")
-    remove_modal_spinner() # remove it when done
-    
-    
+    remove_modal_spinner()
   })
-  
-  
   observeEvent(input$actBtnPatient,{    
-    show_modal_spinner(
-      spin = "semipolar",
-      color = "deepskyblue",
-      text = "Please wait..."
-    ) # show the modal window
+    show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     
     if(nchar(as.character(input$patient))>0){
       load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
@@ -53,26 +33,13 @@ shinyServer(function(input, output, session) {
       singlet <<- all
     }
     
-    
-    sendSweetAlert(
-      session = session,
-      title = "Done !",
-      text = "Le subsample a bien été créé !",
-      type = "success"
-    )
-    remove_modal_spinner() # remove it when done
+    sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
+    remove_modal_spinner()
   })
   observeEvent(input$resetPatient,{
     singlet <<- all
-    sendSweetAlert(
-      session = session,
-      title = "Done !",
-      text = "Tous les subsamples ont été supprimé !",
-      type = "success"
-    )
+    sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
   })
-  
-  
 
   heatmap <- reactive({
     top10 <- sortie()@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
@@ -118,7 +85,6 @@ shinyServer(function(input, output, session) {
         singlet2 <- clonotype()
       }
     }
-    
     for (k in group()) {
       Idents(singlet2)<- k
       tokeep <- levels(Idents(singlet2))
@@ -169,39 +135,31 @@ shinyServer(function(input, output, session) {
   
   output$nb_tot_cell <- renderText({
     sortie()
-    return(paste("Number of cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))))
-                 ))
+    return(paste("Number of cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))))))
   })
   output$nb_b_cell <- renderText({
     sortie()
-    return(paste("B cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))
-    ))
+    return(paste("B cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))))
   })
   output$nb_other_cell <- renderText({
     sortie()
-    return(paste("\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))
-    ))
+    return(paste("\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))))
   })
   output$nb_Controle_cell <- renderText({
     sortie()
-    return(paste("\nControle : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Pré-greffe"]))
-    ))
+    return(paste("\nControle : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Pré-greffe"]))))
   })
   output$nb_Excipient_cell <- renderText({
     sortie()
-    return(paste("\nExcipient : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Excipient"]))
-    ))
+    return(paste("\nExcipient : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Excipient"]))))
   })
   output$nb_RCHOP_cell <- renderText({
     sortie()
-    return(paste("\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"]))
-    ))
+    return(paste("\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"]))))
   })
   output$nb_clonotype_cell2 <- renderText({
     sortie()
-    return(
-      paste0(
-        "Numbre total de cellule détectée : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype)))),
+    return(paste0("Numbre total de cellule détectée : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype)))),
         "\n\nB cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
         "\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
         
@@ -210,44 +168,31 @@ shinyServer(function(input, output, session) {
         "\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"])),
         
         "\n\nClonotype majoritaire :", 
-             "\n Proportion : \t", round(singlet@tools$vloupe$proportion[1],3)*100,
-             "% \n Type : \t", singlet@tools$vloupe$type[1], 
-             "\n Isotype : \t", singlet@tools$vloupe$igh_c_genes[1], 
+             "\n Proportion : \t", round(singlet@tools$vloupe$proportion[1],3)*100,"% \n Type : \t", singlet@tools$vloupe$type[1],"\n Isotype : \t", singlet@tools$vloupe$igh_c_genes[1], 
              "\n Heavy : \t", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1], 
-             "\n Light : \t", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1], "\n")
-    )
+             "\n Light : \t", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1], "\n"))
   })
   output$nb_clonotype_cell <- renderText({
     sortie()
-    return(
-      paste0("Clonotype majoritaire :", 
-             "\n Proportion : ", round(singlet@tools$vloupe$proportion[1],3)*100,
-             "% \n Type : ", singlet@tools$vloupe$type[1], 
-             "\n Isotype : ", singlet@tools$vloupe$igh_c_genes[1], 
+    return(paste0("Clonotype majoritaire :", 
+             "\n Proportion : ", round(singlet@tools$vloupe$proportion[1],3)*100,"% \n Type : ", singlet@tools$vloupe$type[1],"\n Isotype : ", singlet@tools$vloupe$igh_c_genes[1], 
              "\n Heavy : ", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1], 
-             "\n Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1])
-    )
+             "\n Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1]))
   })
   output$H_clonotype_cell <- renderText({
     sortie()
-    return(
-      paste0("Heavy : ", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1])
-    )
+    return(paste0("Heavy : ", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1]))
   })
   output$L_clonotype_cell <- renderText({
     sortie()
-    return(
-      paste0("Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1])
-    )
+    return(paste0("Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1]))
   })
   
   output$Dynamic_Sub_Spe <- renderUI({
     choice <- list()
     for(i in 1:length(metadata)){
       for(j in 1:length(List[[metadata[i]]])){
-        if(metadata[i] %in% input$Subgroup){
-          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("p",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))
-        }
+        if(metadata[i] %in% input$Subgroup){choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("p",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))}
       }
       fluidRow()
     }
@@ -257,9 +202,7 @@ shinyServer(function(input, output, session) {
     choice <- list()
     for(i in 1:length(metadata)){
       for(j in 1:length(List[[metadata[i]]])){
-        if(metadata[i] %in% input$Groupes){
-          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = List[[metadata[i]]][j], label = NULL, choices = List[[metadata[i]]][j]))  
-        }
+        if(metadata[i] %in% input$Groupes){choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = List[[metadata[i]]][j], label = NULL, choices = List[[metadata[i]]][j]))}
       }
       fluidRow()
     }
@@ -269,9 +212,7 @@ shinyServer(function(input, output, session) {
     choice <- list()   
     for(i in 1:length(metadata)){
       for(j in 1:length(List[[metadata[i]]])){
-        if(metadata[i] %in% input$Splites){
-          choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("s",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))  
-        }
+        if(metadata[i] %in% input$Splites){choice[[List[[metadata[i]]][j]]] <- list(checkboxGroupInput(inputId = paste0("s",List[[metadata[i]]][j]), label = NULL, choices = List[[metadata[i]]][j]))}
       }
       fluidRow()
     }
@@ -292,31 +233,19 @@ shinyServer(function(input, output, session) {
   output$Dfeature_tsne = renderUI({if(length(input$Dvariables)>0){plotlyOutput("DFeaturePlot_TSNE", width = "100%",  height = "800px")}})
   
   output$DFeaturePlot_PCA <- renderPlotly({
-    plot_ly(data = D3feature(), x = ~PC_1, y = ~PC_2, z = ~PC_3, 
-            color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-            colors = c('darkgreen', 'red'), opacity = .5,
-            type = "scatter3d", mode = "markers",
-            marker = list(size = 3, width=2), 
-            text=~label, hoverinfo="text"
-    )# %>% layout(title=gene_feature)
+    plot_ly(data = D3feature(), x = ~PC_1, y = ~PC_2, z = ~PC_3,color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers",
+            marker = list(size = 3, width=2),text=~label, hoverinfo="text")# %>% layout(title=gene_feature)
   })
   output$DFeaturePlot_UMAP<- renderPlotly({
-    plot_ly(data = D3feature(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3, 
-            color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-            colors = c('darkgreen', 'red'), opacity = .5,
-            type = "scatter3d", mode = "markers",
-            marker = list(size = 3, width=2), 
-            text=~label, hoverinfo="text"
-    )# %>% layout(title=gene_feature)
+    plot_ly(data = D3feature(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers",
+            marker = list(size = 3, width=2),text=~label, hoverinfo="text")# %>% layout(title=gene_feature)
   })
   output$DFeaturePlot_TSNE<- renderPlotly({
-    plot_ly(data = D3feature(), x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
-            color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-            colors = c('darkgreen', 'red'), opacity = .5,
-            type = "scatter3d", mode = "markers",
-            marker = list(size = 3, width=2), 
-            text=~label, hoverinfo="text"
-    ) #%>% layout(title=gene_feature)
+    plot_ly(data = D3feature(), x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3,color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
+            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers",
+            marker = list(size = 3, width=2),text=~label, hoverinfo="text") #%>% layout(title=gene_feature)
   })
   
   updateSelectizeInput(session, 'Svariables', choices = feature, server = TRUE)
@@ -340,23 +269,13 @@ shinyServer(function(input, output, session) {
   ## -- PCA -- ##
   output$PCA <- renderPlot({
     plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
-    plots & theme(title = element_text(size=20),
-                  legend.position = "top",
-                  legend.title = element_text(size=10),
-                  legend.text = element_text(size=10)
+    plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)
     ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
   })
   output$D_PCA <- renderPlotly({
-    plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3, 
-            color = singlet@meta.data[[input$metadata]], 
-            type = "scatter3d", mode = "markers", 
-            marker = list(size = 3, width=2),
-            text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata,
-                                                                                    scene = list(
-                                                                                      xaxis = list(title = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")),
-                                                                                      yaxis = list(title = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %")),
-                                                                                      zaxis = list(title = paste0("PCA 3 : ", round(Stdev(singlet[["pca"]])[3],2), " %"))
-                                                                                    ))
+    plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3,color = singlet@meta.data[[input$metadata]], 
+            type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
+            text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>%layout(title=input$metadata,scene = list(xaxis = list(title = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")),yaxis = list(title = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %")),zaxis = list(title = paste0("PCA 3 : ", round(Stdev(singlet[["pca"]])[3],2), " %"))))
   })
   
   ## -- UMAP -- ##
@@ -365,10 +284,8 @@ shinyServer(function(input, output, session) {
     plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4))) 
   })
   output$D_UMAP <- renderPlotly({
-    plot_ly(data = D3plot(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,
-            color = singlet@meta.data[[input$metadata]],
-            type = "scatter3d", mode = "markers", 
-            marker = list(size = 3, width=2),
+    plot_ly(data = D3plot(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,color = singlet@meta.data[[input$metadata]],
+            type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
             text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata) 
   })
   
@@ -379,14 +296,13 @@ shinyServer(function(input, output, session) {
   })
   output$D_TSNE <- renderPlotly({
     data2 <- D3plot()
-    plot_ly(data = data2, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3, 
-            color = singlet@meta.data[[input$metadata]], 
-            type = "scatter3d", mode = "markers", 
-            marker = list(size = 3, width=2),
+    plot_ly(data = data2, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3,color = singlet@meta.data[[input$metadata]], 
+            type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
             text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata)
   })
   
-  ## -- Heatmap -- ##
+  ## -- Expression différentielle -- ##
+  # RCHOP / Excipient
   output$DE_Heatmap_RE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
@@ -402,12 +318,20 @@ shinyServer(function(input, output, session) {
     Idents(singlet)<-"Condition"
     VlnPlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20], sort = T) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
+  output$Linear_RE <- renderPlot({
+    sortie()
+    result <- rownames(singlet@tools$avg.b.cells_RE[which(singlet@tools$avg.b.cells_RE$CTRL/singlet@tools$avg.b.cells_RE$STIM < 0.8),])
+    p1 <- ggplot(singlet@tools$avg.b.cells_RE, aes(CTRL, STIM)) + geom_point() + ggtitle("B Cells") 
+    LabelPoints(plot = p1, points = result, repel = TRUE, xnudge = 0.2, ynudge = 0.5)
+  })
   output$DE_DotPlot_RE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
     DotPlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20]) + RotatedAxis()
   })
+  output$DE_info_RE <- renderPrint({print(sortie()@tools$DE_RE)})
   
+  # Pré-greffe / Excipient
   output$DE_Heatmap_PE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
@@ -423,19 +347,20 @@ shinyServer(function(input, output, session) {
     Idents(singlet)<-"Condition"
     VlnPlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20], sort = T) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
+  output$Linear_PE <- renderPlot({
+    sortie()
+    result <- rownames(singlet@tools$avg.b.cells_PE[which(singlet@tools$avg.b.cells_PE$CTRL/singlet@tools$avg.b.cells_PE$STIM > 1.2),])
+    p1 <- ggplot(singlet@tools$avg.b.cells_PE, aes(CTRL, STIM)) + geom_point() + ggtitle("B Cells") 
+    LabelPoints(plot = p1, points = result, repel = TRUE, xnudge = 0.2, ynudge = 0.5)
+  })
   output$DE_DotPlot_PE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
     DotPlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20]) + RotatedAxis()
   })
-
-  
-  
-  output$DE_info_RE <- renderPrint({print(sortie()@tools$DE_RE)})
   output$DE_info_PE <- renderPrint({print(sortie()@tools$DE_PE)})
   
-  
-  
+  ## -- Heatmap -- ##
   output$Heatmap <- renderPlot({
     sortie()
     DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()
@@ -485,13 +410,8 @@ shinyServer(function(input, output, session) {
     sortie()
     singlet@meta.data$active.idents <- singlet@active.ident
     singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "Phase", "orig.ident") # "clonotype_id",
-    if(is.null(rv$order)){
-      dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),
-                   annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
-    }else{
-      dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),
-                   annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)
-    }  
+    if(is.null(rv$order)){dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
+    }else{dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)}  
   })
   
   output$hallmark_VlnPlot <- renderPlot({
@@ -515,21 +435,16 @@ shinyServer(function(input, output, session) {
   #})
   
   ## -- Monocle -- ##
-  output$cell_trajectory <- renderPlot({
-    plot_cell_trajectory(data, color_by = input$color_trajectory)
-  })
+  output$cell_trajectory <- renderPlot({plot_cell_trajectory(data, color_by = input$color_trajectory)})
   output$order_trajectory <- renderPlot({
     data_expressed_genes <-  row.names(subset(fData(data), num_cells_expressed >= 10))
     data_filtered <- data[data_expressed_genes,]
     my_genes <- row.names(subset(fData(data_filtered), gene_short_name %in% input$in8))
     cds_subset <- data_filtered[my_genes,]
     p <- plot_genes_in_pseudotime(cds_subset, color_by = input$color_order)
-    p + theme(
-      text = element_text(size=20),
-      legend.title = element_text(color = "black", size = 14),
-      legend.text = element_text(color = "black", size = 14),
-      axis.text=element_text(size=14),
-      axis.title=element_text(size=14)
+    p + theme(text = element_text(size=20),
+      legend.title = element_text(color = "black", size = 14),legend.text = element_text(color = "black", size = 14),
+      axis.text=element_text(size=14),axis.title=element_text(size=14)
     ) 
   })
   
@@ -542,9 +457,7 @@ shinyServer(function(input, output, session) {
   ## -- Clonotype -- ##
   output$VDJ_Clonotype = renderPlotly({
     plot_ly(x = sortie()@tools$Clonotype[[1]], y = sortie()@tools$Clonotype[[2]], name = "Info", type = "bar", 
-            hovertemplate = paste0('Clonotype : %{x}\n', "Proportion : ", round(singlet@tools$vloupe$proportion[1:5],3)*100,
-                                   "% \nType : ", singlet@tools$vloupe$type[1:5], 
-                                   "\nIsotype : ", singlet@tools$vloupe$igh_c_genes[1:5], 
+            hovertemplate = paste0('Clonotype : %{x}\n', "Proportion : ", round(singlet@tools$vloupe$proportion[1:5],3)*100,"% \nType : ", singlet@tools$vloupe$type[1:5],"\nIsotype : ", singlet@tools$vloupe$igh_c_genes[1:5], 
                                    "\nHeavy : ", singlet@tools$vloupe$V_lourde[1:5], " / ", singlet@tools$vloupe$D_lourde[1:5], " / ", singlet@tools$vloupe$J_lourde[1:5], 
                                    "\nLight : ", singlet@tools$vloupe$V_legere[1:5], " / ", singlet@tools$vloupe$J_legere[1:5])
     ) %>% layout(title='Frequencies of the mains clonotypes', yaxis =list(title="Number of cells"))
@@ -560,8 +473,7 @@ shinyServer(function(input, output, session) {
       layout(title='Frequencies D genes : Heavy chain',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
   })
   output$J = renderPlotly({
-    sortie()
-    plot_ly(x = singlet@tools$J[[1]], y = singlet@tools$J[[2]], name = "Clonotype", type = "bar") %>% 
+    plot_ly(x = sortie()@tools$J[[1]], y = sortie()@tools$J[[2]], name = "Clonotype", type = "bar") %>% 
       layout(title='Frequencies J genes : Heavy and Lights chains',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
   })
   
@@ -589,73 +501,31 @@ shinyServer(function(input, output, session) {
       layout(title='Frequencies Light Chain with details', yaxis =list(title="Number of cells"))
   })
   
-  
-  
-  
-  
-  
   ## -- Méta-VDJ -- ##
-  output$FL08_VDJ = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL08G0293_VDJ.RData")
-    e
-  })
-  output$FL09_VDJ = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL09C1164_VDJ.RData")
-    e
-  })
-  output$FL12_VDJ = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL12C1888_VDJ.RData")
-    e
-  })
-  output$FL14_VDJ = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL140304_VDJ.RData")
-    e
-  })
-  output$FL02_VDJ = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL02G095_VDJ.RData")
-    e
-  })
-  output$FL05_VDJ = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL05G0330_VDJ.RData")
-    e
-  })
+  output$FL08_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL08G0293_VDJ.RData") ; e})
+  output$FL09_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL09C1164_VDJ.RData") ; e})
+  output$FL12_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL12C1888_VDJ.RData") ; e})
+  output$FL14_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL140304_VDJ.RData") ; e})
+  output$FL02_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL02G095_VDJ.RData") ; e})
+  output$FL05_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL05G0330_VDJ.RData") ; e})
   
-  output$FL08_Meta = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL08G0293_VDJ.RData")
-    f
-  })
-  output$FL09_Meta = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL09C1164_VDJ.RData")
-    f
-  })
-  output$FL12_Meta = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL12C1888_VDJ.RData")
-    f
-  })
-  output$FL14_Meta = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL140304_VDJ.RData")
-    f
-  })
+  output$FL08_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL08G0293_VDJ.RData") ; f})
+  output$FL09_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL09C1164_VDJ.RData") ; f})
+  output$FL12_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL12C1888_VDJ.RData") ; f})
+  output$FL14_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL140304_VDJ.RData") ; f})
+  output$FL02_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL02G095_VDJ.RData") ; f})
+  output$FL05_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/app/www/FL05G0330_VDJ.RData") ; f})
   
-  output$FL02_Meta = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL02G095_VDJ.RData")
-    f
-  })
-  output$FL05_Meta = renderPlotly({
-    load(file = "/home/boris/Bureau/scShiny/shiny/www/FL05G0330_VDJ.RData")
-    f
-  })
-
+  
+  ## -- Rapport Patient -- ##
   output$PDF_report <- downloadHandler(
     filename = function() {paste0("rapport_", input$patient,".pdf")},
     content = function(file) {file.copy(paste0("www/",input$patient,"/rapport_", input$patient,".pdf"), file)}
   )
-  
   output$HTML_report <- downloadHandler(
     filename = function() {paste0("rapport_", input$patient,".html")},
     content = function(file) {file.copy(paste0("www/",input$patient,"/rapport_", input$patient,".html"), file)}
   )
-  
   output$Word_report <- downloadHandler(
     filename = function() {paste0("rapport_", input$patient,".docx")},
     content = function(file) {file.copy(paste0("www/",input$patient,"/rapport_", input$patient,".docx"), file)}
