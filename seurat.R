@@ -13,7 +13,7 @@ source(file = "/home/boris/Bureau/scShiny/app/functions.R")
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293","FL02G095","FL05G0330") #'all'
-patient <- siege[6]
+patient <- siege[5]
 #load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
 
 
