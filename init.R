@@ -9,7 +9,7 @@ my_packages = c('plotly','shiny','shinybusy','shinydashboard','dashboardthemes',
 install_if_missing = function(p) {
   if (p %in% rownames(installed.packages()) == FALSE) {
     install.packages(p)
-    BiocManager::install("dittoSeq")
+    install.packages("dittoSeq_1.4.1.tar.gz", repos = NULL, type="source")
   }
 }
 
