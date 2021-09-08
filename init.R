@@ -3,7 +3,7 @@
 # Example R code to install packages if not already installed
 #
 
-my_packages = c('Seurat','plotly','shiny','shinybusy','shinydashboard','dashboardthemes','shinyWidgets')
+my_packages = c('plotly','shiny','shinybusy','shinydashboard','dashboardthemes','shinyWidgets')#'Seurat',
 
 
 install_if_missing = function(p) {
