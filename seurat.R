@@ -8,13 +8,13 @@ library(dplyr)
 library(future)
 library(DESeq2)
 library(cowplot)
-source(file = "/home/boris/Bureau/scShiny/app/functions.R")
+source(file = "/home/boris/Bureau/scShiny/functions.R")
 
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293","FL02G095","FL05G0330") #'all'
-patient <- siege[5]
-#load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
+patient <- siege[6]
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
 
 
 ## -- Workflow -- ## 
@@ -152,3 +152,33 @@ head(b.interferon.response, n = 15)
 
 plots <- VlnPlot(immune.combined, features = c("CD69"), split.by = "stim", group.by = "Condition", pt.size = 0, combine = FALSE, split.plot = TRUE)
 CombinePlots(plots = plots, ncol = 1)
+
+
+
+
+## -- TEST -- ##
+liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.07 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("RCHOP"))])
+liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.13 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("Excipient"))])
+sub_all <- subset(all, cells = c(liste,liste2))
+
+singlet <- NormalizeData(all, normalization.method = "LogNormalize", scale.factor = 10000) 
+singlet <- FindVariableFeatures(singlet, selection.method = "vst", nfeatures = 2000)
+singlet <- ScaleData(singlet, features = rownames(singlet))                                               # Scale data :singlet@assays$RNA@scale.data, singlet[["RNA"]]@scale.data
+singlet <- RunPCA(singlet, features = VariableFeatures(singlet), ndims.print = 1:10, nfeatures.print = 30)# Reduction dimension
+singlet <- FindNeighbors(singlet, reduction = "pca", dims = 1:40, compute.SNN = T)
+singlet <- FindClusters(singlet, resolution = 0.5)                                                        # head(Idents(singlet), 10) 
+singlet <- RunUMAP(singlet, reduction = "pca", dims = 1:40)
+
+plots <- UMAPPlot(object = singlet, group.by = "Condition", split.by = NULL, label.size = 0.0, pt.size = 2)
+plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)
+) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
+
+liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.18 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("RCHOP"))])
+liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.18 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("Excipient"))])
+
+
+
+
+all <- seurat_subset(all, "Phénotype", )
+apop <- as.vector(read.table("/home/boris/Bureau/gene_apop.txt"))
+DoHeatmap(singlet, group.by = "Condition", feature = apop$V1)

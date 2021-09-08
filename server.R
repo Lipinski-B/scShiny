@@ -36,6 +36,11 @@ shinyServer(function(input, output, session) {
     sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
     remove_modal_spinner()
   })
+  
+  
+  
+  
+  
   observeEvent(input$resetPatient,{
     singlet <<- all
     sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
