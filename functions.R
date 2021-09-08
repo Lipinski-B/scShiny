@@ -125,6 +125,8 @@ metadata <- function(singlet){
   
   ##### -- DE -- ##### 
   Idents(singlet)<-"Condition"
+  singlet <- all
+  View(head(as.matrix(singlet@assays$RNA@scale.data)))
   singlet@tools$DE_RE <- FindMarkers(singlet, slot = "data", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "DESeq2")
   singlet@tools$DE_PE <- FindMarkers(singlet, slot = "data", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "DESeq2")
   Idents(singlet)<-"seurat_clusters"
