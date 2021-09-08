@@ -12,9 +12,9 @@ install_if_missing = function(p) {
     install.packages("htmltools_0.5.2.tar.gz", repos = NULL, type="source")
     install.packages(p)
     BiocManager::install('dittoSeq', update = F, force = TRUE)
-    install.packages("Seurat")
   }
 }
 
 invisible(sapply(my_packages, install_if_missing))
 
+install.packages("Seurat")
