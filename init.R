@@ -11,6 +11,7 @@ install_if_missing = function(p) {
     install.packages("fastmap_1.1.0.tar.gz", repos = NULL, type="source")
     install.packages("htmltools_0.5.2.tar.gz", repos = NULL, type="source")
     install.packages(p)
+    install.packages("Seurat")
     BiocManager::install('dittoSeq', update = F, force = TRUE)
   }
 }
