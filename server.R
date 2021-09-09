@@ -36,11 +36,7 @@ shinyServer(function(input, output, session) {
     sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
     remove_modal_spinner()
   })
-  
-  
-  
-  
-  
+
   observeEvent(input$resetPatient,{
     singlet <<- all
     sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
@@ -138,30 +134,12 @@ shinyServer(function(input, output, session) {
     order = NULL
   )
   
-  output$nb_tot_cell <- renderText({
-    sortie()
-    return(paste("Number of cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))))))
-  })
-  output$nb_b_cell <- renderText({
-    sortie()
-    return(paste("B cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))))
-  })
-  output$nb_other_cell <- renderText({
-    sortie()
-    return(paste("\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"]))))
-  })
-  output$nb_Controle_cell <- renderText({
-    sortie()
-    return(paste("\nControle : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Pré-greffe"]))))
-  })
-  output$nb_Excipient_cell <- renderText({
-    sortie()
-    return(paste("\nExcipient : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Excipient"]))))
-  })
-  output$nb_RCHOP_cell <- renderText({
-    sortie()
-    return(paste("\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"]))))
-  })
+  output$nb_tot_cell <- renderText({return(paste("Number of cells : \t", as.character(as.numeric(sum(table(sortie()@meta.data$Phénotype))))))})
+  output$nb_b_cell <- renderText({return(paste("B cells : \t", as.character(as.numeric(table(sortie()@meta.data$Phénotype)["B-cells"]))))})
+  output$nb_other_cell <- renderText({return(paste("\nOther cells : \t", as.character(as.numeric(sum(table(sortie()@meta.data$Phénotype))) - as.numeric(table(sortie()@meta.data$Phénotype)["B-cells"]))))})
+  output$nb_Controle_cell <- renderText({return(paste("\nControle : \t", as.character(as.numeric(table(sortie()@meta.data$Condition)["Pré-greffe"]))))})
+  output$nb_Excipient_cell <- renderText({return(paste("\nExcipient : \t", as.character(as.numeric(table(sortie()@meta.data$Condition)["Excipient"]))))})
+  output$nb_RCHOP_cell <- renderText({return(paste("\nRCHOP : \t", as.character(as.numeric(table(sortie()@meta.data$Condition)["RCHOP"]))))})
   output$nb_clonotype_cell2 <- renderText({
     sortie()
     return(paste0("Numbre total de cellule détectée : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype)))),
@@ -419,8 +397,7 @@ shinyServer(function(input, output, session) {
     }else{dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)}  
   })
   
-  output$hallmark_VlnPlot <- renderPlot({
-    dittoPlot(sortie() , input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
+  output$hallmark_VlnPlot <- renderPlot({dittoPlot(sortie() , input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
   output$hallmark_HD <- renderPlot({
     dittoScatterHex(sortie(),x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + 
       theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
@@ -447,17 +424,11 @@ shinyServer(function(input, output, session) {
     my_genes <- row.names(subset(fData(data_filtered), gene_short_name %in% input$in8))
     cds_subset <- data_filtered[my_genes,]
     p <- plot_genes_in_pseudotime(cds_subset, color_by = input$color_order)
-    p + theme(text = element_text(size=20),
-      legend.title = element_text(color = "black", size = 14),legend.text = element_text(color = "black", size = 14),
-      axis.text=element_text(size=14),axis.title=element_text(size=14)
-    ) 
+    p + theme(text = element_text(size=20), legend.title = element_text(color = "black", size = 14),legend.text = element_text(color = "black", size = 14),axis.text=element_text(size=14),axis.title=element_text(size=14))
   })
   
   ## -- Sunburst -- ##
-  output$dataTable = renderPlotly({
-    plot_ly(sortie()@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")),
-            type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%", "\nTotal : " ,singlet@tools$sunburst$values)) 
-  })
+  output$dataTable = renderPlotly({plot_ly(sortie()@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")), type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%", "\nTotal : " ,singlet@tools$sunburst$values))})
   
   ## -- Clonotype -- ##
   output$VDJ_Clonotype = renderPlotly({
@@ -469,18 +440,9 @@ shinyServer(function(input, output, session) {
   })
   
   ## -- VDJ -- ##
-  output$V = renderPlotly({
-    plot_ly(x = sortie()@tools$V[[1]], y = sortie()@tools$V[[2]], name = "Clonotype", type = "bar") %>% 
-      layout(title='Frequencies V genes : Heavy and Lights chains', xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
-  })
-  output$D = renderPlotly({
-    plot_ly(x = sortie()@tools$D[[1]], y = sortie()@tools$D[[2]], name = "Clonotype", type = "bar") %>% 
-      layout(title='Frequencies D genes : Heavy chain',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
-  })
-  output$J = renderPlotly({
-    plot_ly(x = sortie()@tools$J[[1]], y = sortie()@tools$J[[2]], name = "Clonotype", type = "bar") %>% 
-      layout(title='Frequencies J genes : Heavy and Lights chains',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
-  })
+  output$V = renderPlotly({plot_ly(x = sortie()@tools$V[[1]], y = sortie()@tools$V[[2]], name = "Clonotype", type = "bar") %>% layout(title='Frequencies V genes : Heavy and Lights chains', xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))})
+  output$D = renderPlotly({plot_ly(x = sortie()@tools$D[[1]], y = sortie()@tools$D[[2]], name = "Clonotype", type = "bar") %>% layout(title='Frequencies D genes : Heavy chain',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))})
+  output$J = renderPlotly({plot_ly(x = sortie()@tools$J[[1]], y = sortie()@tools$J[[2]], name = "Clonotype", type = "bar") %>% layout(title='Frequencies J genes : Heavy and Lights chains',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))})
   
   ## -- Heavy chain -- ##
   output$VDJ_Heavy = renderPlotly({

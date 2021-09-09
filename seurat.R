@@ -6,7 +6,7 @@ library(dplyr)
 library(future)
 library(DESeq2)
 library(cowplot)
-source(file = "functions.R")
+source(file = "/home/boris/Bureau/scShiny/functions.R")
 
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
@@ -24,7 +24,6 @@ save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RDat
 ## -- Sub sample -- ##
 patient <- "FL05G0330"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-singlet <- all
 all <- seurat_subset(singlet,"Condition", c("RCHOP","Pré-greffe")) ; save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_PG_RCHOP.RData"))
 all <- seurat_subset(singlet,"Condition", c("Excipient","Pré-greffe")) ; save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_PG_EX.RData"))
 all <- seurat_subset(singlet,"Condition", c("RCHOP","Excipient")) ; save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_EX_RCHOP.RData"))
@@ -122,3 +121,14 @@ liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.18 & 
 all <- seurat_subset(all, "Phénotype", )
 apop <- as.vector(read.table("/home/boris/Bureau/gene_apop.txt"))
 DoHeatmap(singlet, group.by = "Condition", feature = apop$V1)
+
+
+
+## -- TEST : soustraction dissociation-- ##
+patient <- "FL05G0330"
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) ; Idents(all)<-"Condition"
+
+dissoc <- read.table("/home/boris/Bureau/scShiny/document/gene/dissoc.txt", header = T)$x
+apop <- read.table("/home/boris/Bureau/scShiny/document/gene/geneset/UV_RESPONSE_UP.txt")$V1
+DoHeatmap(subset(all, idents = c("Excipient","RCHOP")), features = apop, size = 3)
+DoHeatmap(subset(all, idents = c("Excipient","RCHOP")), features = setdiff(rownames(all@tools$DE_PE)[1:50], dissoc), size = 3)
