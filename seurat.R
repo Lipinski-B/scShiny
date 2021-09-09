@@ -1,14 +1,12 @@
-library(Seurat)
 library(celldex)
 library(SingleR)
 library(escape)
-library(dittoSeq)
 library(stringr)
 library(dplyr)
 library(future)
 library(DESeq2)
 library(cowplot)
-source(file = "/home/boris/Bureau/scShiny/functions.R")
+source(file = "functions.R")
 
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
@@ -85,61 +83,6 @@ all@commands[["FindAllMarkers"]] <- FindAllMarkers(all, only.pos = FALSE, min.pc
 
 
 
-## -- Integrating stimulated vs. control -- ##
-for (patient in c("FL140304","FL09C1164","FL08G0293","FL02G095","FL05G0330","FL12C1888")) {
-  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-  
-  ctrl <- seurat_subset(all, "Condition", "Excipient") ; ctrl$stim <- "CTRL"
-  stim <- seurat_subset(all, "Condition", "RCHOP") ; stim$stim <- "STIM"
-  
-  immune.anchors <- FindIntegrationAnchors(object.list = list(ctrl, stim), dims = 1:20, k.filter=80)
-  immune.combined <- IntegrateData(anchorset = immune.anchors, dims = 1:20, k.weight=80)
-  DefaultAssay(immune.combined) <- "integrated"
-  immune.combined <- ScaleData(immune.combined, verbose = FALSE)
-  immune.combined <- RunPCA(immune.combined, npcs = 30, verbose = FALSE)
-  immune.combined <- RunUMAP(immune.combined, reduction = "pca", dims = 1:20)
-  immune.combined <- FindNeighbors(immune.combined, reduction = "pca", dims = 1:20)
-  immune.combined <- FindClusters(immune.combined, resolution = 0.5)
-  
-  Idents(immune.combined)<-"Phénotype" ; DefaultAssay(immune.combined) <- "RNA"
-  nk.markers <- FindConservedMarkers(immune.combined, ident.1 = "B-cells", grouping.var = "stim", verbose = FALSE)
-  
-  b.cells <- subset(immune.combined, idents = "B-cells") ; Idents(b.cells) <- "stim"
-  all@tools$avg.b.cells_RE <- as.data.frame(log1p(AverageExpression(b.cells, verbose = FALSE)$RNA))
-  
-  save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-  
-}
-
-for (patient in c("FL140304","FL09C1164","FL08G0293","FL02G095","FL05G0330","FL12C1888")) {
-  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-  
-  ctrl <- seurat_subset(all, "Condition", "Pré-greffe") ; ctrl$stim <- "CTRL"
-  stim <- seurat_subset(all, "Condition", "Excipient") ; stim$stim <- "STIM"
-  
-  immune.anchors <- FindIntegrationAnchors(object.list = list(ctrl, stim), dims = 1:20, k.filter=80)
-  immune.combined <- IntegrateData(anchorset = immune.anchors, dims = 1:20, k.weight=80)
-  DefaultAssay(immune.combined) <- "integrated"
-  immune.combined <- ScaleData(immune.combined, verbose = FALSE)
-  immune.combined <- RunPCA(immune.combined, npcs = 30, verbose = FALSE)
-  immune.combined <- RunUMAP(immune.combined, reduction = "pca", dims = 1:20)
-  immune.combined <- FindNeighbors(immune.combined, reduction = "pca", dims = 1:20)
-  immune.combined <- FindClusters(immune.combined, resolution = 0.5)
-  
-  Idents(immune.combined)<-"Phénotype" ; DefaultAssay(immune.combined) <- "RNA"
-  nk.markers <- FindConservedMarkers(immune.combined, ident.1 = "B-cells", grouping.var = "stim", verbose = FALSE)
-  
-  b.cells <- subset(immune.combined, idents = "B-cells") ; Idents(b.cells) <- "stim"
-  all@tools$avg.b.cells_PE <- as.data.frame(log1p(AverageExpression(b.cells, verbose = FALSE)$RNA))
-  
-  save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-  
-  
-}
-
-result <- rownames(avg.b.cells[which(avg.b.cells$CTRL/avg.b.cells$STIM < 0.8),])
-p1 <- ggplot(avg.b.cells, aes(CTRL, STIM)) + geom_point() + ggtitle("B Cells") 
-LabelPoints(plot = p1, points = result, repel = TRUE, xnudge = 0.2, ynudge = 0.5)
 
 
 
@@ -175,9 +118,6 @@ plots & theme(title = element_text(size=20),legend.position = "top",legend.title
 
 liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.18 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("RCHOP"))])
 liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.18 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("Excipient"))])
-
-
-
 
 all <- seurat_subset(all, "Phénotype", )
 apop <- as.vector(read.table("/home/boris/Bureau/gene_apop.txt"))
