@@ -289,17 +289,17 @@ shinyServer(function(input, output, session) {
   output$DE_Heatmap_RE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    DoHeatmap(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
+    DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
   })
   output$DE_RidgePlot_RE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    RidgePlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20], ncol = 4) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+    RidgePlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
   })
   output$DE_VlnPlot_RE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    VlnPlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20], sort = T) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+    VlnPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
   output$Linear_RE <- renderPlot({
     sortie()
@@ -310,7 +310,8 @@ shinyServer(function(input, output, session) {
   output$DE_DotPlot_RE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    DotPlot(subset(singlet, idents = c("Excipient","RCHOP")), features = rownames(singlet@tools$DE_RE)[1:20]) + RotatedAxis()
+    DotPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12]) + RotatedAxis()
+  
   })
   output$DE_info_RE <- renderPrint({print(sortie()@tools$DE_RE)})
   
@@ -318,17 +319,17 @@ shinyServer(function(input, output, session) {
   output$DE_Heatmap_PE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    DoHeatmap(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:50], size = 3)
+    DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","Pré-greffe"))], features = rownames(singlet@tools$DE_PE)[1:50], size = 3)
   })
   output$DE_RidgePlot_PE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    RidgePlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20], ncol = 4) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+    RidgePlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
   })
   output$DE_VlnPlot_PE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    VlnPlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20], sort = T) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+    VlnPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
   output$Linear_PE <- renderPlot({
     sortie()
@@ -339,7 +340,7 @@ shinyServer(function(input, output, session) {
   output$DE_DotPlot_PE <- renderPlot({
     sortie()
     Idents(singlet)<-"Condition"
-    DotPlot(subset(singlet, idents = c("Excipient","Pré-greffe")), features = rownames(singlet@tools$DE_PE)[1:20]) + RotatedAxis()
+    DotPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12]) + RotatedAxis()
   })
   output$DE_info_PE <- renderPrint({print(sortie()@tools$DE_PE)})
   
