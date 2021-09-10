@@ -47,7 +47,7 @@ shinyServer(function(input, output, session) {
     return(top10)
   })
   FeaturesVariable <- reactive({
-    annotations <- read.csv("/home/boris/Bureau/scShiny/document/annotation_FindAllMarkers.csv")
+    annotations <- read.csv("document/annotation_FindAllMarkers.csv")
     fv <- annotations[which(annotations$gene_name %in% heatmap()$gene),] 
     fv <- fv[order(fv$gene_name),] 
     return(fv)
@@ -470,19 +470,19 @@ shinyServer(function(input, output, session) {
   })
   
   ## -- Méta-VDJ -- ##
-  output$FL08_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL08G0293_VDJ.RData") ; e})
-  output$FL09_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL09C1164_VDJ.RData") ; e})
-  output$FL12_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL12C1888_VDJ.RData") ; e})
-  output$FL14_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL140304_VDJ.RData") ; e})
-  output$FL02_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL02G095_VDJ.RData") ; e})
-  output$FL05_VDJ = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL05G0330_VDJ.RData") ; e})
+  output$FL08_VDJ = renderPlotly({load(file = "www/FL08G0293_VDJ.RData") ; e})
+  output$FL09_VDJ = renderPlotly({load(file = "www/FL09C1164_VDJ.RData") ; e})
+  output$FL12_VDJ = renderPlotly({load(file = "www/FL12C1888_VDJ.RData") ; e})
+  output$FL14_VDJ = renderPlotly({load(file = "www/FL140304_VDJ.RData") ; e})
+  output$FL02_VDJ = renderPlotly({load(file = "www/FL02G095_VDJ.RData") ; e})
+  output$FL05_VDJ = renderPlotly({load(file = "www/FL05G0330_VDJ.RData") ; e})
   
-  output$FL08_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL08G0293_VDJ.RData") ; f})
-  output$FL09_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL09C1164_VDJ.RData") ; f})
-  output$FL12_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL12C1888_VDJ.RData") ; f})
-  output$FL14_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL140304_VDJ.RData") ; f})
-  output$FL02_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL02G095_VDJ.RData") ; f})
-  output$FL05_Meta = renderPlotly({load(file = "/home/boris/Bureau/scShiny/www/FL05G0330_VDJ.RData") ; f})
+  output$FL08_Meta = renderPlotly({load(file = "www/FL08G0293_VDJ.RData") ; f})
+  output$FL09_Meta = renderPlotly({load(file = "www/FL09C1164_VDJ.RData") ; f})
+  output$FL12_Meta = renderPlotly({load(file = "www/FL12C1888_VDJ.RData") ; f})
+  output$FL14_Meta = renderPlotly({load(file = "www/FL140304_VDJ.RData") ; f})
+  output$FL02_Meta = renderPlotly({load(file = "www/FL02G095_VDJ.RData") ; f})
+  output$FL05_Meta = renderPlotly({load(file = "www/FL05G0330_VDJ.RData") ; f})
   
   
   ## -- Rapport Patient -- ##
