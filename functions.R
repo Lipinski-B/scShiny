@@ -158,12 +158,12 @@ metadata <- function(singlet){
     b.cells <- subset(immune.combined, idents = "B-cells") ; Idents(b.cells) <- "stim"
     return(as.data.frame(log1p(AverageExpression(b.cells, verbose = FALSE)$RNA)))
   }
-  Excipient <- seurat_subset(all, "Condition", "Excipient")
-  RCHOP <- seurat_subset(all, "Condition", "RCHOP")
-  Pregreffe <- seurat_subset(all, "Condition", "Pré-greffe")
+  Excipient <- seurat_subset(singlet, "Condition", "Excipient")
+  RCHOP <- seurat_subset(singlet, "Condition", "RCHOP")
+  Pregreffe <- seurat_subset(singlet, "Condition", "Pré-greffe")
   
-  all@tools$avg.b.cells_RE <- linear_correlation(Excipient, RCHOP)
-  all@tools$avg.b.cells_PE <- linear_correlation(Pregreffe, Excipient)
+  singlet@tools$avg.b.cells_RE <- linear_correlation(Excipient, RCHOP)
+  singlet@tools$avg.b.cells_PE <- linear_correlation(Pregreffe, Excipient)
   
   
   return(singlet)

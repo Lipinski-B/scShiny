@@ -12,7 +12,18 @@ source(file = "/home/boris/Bureau/scShiny/functions.R")
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293","FL02G095","FL05G0330") #'all'
 patient <- siege[4]
-#load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
+
+all@assays[["RNA"]]@counts <- as.matrix(0)
+save(all, file = paste0("/home/boris/Documents/analyse/", patient,".RData")) 
+
+
+plots <- PCAPlot(object = all, group.by = NULL, split.by = NULL, label.size = 0.0, pt.size = 2)
+plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
+  guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & 
+  xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) & 
+  ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
+
 
 
 ## -- Workflow -- ## 
@@ -64,6 +75,8 @@ load(file = paste0("/home/boris/Documents/analyse/singlet_", siege[5],".RData"))
 load(file = paste0("/home/boris/Documents/analyse/singlet_", siege[6],".RData")) ; P6 <- all ; rownames(P6@meta.data) <- paste0("FL05_",rownames(P6@meta.data)) ; P6 <- metadata_merge(P6)
 
 all <- merge(P1, y = c(P2,P3,P4,P5,P6), add.cell.ids = c("FL14","FL12","FL09","FL08","FL02","FL05"), project = "FL")
+save(all, file = paste0("/home/boris/Documents/analyse/singlet_all.RData"))
+load(file = paste0("/home/boris/Documents/analyse/singlet_all.RData"))
 all <- visualisation(all)
 all@tools$hallmarks <- c("ADIPOGENESIS","ALLOGRAFT_REJECTION","ANDROGEN_RESPONSE","ANGIOGENESIS","APICAL_JUNCTION","APICAL_SURFACE","APOPTOSIS","BILE_ACID_METABOLISM","CHOLESTEROL_HOMEOSTASIS","COAGULATION","COMPLEMENT","DNA_REPAIR","E2F_TARGETS","EPITHELIAL_MESENCHYMAL_TRANSITION","ESTROGEN_RESPONSE_EARLY","ESTROGEN_RESPONSE_LATE","FATTY_ACID_METABOLISM","G2M_CHECKPOINT","GLYCOLYSIS","HEDGEHOG_SIGNALING","HEME_METABOLISM","HYPOXIA","IL2_STAT5_SIGNALING","IL6_JAK_STAT3_SIGNALING","INFLAMMATORY_RESPONSE","INTERFERON_ALPHA_RESPONSE","INTERFERON_GAMMA_RESPONSE","KRAS_SIGNALING_DN","KRAS_SIGNALING_UP","MITOTIC_SPINDLE","MTORC1_SIGNALING","MYC_TARGETS_V1","MYC_TARGETS_V2","MYOGENESIS","NOTCH_SIGNALING","OXIDATIVE_PHOSPHORYLATION","P53_PATHWAY","PANCREAS_BETA_CELLS","PEROXISOME","PI3K_AKT_MTOR_SIGNALING","PROTEIN_SECRETION","REACTIVE_OXYGEN_SPECIES_PATHWAY","SPERMATOGENESIS","TGF_BETA_SIGNALING","TNFA_SIGNALING_VIA_NFKB","UNFOLDED_PROTEIN_RESPONSE","UV_RESPONSE_DN","UV_RESPONSE_UP","WNT_BETA_CATENIN_SIGNALING","XENOBIOTIC_METABOLISM")
 all@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "clonotype_id", "Phase", "old.ident", "BCL2_L23L","BCL2_K22K","CD79B_Y696H","EZH2_A682G_1","EZH2_A682G_2","EZH2_A692V_1","EZH2_A692V_2","EZH2_Y646C","EZH2_Y646F","EZH2_Y646H","EZH2_Y646N","EZH2_Y646S","EZH2_A692V","EZH2_A682G")#, "BCL2_K22K", "BCL2_L23L", "CD79B_Y696H")# c("seurat_clusters", "Condition", "Phénotype", "Phase", "K29Q", "L37M", "M11I", "pGln45")
@@ -128,7 +141,8 @@ DoHeatmap(singlet, group.by = "Condition", feature = apop$V1)
 patient <- "FL05G0330"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) ; Idents(all)<-"Condition"
 
-dissoc <- read.table("/home/boris/Bureau/scShiny/document/gene/dissoc.txt", header = T)$x
+list.files(path = "/home/boris/Bureau/scShiny/document/gene/geneset/")
 apop <- read.table("/home/boris/Bureau/scShiny/document/gene/geneset/UV_RESPONSE_UP.txt")$V1
-DoHeatmap(subset(all, idents = c("Excipient","RCHOP")), features = apop, size = 3)
-DoHeatmap(subset(all, idents = c("Excipient","RCHOP")), features = setdiff(rownames(all@tools$DE_PE)[1:50], dissoc), size = 3)
+RE <- subset(all, idents = c("Excipient","RCHOP"))
+DoHeatmap(RE, features = apop, size = 3)
+#DoHeatmap(subset(all, idents = c("Excipient","RCHOP")), features = setdiff(rownames(all@tools$DE_PE)[1:50], dissoc), size = 3)
