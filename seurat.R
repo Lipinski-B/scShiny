@@ -10,14 +10,15 @@ source(file = "/home/boris/Bureau/scShiny/functions.R")
 
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
-siege <- c("FL12C1888","FL09C1164","FL02G095","FL05G0330") #'all' "FL140304","FL08G0293",
+siege <- c("FL12C1888","FL09C1164","FL02G095","FL05G0330", "FL140304","FL08G0293") #'all' 
 patient <- siege[1]
 
 for (patient in siege){
   load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
   all@assays[["HTO"]] <- as.matrix(0)
   all@assays[["RNA"]]@counts <- as.matrix(0)
-  #all@assays[["RNA"]]@data <- as.matrix(0)
+  #all@assays[["RNA"]]@data@i <- as.integer(0)
+  all@assays[["RNA"]]@data@x <-as.integer(0)
   all@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
   save(all, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
 }
