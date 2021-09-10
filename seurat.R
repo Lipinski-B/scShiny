@@ -14,30 +14,26 @@ siege <- c("FL12C1888","FL09C1164","FL02G095","FL05G0330", "FL140304","FL08G0293
 patient <- siege[1]
 
 for (patient in siege){
-  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
-  all@assays[["HTO"]] <- as.matrix(0)
-  all@assays[["RNA"]]@counts <- as.matrix(0)
-  all@graphs <- list()
-  all@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
-  save(all, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
+  load(file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
+  singlet <- all
+  save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
 }
 
-plots <- PCAPlot(object = all, group.by = NULL, split.by = NULL, label.size = 0.0, pt.size = 2)
-plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
-  guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & 
-  xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) & 
-  ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
-
-Idents(all)<-"Condition"
-DoHeatmap(all, cells = rownames(all@meta.data)[which(all@meta.data$Condition==c("Excipient","Pré-greffe"))], features = rownames(all@tools$DE_PE)[1:50], size = 3) 
 
 
-a <- subset(all, idents = c("Excipient","Pré-greffe"))
-
-## -- Workflow -- ## 
-all <- processing(patient)
-save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+## -- Workflow -- ##
+#Full
+singlet <- processing(patient)
+save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 #save(all, file = paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/singlet_", patient,".RData"))
+
+#app
+singlet@assays[["HTO"]] <- as.matrix(0)
+singlet@assays[["RNA"]]@counts <- as.matrix(0)
+singlet@graphs <- list()
+singlet@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
+save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
+
 
 
 ## -- Sub sample -- ##

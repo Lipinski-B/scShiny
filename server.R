@@ -9,7 +9,7 @@ shinyServer(function(input, output, session) {
     show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     if(nchar(as.character(input$patient))>0){
       load(file = paste0("www/",input$patient,".RData"))
-      singlet <<- all
+      singlet <<- singlet
     }
     sendSweetAlert(session = session,title = "Done !",type = "success")
     shinyjs::runjs("window.scrollTo(0, 50)")
@@ -20,7 +20,7 @@ shinyServer(function(input, output, session) {
     
     if(nchar(as.character(input$patient))>0){
       load(file = paste0("www/",input$patient,".RData"))
-      singlet <<- all
+      singlet <<- singlet
     }
     sortie()
     
@@ -30,7 +30,7 @@ shinyServer(function(input, output, session) {
     
     if(length(input$combo)>0){
       load(file = paste0("www/singlet_",input$patient,"_",input$combo,".RData"))
-      singlet <<- all
+      singlet <<- singlet
     }
     
     sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
@@ -38,7 +38,7 @@ shinyServer(function(input, output, session) {
   })
 
   observeEvent(input$resetPatient,{
-    singlet <<- all
+    singlet <<- singlet
     sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
   })
 
