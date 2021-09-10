@@ -17,8 +17,9 @@ for (patient in siege){
   load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
   all@assays[["HTO"]] <- as.matrix(0)
   all@assays[["RNA"]]@counts <- as.matrix(0)
-  #all@assays[["RNA"]]@data@i <- as.integer(0)
-  all@assays[["RNA"]]@data@x <-as.integer(0)
+  #all@assays[["RNA"]]@data@i <- as.integer(1)
+  #all@assays[["RNA"]]@data@x <-as.integer(0)
+  all@graphs <- list()
   all@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
   save(all, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
 }
@@ -30,7 +31,7 @@ plots & theme(title = element_text(size=20),legend.position = "top",legend.title
   ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
 
 Idents(all)<-"Condition"
-DoHeatmap(subset(all, idents = c("Excipient","Pré-greffe")), features = rownames(all@tools$DE_PE)[1:50], size = 3)
+DoHeatmap(subset(all, idents = c("Excipient","Pré-greffe")), features = rownames(all@tools$DE_PE)[1:50], size = 3, slot = "scale.data")
 
 
 
