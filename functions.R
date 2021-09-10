@@ -7,6 +7,7 @@ library(shinybusy)
 library(shinyWidgets)
 library(shinydashboard)
 library(dashboardthemes)
+library(shinyjs)
 
 ## -- Worflow -- ##
 metadata <- function(singlet){  
@@ -269,7 +270,7 @@ QC_subset <- function(singlet, maximum_sub, percent_mt_sub){
 
 
 ## -- Other -- ## 
-#library(shinyjs)
+
 #library(dplyr)
 #library(SingleR)
 #library(stringr)
