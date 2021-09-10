@@ -10,19 +10,26 @@ source(file = "/home/boris/Bureau/scShiny/functions.R")
 
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
-siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293","FL02G095","FL05G0330") #'all'
-patient <- siege[4]
-load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
+siege <- c("FL12C1888","FL09C1164","FL02G095","FL05G0330") #'all' "FL140304","FL08G0293",
+patient <- siege[1]
 
-all@assays[["RNA"]]@counts <- as.matrix(0)
-save(all, file = paste0("/home/boris/Documents/analyse/", patient,".RData")) 
-
+for (patient in siege){
+  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) 
+  all@assays[["HTO"]] <- as.matrix(0)
+  all@assays[["RNA"]]@counts <- as.matrix(0)
+  #all@assays[["RNA"]]@data <- as.matrix(0)
+  all@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
+  save(all, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
+}
 
 plots <- PCAPlot(object = all, group.by = NULL, split.by = NULL, label.size = 0.0, pt.size = 2)
 plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
   guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & 
   xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) & 
   ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
+
+Idents(all)<-"Condition"
+DoHeatmap(subset(all, idents = c("Excipient","Pré-greffe")), features = rownames(all@tools$DE_PE)[1:50], size = 3)
 
 
 

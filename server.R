@@ -8,7 +8,7 @@ shinyServer(function(input, output, session) {
   observeEvent(input$actBtnPatient1,{    
     show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     if(nchar(as.character(input$patient))>0){
-      load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
+      load(file = paste0("/www/",input$patient,".RData"))
       singlet <<- all
     }
     sendSweetAlert(session = session,title = "Done !",type = "success")
@@ -19,7 +19,7 @@ shinyServer(function(input, output, session) {
     show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     
     if(nchar(as.character(input$patient))>0){
-      load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,".RData"))
+      load(file = paste0("/www/",input$patient,".RData"))
       singlet <<- all
     }
     sortie()
@@ -29,7 +29,7 @@ shinyServer(function(input, output, session) {
     if(nchar(as.character(input$maximum))>0 || nchar(as.character(input$percent_mt))>0){singlet <<- QC_subset(singlet, maximum_sub=input$maximum, percent_mt_sub=input$percent_mt)}
     
     if(length(input$combo)>0){
-      load(file = paste0("/home/boris/Documents/analyse/singlet_",input$patient,"_",input$combo,".RData"))
+      load(file = paste0("/www/singlet_",input$patient,"_",input$combo,".RData"))
       singlet <<- all
     }
     
