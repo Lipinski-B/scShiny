@@ -6,53 +6,46 @@ library(dplyr)
 library(future)
 library(DESeq2)
 library(cowplot)
+library(Seurat)
+library(dittoSeq)
 source(file = "/home/boris/Bureau/scShiny/functions.R")
 
 ## -- Loading -- ## 
-setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
-siege <- c("FL12C1888","FL09C1164","FL02G095","FL05G0330", "FL140304","FL08G0293") #'all' 
-patient <- siege[1]
+setwd(dir = "/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/")
+siege <- c("FL09C1164","FL02G095","FL05G0330","FL140304", "FL08G0293", "FL12C1888") #'all'
+patient <- siege[2]
 
 
 ## -- Workflow -- ##
-#Full
-singlet <- processing(patient)
-save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+for (patient in siege) {
+  singlet <- processing(patient) ; diet(singlet)
+  save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+  rm(singlet)
+  gc() ; gc() ; gc()
+}
 #save(all, file = paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/singlet_", patient,".RData"))
-
-#app
-load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-all@assays[["SCT"]]@scale.data <- subset(all@assays[["SCT"]]@scale.data, rownames(all@assays[["SCT"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
-singlet <- DietSeurat(all, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
-all@assays[["HTO"]] <- list()
-all@assays[["RNA"]] <- list()
-save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
-
-PCAPlot(object = singlet, label.size = 0.0, pt.size = 2) & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
-Idents(singlet)<-"Condition" ; DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
 
 
 
 ## -- Sub sample -- ##
 patient <- "FL05G0330"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-all <- seurat_subset(singlet,"Condition", c("RCHOP","Pré-greffe")) ; save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_PG_RCHOP.RData"))
-all <- seurat_subset(singlet,"Condition", c("Excipient","Pré-greffe")) ; save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_PG_EX.RData"))
-all <- seurat_subset(singlet,"Condition", c("RCHOP","Excipient")) ; save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_EX_RCHOP.RData"))
+singlet <- seurat_subset(singlet,"Condition", c("RCHOP","Pré-greffe")) ; save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_PG_RCHOP.RData"))
+singlet <- seurat_subset(singlet,"Condition", c("Excipient","Pré-greffe")) ; save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_PG_EX.RData"))
+singlet <- seurat_subset(singlet,"Condition", c("RCHOP","Excipient")) ; save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_EX_RCHOP.RData"))
 
 
 
 ## -- Séparation Pré-greffe/Excipient -- ##
 patient <- "FL05G0330"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-Idents(all) <- "Condition"
-all <- subset(all, idents = c('Pré-greffe','Excipient'))
-all <- subset(all, idents = 'B-cells')
-all <- visualisation(all)
+Idents(singlet) <- "Condition"
+singlet <- subset(singlet, idents = c('Pré-greffe','Excipient'))
+all <- subset(singlet, idents = 'B-cells')
+singlet <- visualisation(singlet)
 
-PCAPlot(object = all, label.size = 0.0, pt.size = 2) & 
-  theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) &guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & 
-  xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) &ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
+PCAPlot(object = singlet, label.size = 0.0, pt.size = 2) & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
+Idents(singlet)<-"Condition" ; DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
 
 
 
@@ -167,6 +160,8 @@ DEenrichRPlot(all, slot = "counts", ident.1 = "Excipient", ident.2 = "RCHOP", te
 ## -- TEST : DE RCHOP : apop+ / apop- -- ##
 patient <- "FL05G0330"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.07 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("RCHOP"))])
-liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.13 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("Excipient"))])
+liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS<0.13 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
+liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.13 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
 sub_all <- subset(all, cells = c(liste,liste2))
+
+

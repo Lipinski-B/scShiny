@@ -1,14 +1,8 @@
 #.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
-#library(Seurat)
-#library(dittoSeq)
 library(plotly)
 library(shiny)
-#library(shinybusy)
 library(shinyWidgets)
 library(shinydashboard)
-#library(dashboardthemes)
-#library(shinyjs)
-#library(ggplot2)
 
 
 ## -- Worflow -- ##
@@ -168,6 +162,7 @@ metadata <- function(singlet){
   singlet@tools$avg.b.cells_RE <- linear_correlation(Excipient, RCHOP)
   singlet@tools$avg.b.cells_PE <- linear_correlation(Pregreffe, Excipient)
   
+  save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
   
   return(singlet)
 }
@@ -221,6 +216,12 @@ processing <- function(patient){
   singlet <- metadata(singlet)
   return(singlet)
 }
+diet <- function(singlet){
+  singlet@assays[["SCT"]]@scale.data <- subset(singlet@assays[["SCT"]]@scale.data, rownames(singlet@assays[["SCT"]]@scale.data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
+  singlet <- DietSeurat(singlet, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
+  singlet@assays[["HTO"]] <- list() ; singlet@assays[["RNA"]] <- list()
+  save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
+}
 
 ## -- Merge -- ##
 metadata_merge <- function(singlet){
@@ -271,6 +272,13 @@ QC_subset <- function(singlet, maximum_sub, percent_mt_sub){
 #library(celldex)
 #library(monocle)
 #library(escape)
+
+#library(dashboardthemes)
+#library(shinyjs)
+#library(ggplot2)
+#library(shinybusy)
+#library(Seurat)
+#library(dittoSeq)
 
 visualisation2 <- function(singlet){
   ## -- Pre-processing  -- ##
