@@ -13,7 +13,7 @@ shinyServer(function(input, output, session) {
     }
     shinyWidgets::sendSweetAlert(session = session,title = "Done !",type = "success")
     shinyjs::runjs("window.scrollTo(0, 50)")
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
   observeEvent(input$actBtnPatient,{    
     shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
@@ -34,7 +34,7 @@ shinyServer(function(input, output, session) {
     }
     
     shinyWidgets::sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
   observeEvent(input$resetPatient,{
