@@ -22,8 +22,10 @@ save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".
 
 #app
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-all@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
+all@assays[["SCT"]]@scale.data <- subset(all@assays[["SCT"]]@scale.data, rownames(all@assays[["SCT"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
 singlet <- DietSeurat(all, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
+all@assays[["HTO"]] <- list()
+all@assays[["RNA"]] <- list()
 save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
 
 PCAPlot(object = singlet, label.size = 0.0, pt.size = 2) & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
@@ -46,41 +48,14 @@ load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 Idents(all) <- "Condition"
 all <- subset(all, idents = c('Pré-greffe','Excipient'))
 all <- subset(all, idents = 'B-cells')
-
-all <- NormalizeData(all) 
-all <- FindVariableFeatures(all, selection.method = "mvp") #vst mvp disp
-all <- ScaleData(all, model.use = 'negbinom') #features = rownames(all)                                               # Scale data :singlet@assays$RNA@scale.data, singlet[["RNA"]]@scale.data
-all <- RunPCA(all) # features = VariableFeatures(all) Reduction dimension
-
-
-
-all <- PercentageFeatureSet(all, pattern = "^MT-", col.name = "percent.mt")
-all <- SCTransform(all, vars.to.regress = "percent.mt", verbose = FALSE)
-all <- SCTransform(all, method = "glmGamPoi", vars.to.regress = "percent.mt", verbose = FALSE)
-all <- RunPCA(all, verbose = FALSE)
-all <- RunUMAP(all, dims = 1:30, verbose = FALSE)
-all <- FindNeighbors(all, dims = 1:30, verbose = FALSE)
-all <- FindClusters(all, verbose = FALSE)
-DimPlot(all, label = TRUE) + NoLegend()
-
-
-
-
+all <- visualisation(all)
 
 PCAPlot(object = all, label.size = 0.0, pt.size = 2) & 
-  theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
-  guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & 
-  xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) & 
-  ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
+  theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) &guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & 
+  xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) &ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
 
 
-all <- FindNeighbors(all, reduction = "pca", dims = 1:40, compute.SNN = T)
-all <- FindClusters(all, resolution = 0.5)                                                        # head(Idents(singlet), 10) 
-all <- RunUMAP(all, reduction = "pca", dims = 1:40)
-all <- RunTSNE(all, reduction = "pca", dims = 1:40)
 
-
-all <- visualisation(all)
 
 ## -- DE intersect -- ##
 DE <- list()
