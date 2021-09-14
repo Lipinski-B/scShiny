@@ -6,17 +6,17 @@ shinyServer(function(input, output, session) {
   sortie <- eventReactive(c(input$actBtnPatient1,input$actBtnPatient, input$resetPatient) ,{singlet})
   
   observeEvent(input$actBtnPatient1,{    
-    show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
+    shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     if(nchar(as.character(input$patient))>0){
       load(file = paste0("www/",input$patient,".RData"))
       singlet <<- singlet
     }
-    sendSweetAlert(session = session,title = "Done !",type = "success")
+    shinyWidgets::sendSweetAlert(session = session,title = "Done !",type = "success")
     shinyjs::runjs("window.scrollTo(0, 50)")
     remove_modal_spinner()
   })
   observeEvent(input$actBtnPatient,{    
-    show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
+    shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     
     if(nchar(as.character(input$patient))>0){
       load(file = paste0("www/",input$patient,".RData"))
@@ -33,13 +33,13 @@ shinyServer(function(input, output, session) {
       singlet <<- singlet
     }
     
-    sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
+    shinyWidgets::sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
     remove_modal_spinner()
   })
 
   observeEvent(input$resetPatient,{
     singlet <<- singlet
-    sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
+    shinyWidgets::sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
   })
 
   heatmap <- reactive({
@@ -75,25 +75,25 @@ shinyServer(function(input, output, session) {
     sortie()
     singlet2 <- singlet
     for (l in split()) {
-      Idents(singlet2) <- l
-      tokeep <- levels(Idents(singlet2))
+      Seurat::Idents(singlet2) <- l
+      tokeep <- levels(Seurat::Idents(singlet2))
       t <- c()
       for (i in tokeep){t <- c(t, input[[paste0("s",i)]])}      
       tokeep <- tokeep[tokeep %in% t]
       singlet2 <- subset(singlet2, idents = tokeep)
-      Idents(singlet2)<-"seurat_clusters"
+      Seurat::Idents(singlet2)<-"seurat_clusters"
       if(length(input$sclonotype) == 1){
         singlet2 <- clonotype()
       }
     }
     for (k in group()) {
-      Idents(singlet2)<- k
-      tokeep <- levels(Idents(singlet2))
+      Seurat::Idents(singlet2)<- k
+      tokeep <- levels(Seurat::Idents(singlet2))
       t <- c()
       for (i in tokeep){t <- c(t, input[[i]])}      
       tokeep <- tokeep[tokeep %in% t]
       singlet2 <- subset(singlet2, idents = tokeep)
-      Idents(singlet2)<-"seurat_clusters"
+      Seurat::Idents(singlet2)<-"seurat_clusters"
     }
     
     return(singlet2)
@@ -106,8 +106,8 @@ shinyServer(function(input, output, session) {
   })
   tosub <- reactive({
     for (l in sub()) {
-      Idents(singlet) <- l
-      tokeep <- levels(Idents(singlet))
+      Seurat::Idents(singlet) <- l
+      tokeep <- levels(Seurat::Idents(singlet))
       t <- c()
       for (i in tokeep){t <- c(t, as.character(input[[paste0("p",i)]]))}
       tokeep <- tokeep[tokeep %in% t]
@@ -251,19 +251,19 @@ shinyServer(function(input, output, session) {
   
   ## -- PCA -- ##
   output$PCA <- renderPlot({
-    plots <- PCAPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
+    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 1, reduction = 'pca')
     plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)
-    ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
+    ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Seurat::Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Seurat::Stdev(singlet[["pca"]])[2],2), " %"))
   })
   output$D_PCA <- renderPlotly({
     plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3,color = singlet@meta.data[[input$metadata]], 
             type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
-            text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>%layout(title=input$metadata,scene = list(xaxis = list(title = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")),yaxis = list(title = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %")),zaxis = list(title = paste0("PCA 3 : ", round(Stdev(singlet[["pca"]])[3],2), " %"))))
+            text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>%layout(title=input$metadata,scene = list(xaxis = list(title = paste0("PCA 1 : ", round(Seurat::Stdev(singlet[["pca"]])[1],2), " %")),yaxis = list(title = paste0("PCA 2 : ", round(Seurat::Stdev(singlet[["pca"]])[2],2), " %")),zaxis = list(title = paste0("PCA 3 : ", round(Seurat::Stdev(singlet[["pca"]])[3],2), " %"))))
   })
   
   ## -- UMAP -- ##
   output$UMAP <- renderPlot({
-    plots <- UMAPPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
+    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'umap')
     plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4))) 
   })
   output$D_UMAP <- renderPlotly({
@@ -274,7 +274,7 @@ shinyServer(function(input, output, session) {
   
   ## -- TSNE -- ##
   output$TSNE <- renderPlot({
-    plots <- TSNEPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2)
+    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'tsne')
     plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4)))
   })
   output$D_TSNE <- renderPlotly({
@@ -288,88 +288,87 @@ shinyServer(function(input, output, session) {
   # RCHOP / Excipient
   output$DE_Heatmap_RE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
   })
   output$DE_RidgePlot_RE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    RidgePlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::RidgePlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
   })
   output$DE_VlnPlot_RE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    VlnPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::VlnPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
   output$Linear_RE <- renderPlot({
     sortie()
-    result <- rownames(singlet@tools$avg.b.cells_RE[which(singlet@tools$avg.b.cells_RE$CTRL/singlet@tools$avg.b.cells_RE$STIM < 0.8),])
-    p1 <- ggplot(singlet@tools$avg.b.cells_RE, aes(CTRL, STIM)) + geom_point() + ggtitle("B Cells") 
-    LabelPoints(plot = p1, points = result, repel = TRUE, xnudge = 0.2, ynudge = 0.5)
+    result <- rownames(singlet@tools$avg.b.cells_RE[which(singlet@tools$avg.b.cells_RE$CTRL/singlet@tools$avg.b.cells_RE$STIM < 0.75),])
+    ggplot(singlet@tools$avg.b.cells_RE, aes(CTRL, STIM)) + geom_point() + ggtitle("B Cells") 
+    #Seurat::LabelPoints(plot = p1, points = result, repel = TRUE, xnudge = 0.2, ynudge = 0.5)
   })
   output$DE_DotPlot_RE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    DotPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12]) + RotatedAxis()
-  
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::DotPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12]) + Seurat::RotatedAxis()
   })
   output$DE_info_RE <- renderPrint({print(sortie()@tools$DE_RE)})
   
   # Pré-greffe / Excipient
   output$DE_Heatmap_PE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","Pré-greffe"))], features = rownames(singlet@tools$DE_PE)[1:50], size = 3)
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","Pré-greffe"))], features = rownames(singlet@tools$DE_PE)[1:50], size = 3)
   })
   output$DE_RidgePlot_PE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    RidgePlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::RidgePlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
   })
   output$DE_VlnPlot_PE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    VlnPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::VlnPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
   output$Linear_PE <- renderPlot({
     sortie()
-    result <- rownames(singlet@tools$avg.b.cells_PE[which(singlet@tools$avg.b.cells_PE$CTRL/singlet@tools$avg.b.cells_PE$STIM > 1.2),])
-    p1 <- ggplot(singlet@tools$avg.b.cells_PE, aes(CTRL, STIM)) + geom_point() + ggtitle("B Cells") 
-    LabelPoints(plot = p1, points = result, repel = TRUE, xnudge = 0.2, ynudge = 0.5)
+    result <- rownames(singlet@tools$avg.b.cells_PE[which(singlet@tools$avg.b.cells_PE$CTRL/singlet@tools$avg.b.cells_PE$STIM > 2),])
+    ggplot(singlet@tools$avg.b.cells_PE, aes(CTRL, STIM)) + geom_point() + ggtitle("B Cells") 
+    #Seurat::LabelPoints(plot = p1, points = result, repel = TRUE, xnudge = 0.2, ynudge = 0.2)
   })
   output$DE_DotPlot_PE <- renderPlot({
     sortie()
-    Idents(singlet)<-"Condition"
-    DotPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12]) + RotatedAxis()
+    Seurat::Idents(singlet)<-"Condition"
+    Seurat::DotPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12]) + Seurat::RotatedAxis()
   })
   output$DE_info_PE <- renderPrint({print(sortie()@tools$DE_PE)})
   
   ## -- Heatmap -- ##
   output$Heatmap <- renderPlot({
     sortie()
-    DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()
+    Seurat::DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()
   })
   output$Heatmap_feature <- renderPrint({print(sortie()@commands[["FindAllMarkers"]])})
   
   ## -- Mitochondrie Figure -- ##
   output$MT_VlnPlot <- renderPlot({
     sortie()
-    singlet@tools$mitochondrie_all + VlnPlot(singlet, features = "nFeature_RNA", group.by = "Condition") +  VlnPlot(singlet, features = "nCount_RNA", group.by = "Condition") + VlnPlot(singlet, features = "percent.mt", group.by = "Condition")
+    singlet@tools$mitochondrie_all + Seurat::VlnPlot(singlet, features = "nFeature_RNA", group.by = "Condition") +  Seurat::VlnPlot(singlet, features = "nCount_RNA", group.by = "Condition") + Seurat::VlnPlot(singlet, features = "percent.mt", group.by = "Condition")
   })
   output$MT_FeatureScatter <- renderPlot({
     sortie()
-    FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+    Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
   })
   output$MT_FeatureScatter2 <- renderPlot({
     sortie()
-    FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")
+    Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")
   })
   
   ## -- The 50 most highly variable genes -- ##
   output$top50 <- renderPlot({
     sortie()
-    VariableFeaturePlot(singlet)
-    LabelPoints(plot = VariableFeaturePlot(singlet), points = head(VariableFeatures(singlet), 50), repel = TRUE)
+    Seurat::VariableFeaturePlot(singlet)
+    Seurat::LabelPoints(plot = Seurat::VariableFeaturePlot(singlet), points = head(VariableFeatures(singlet), 50), repel = TRUE)
   })
   output$Variable_feature <- renderPrint({print(FeaturesVariable())})
   
@@ -394,23 +393,23 @@ shinyServer(function(input, output, session) {
     sortie()
     singlet@meta.data$active.idents <- singlet@active.ident
     singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "Phase", "orig.ident") # "clonotype_id",
-    if(is.null(rv$order)){dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
-    }else{dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)}  
+    if(is.null(rv$order)){dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
+    }else{dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)}  
   })
   
-  output$hallmark_VlnPlot <- renderPlot({dittoPlot(sortie() , input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
+  output$hallmark_VlnPlot <- renderPlot({dittoSeq::dittoPlot(sortie() , input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
   output$hallmark_HD <- renderPlot({
-    dittoScatterHex(sortie(),x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + 
+    dittoSeq::dittoScatterHex(sortie(),x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + 
       theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
   })
   output$hallmark_RP <- renderPlot({
     sortie()
-    ES2 <- data.frame(singlet[[]], Idents(singlet))
+    ES2 <- data.frame(singlet[[]], Seurat::Idents(singlet))
     colnames(ES2)[ncol(ES2)] <- "cluster"
-    ridgeEnrichment(ES2, gene.set = input$hallmark_order_RP, group = input$metadata_group_RP, facet = input$metadata_facet_RP, add.rug = TRUE)
+    escape::ridgeEnrichment(ES2, gene.set = input$hallmark_order_RP, group = input$metadata_group_RP, facet = input$metadata_facet_RP, add.rug = TRUE)
   })
   #output$hallmark_PCA <- renderPlot({
-  #ES2 <- data.frame(singlet[[]], Idents(singlet))
+  #ES2 <- data.frame(singlet[[]], Seurat::Idents(singlet))
   #PCA <- performPCA(enriched = ES2, groups = c("cluster", "SingleR.calls"))
   #pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = TRUE)
   #pcaEnrichment(PCA, PCx = "PC1", PCy = "PC2", contours = FALSE, facet = "cluster") 

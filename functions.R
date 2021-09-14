@@ -1,13 +1,15 @@
 #.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
-library(Seurat)
-library(dittoSeq)
+#library(Seurat)
+#library(dittoSeq)
 library(plotly)
 library(shiny)
-library(shinybusy)
+#library(shinybusy)
 library(shinyWidgets)
 library(shinydashboard)
-library(dashboardthemes)
-library(shinyjs)
+#library(dashboardthemes)
+#library(shinyjs)
+#library(ggplot2)
+
 
 ## -- Worflow -- ##
 metadata <- function(singlet){  
@@ -28,7 +30,7 @@ metadata <- function(singlet){
   
   
   ##### -- GoT  -- ##### 
-  load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/", patient, "/R/", patient, "_GoT.Rdata"))
+  load(file=paste0("/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/", patient, "/R/", patient, "_GoT.Rdata"))
   singlet <- AddMetaData(object = singlet, metadata = GOT)
   
   
@@ -54,7 +56,7 @@ metadata <- function(singlet){
   singlet <- AddMetaData(object=singlet, metadata = bcr)                        #, col.name = colnames(as.data.frame(bcr)))   # Add to the Seurat object's metadata.
   
   # Figure
-  load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/VDJ.RData"))
+  load(file=paste0("/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/",patient,"/R/VDJ.RData"))
   singlet@tools$Clonotype <- Clonotype
   singlet@tools$Type <- Type
   singlet@tools$Isotype <- Isotype
@@ -134,10 +136,10 @@ metadata <- function(singlet){
   
   ##### -- DE -- ##### 
   Idents(singlet)<-"Condition"
-  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)+1
+  singlet[["SCT"]]@counts <- as.matrix(singlet[["SCT"]]@counts)+1
   singlet@tools$DE_RE <- FindMarkers(singlet, slot = "counts", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "DESeq2")
   singlet@tools$DE_PE <- FindMarkers(singlet, slot = "counts", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "DESeq2")
-  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)-1
+  singlet[["SCT"]]@counts <- as.matrix(singlet[["SCT"]]@counts)-1
   Idents(singlet)<-"seurat_clusters"
   
   
@@ -204,19 +206,13 @@ seurat_object <- function(patient){
   return(singlet)
 }
 visualisation <- function(singlet){
-  ## -- Pre-processing  -- ##
-  singlet <- NormalizeData(singlet, normalization.method = "LogNormalize", scale.factor = 10000) 
-  singlet <- FindVariableFeatures(singlet, selection.method = "vst", nfeatures = 2000)
-  singlet <- ScaleData(singlet, features = rownames(singlet))                                               # Scale data :singlet@assays$RNA@scale.data, singlet[["RNA"]]@scale.data
-  singlet <- RunPCA(singlet, features = VariableFeatures(singlet), ndims.print = 1:10, nfeatures.print = 30)# Reduction dimension
-  singlet <- FindNeighbors(singlet, reduction = "pca", dims = 1:40, compute.SNN = T)
-  singlet <- FindClusters(singlet, resolution = 0.5)                                                        # head(Idents(singlet), 10) 
-  singlet <- RunUMAP(singlet, reduction = "pca", dims = 1:40)
-  singlet <- RunTSNE(singlet, reduction = "pca", dims = 1:40)
-  
-  ## -- FindAllMarkers -- ## 
-  singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
-  
+  singlet <- PercentageFeatureSet(singlet, pattern = "^MT-", col.name = "percent.mt")
+  singlet <- SCTransform(singlet, method = "glmGamPoi", verbose = F)
+  singlet <- RunPCA(singlet, verbose = F)
+  singlet <- RunUMAP(singlet, dims = 1:40, verbose = F)
+  singlet <- FindNeighbors(singlet, dims = 1:40, verbose = F)
+  singlet <- FindClusters(singlet, verbose = F)
+  singlet <- RunTSNE(singlet, dims = 1:40, verbose = F)
   return(singlet)
 }
 processing <- function(patient){
@@ -268,12 +264,27 @@ QC_subset <- function(singlet, maximum_sub, percent_mt_sub){
   return(sub_singlet)
 }
 
-
 ## -- Other -- ## 
-
 #library(dplyr)
 #library(SingleR)
 #library(stringr)
 #library(celldex)
 #library(monocle)
 #library(escape)
+
+visualisation2 <- function(singlet){
+  ## -- Pre-processing  -- ##
+  singlet <- NormalizeData(singlet, normalization.method = "LogNormalize", scale.factor = 10000) 
+  singlet <- FindVariableFeatures(singlet, selection.method = "vst", nfeatures = 2000)
+  singlet <- ScaleData(singlet, features = rownames(singlet))                                               # Scale data :singlet@assays$RNA@scale.data, singlet[["RNA"]]@scale.data
+  singlet <- RunPCA(singlet, features = VariableFeatures(singlet), ndims.print = 1:10, nfeatures.print = 30)# Reduction dimension
+  singlet <- FindNeighbors(singlet, reduction = "pca", dims = 1:40, compute.SNN = T)
+  singlet <- FindClusters(singlet, resolution = 0.5)                                                        # head(Idents(singlet), 10) 
+  singlet <- RunUMAP(singlet, reduction = "pca", dims = 1:40)
+  singlet <- RunTSNE(singlet, reduction = "pca", dims = 1:40)
+  
+  ## -- FindAllMarkers -- ## 
+  #singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+  
+  return(singlet)
+}

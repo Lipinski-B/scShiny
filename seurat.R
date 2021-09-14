@@ -13,13 +13,6 @@ setwd(dir = "/home/boris/Documents/lipinskib/flinovo/result/")
 siege <- c("FL12C1888","FL09C1164","FL02G095","FL05G0330", "FL140304","FL08G0293") #'all' 
 patient <- siege[1]
 
-for (patient in siege){
-  load(file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
-  singlet <- all
-  save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
-}
-
-
 
 ## -- Workflow -- ##
 #Full
@@ -28,11 +21,13 @@ save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".
 #save(all, file = paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/singlet_", patient,".RData"))
 
 #app
-singlet@assays[["HTO"]] <- as.matrix(0)
-singlet@assays[["RNA"]]@counts <- as.matrix(0)
-singlet@graphs <- list()
-singlet@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
-save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData")) 
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+all@assays[["RNA"]]@scale.data <- subset(all@assays[["RNA"]]@scale.data, rownames(all@assays[["RNA"]]@scale.data) %in% c(rownames(all@tools$DE_PE)[1:50], rownames(all@tools$DE_RE)[1:50]))
+singlet <- DietSeurat(all, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
+save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
+
+PCAPlot(object = singlet, label.size = 0.0, pt.size = 2) & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
+Idents(singlet)<-"Condition" ; DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
 
 
 
@@ -44,6 +39,48 @@ all <- seurat_subset(singlet,"Condition", c("Excipient","Pré-greffe")) ; save(a
 all <- seurat_subset(singlet,"Condition", c("RCHOP","Excipient")) ; save(all, file = paste0("/home/boris/Documents/analyse/singlet_", patient,"_EX_RCHOP.RData"))
 
 
+
+## -- Séparation Pré-greffe/Excipient -- ##
+patient <- "FL05G0330"
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+Idents(all) <- "Condition"
+all <- subset(all, idents = c('Pré-greffe','Excipient'))
+all <- subset(all, idents = 'B-cells')
+
+all <- NormalizeData(all) 
+all <- FindVariableFeatures(all, selection.method = "mvp") #vst mvp disp
+all <- ScaleData(all, model.use = 'negbinom') #features = rownames(all)                                               # Scale data :singlet@assays$RNA@scale.data, singlet[["RNA"]]@scale.data
+all <- RunPCA(all) # features = VariableFeatures(all) Reduction dimension
+
+
+
+all <- PercentageFeatureSet(all, pattern = "^MT-", col.name = "percent.mt")
+all <- SCTransform(all, vars.to.regress = "percent.mt", verbose = FALSE)
+all <- SCTransform(all, method = "glmGamPoi", vars.to.regress = "percent.mt", verbose = FALSE)
+all <- RunPCA(all, verbose = FALSE)
+all <- RunUMAP(all, dims = 1:30, verbose = FALSE)
+all <- FindNeighbors(all, dims = 1:30, verbose = FALSE)
+all <- FindClusters(all, verbose = FALSE)
+DimPlot(all, label = TRUE) + NoLegend()
+
+
+
+
+
+PCAPlot(object = all, label.size = 0.0, pt.size = 2) & 
+  theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
+  guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & 
+  xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) & 
+  ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
+
+
+all <- FindNeighbors(all, reduction = "pca", dims = 1:40, compute.SNN = T)
+all <- FindClusters(all, resolution = 0.5)                                                        # head(Idents(singlet), 10) 
+all <- RunUMAP(all, reduction = "pca", dims = 1:40)
+all <- RunTSNE(all, reduction = "pca", dims = 1:40)
+
+
+all <- visualisation(all)
 
 ## -- DE intersect -- ##
 DE <- list()
@@ -87,30 +124,28 @@ all@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénoty
 all <- numeric_merge(all)
 save(all, file = paste0("/home/boris/Documents/analyse/singlet_all.RData"))
 
-
-
-## -- Méta subset -- ##
-all <- seurat_subset(all, "Condition", c("Excipient","Pré-greffe"))
-GS <- getGeneSets(library = "H")
-ES <- enrichIt(obj = all, gene.sets = GS, groups = 400, cores = 10)
-names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
-all <- AddMetaData(all, ES)
-all@commands[["FindAllMarkers"]] <- FindAllMarkers(all, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+Idents(all)<-"orig.ident"
+PCAPlot(object = all, group.by = "Phénotype", label.size = 0.0, pt.size = 2) & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Stdev(all[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(all[["pca"]])[2],2), " %"))
 
 
 
 
+## -- Réponse : RP/ RC -- ##
+load(file = paste0("/home/boris/Documents/analyse/singlet_all.RData"))
+all <- seurat_subset(all, "Condition", c("Pré-greffe"))
+all@meta.data[all@meta.data$orig.ident == "FL140304", "Reponse"] <- "RP"
+all@meta.data[all@meta.data$orig.ident == "FL12C1888", "Reponse"] <- "RP"
+all@meta.data[all@meta.data$orig.ident == "FL08G0293", "Reponse"] <- "RP"
 
+all@meta.data[all@meta.data$orig.ident == "FL09C1164", "Reponse"] <- "RC"
+all@meta.data[all@meta.data$orig.ident == "FL02G095", "Reponse"] <- "RC"
+all@meta.data[all@meta.data$orig.ident == "FL05G0330", "Reponse"] <- "RC"
 
+Idents(all)<-"Reponse" ; all[["RNA"]]@counts <- as.matrix(all[["RNA"]]@counts)+1
+all@tools$DE_R <- FindMarkers(all, slot = "counts", ident.1 = "RP", ident.2 = "RC", test.use = "DESeq2", max.cells.per.ident = 2000)
+all[["RNA"]]@counts <- as.matrix(all[["RNA"]]@counts)-1 ; Idents(all)<-"seurat_clusters"
+save(all, file = "/home/boris/Documents/analyse/singlet_all_PG.RData")
 
-immune.combined$celltype.stim <- paste(Idents(immune.combined), immune.combined$stim, sep = "_")
-immune.combined$celltype <- Idents(immune.combined)
-Idents(immune.combined) <- "celltype.stim"
-b.interferon.response <- FindMarkers(immune.combined, ident.1 = "B-cells_STIM", ident.2 = "B-cells_CTRL", verbose = FALSE)
-head(b.interferon.response, n = 15)
-
-plots <- VlnPlot(immune.combined, features = c("CD69"), split.by = "stim", group.by = "Condition", pt.size = 0, combine = FALSE, split.plot = TRUE)
-CombinePlots(plots = plots, ncol = 1)
 
 
 
@@ -141,12 +176,22 @@ DoHeatmap(singlet, group.by = "Condition", feature = apop$V1)
 
 
 
-## -- TEST : soustraction dissociation-- ##
-patient <- "FL05G0330"
-load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData")) ; Idents(all)<-"Condition"
 
-list.files(path = "/home/boris/Bureau/scShiny/document/gene/geneset/")
-apop <- read.table("/home/boris/Bureau/scShiny/document/gene/geneset/UV_RESPONSE_UP.txt")$V1
-RE <- subset(all, idents = c("Excipient","RCHOP"))
-DoHeatmap(RE, features = apop, size = 3)
-#DoHeatmap(subset(all, idents = c("Excipient","RCHOP")), features = setdiff(rownames(all@tools$DE_PE)[1:50], dissoc), size = 3)
+
+
+## -- TEST : DEenrichRPlot -- ##
+patient <- "FL05G0330"
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+DEenrichRPlot(all, slot = "counts", ident.1 = "Excipient", ident.2 = "RCHOP", test.use = "DESeq2", max.cells.per.ident = 2000, balanced=T, p.val.cutoff=0.05, return.gene.list)
+
+
+## -- TEST : DE appareillé : RCHOP/EXP + PG : RC/RP -- ##
+
+
+
+## -- TEST : DE RCHOP : apop+ / apop- -- ##
+patient <- "FL05G0330"
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.07 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("RCHOP"))])
+liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.13 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition ==c("Excipient"))])
+sub_all <- subset(all, cells = c(liste,liste2))

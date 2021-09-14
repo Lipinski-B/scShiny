@@ -41,7 +41,7 @@ shinyUI(dashboardPage(
   ########################## Body ##########################
   dashboardBody(
     ## -- Thème -- ##
-    shinyDashboardThemes(theme = "blue_gradient"),
+    dashboardthemes::shinyDashboardThemes(theme = "blue_gradient"),
     tags$head(tags$style(HTML('.main-header .logo {font-family: "system-ui", Times, "Times New Roman", serif;font-weight: italic;font-size: 36px;'))),
     
     ## -- Page -- ##
