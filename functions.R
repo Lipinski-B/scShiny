@@ -220,7 +220,7 @@ diet <- function(singlet){
   singlet@assays[["SCT"]]@scale.data <- subset(singlet@assays[["SCT"]]@scale.data, rownames(singlet@assays[["SCT"]]@scale.data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
   singlet <- DietSeurat(singlet, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
   singlet@assays[["HTO"]] <- list() ; singlet@assays[["RNA"]] <- list()
-  save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
+  save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
 }
 
 ## -- Merge -- ##

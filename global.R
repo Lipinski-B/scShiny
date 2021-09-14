@@ -1,5 +1,5 @@
 source(file = "functions.R")
-load(file = "www/FL08G0293.RData")
+load(file = "www/FL08G0293/FL08G0293.RData")
 #load(file = "/home/boris/Documents/analyse/FL08G0293.RData") 
 
 feature <- row.names(as.matrix(singlet[["SCT"]]@data)); metadata <- c() ; List <- list()

@@ -8,7 +8,7 @@ shinyServer(function(input, output, session) {
   observeEvent(input$actBtnPatient1,{    
     shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     if(nchar(as.character(input$patient))>0){
-      load(file = paste0("www/",input$patient,".RData"))
+      load(file = paste0("www/",input$patient,"/",input$patient,".RData"))
       singlet <<- singlet
     }
     shinyWidgets::sendSweetAlert(session = session,title = "Done !",type = "success")
@@ -19,7 +19,7 @@ shinyServer(function(input, output, session) {
     shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     
     if(nchar(as.character(input$patient))>0){
-      load(file = paste0("www/",input$patient,".RData"))
+      load(file = paste0("www/",input$patient,"/",input$patient,".RData"))
       singlet <<- singlet
     }
     sortie()
@@ -251,7 +251,7 @@ shinyServer(function(input, output, session) {
   
   ## -- PCA -- ##
   output$PCA <- renderPlot({
-    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 1, reduction = 'pca')
+    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'pca')
     plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)
     ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Seurat::Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Seurat::Stdev(singlet[["pca"]])[2],2), " %"))
   })
@@ -469,19 +469,19 @@ shinyServer(function(input, output, session) {
   })
   
   ## -- Méta-VDJ -- ##
-  output$FL08_VDJ = renderPlotly({load(file = "www/FL08G0293_VDJ.RData") ; e})
-  output$FL09_VDJ = renderPlotly({load(file = "www/FL09C1164_VDJ.RData") ; e})
-  output$FL12_VDJ = renderPlotly({load(file = "www/FL12C1888_VDJ.RData") ; e})
-  output$FL14_VDJ = renderPlotly({load(file = "www/FL140304_VDJ.RData") ; e})
-  output$FL02_VDJ = renderPlotly({load(file = "www/FL02G095_VDJ.RData") ; e})
-  output$FL05_VDJ = renderPlotly({load(file = "www/FL05G0330_VDJ.RData") ; e})
+  output$FL08_VDJ = renderPlotly({load(file = "www/FL08G0293/FL08G0293_VDJ.RData") ; e})
+  output$FL09_VDJ = renderPlotly({load(file = "www/FL09C1164/FL09C1164_VDJ.RData") ; e})
+  output$FL12_VDJ = renderPlotly({load(file = "www/FL12C1888/FL12C1888_VDJ.RData") ; e})
+  output$FL14_VDJ = renderPlotly({load(file = "www/FL140304/FL140304_VDJ.RData") ; e})
+  output$FL02_VDJ = renderPlotly({load(file = "www/FL02G095/FL02G095_VDJ.RData") ; e})
+  output$FL05_VDJ = renderPlotly({load(file = "www/FL05G0330/FL05G0330_VDJ.RData") ; e})
   
-  output$FL08_Meta = renderPlotly({load(file = "www/FL08G0293_VDJ.RData") ; f})
-  output$FL09_Meta = renderPlotly({load(file = "www/FL09C1164_VDJ.RData") ; f})
-  output$FL12_Meta = renderPlotly({load(file = "www/FL12C1888_VDJ.RData") ; f})
-  output$FL14_Meta = renderPlotly({load(file = "www/FL140304_VDJ.RData") ; f})
-  output$FL02_Meta = renderPlotly({load(file = "www/FL02G095_VDJ.RData") ; f})
-  output$FL05_Meta = renderPlotly({load(file = "www/FL05G0330_VDJ.RData") ; f})
+  output$FL08_Meta = renderPlotly({load(file = "www/FL08G0293/FL08G0293_VDJ.RData") ; f})
+  output$FL09_Meta = renderPlotly({load(file = "www/FL09C1164/FL09C1164_VDJ.RData") ; f})
+  output$FL12_Meta = renderPlotly({load(file = "www/FL12C1888/FL12C1888_VDJ.RData") ; f})
+  output$FL14_Meta = renderPlotly({load(file = "www/FL140304/FL140304_VDJ.RData") ; f})
+  output$FL02_Meta = renderPlotly({load(file = "www/FL02G095/FL02G095_VDJ.RData") ; f})
+  output$FL05_Meta = renderPlotly({load(file = "www/FL05G0330/FL05G0330_VDJ.RData") ; f})
   
   
   ## -- Rapport Patient -- ##
