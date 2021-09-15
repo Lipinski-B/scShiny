@@ -130,10 +130,10 @@ metadata <- function(singlet){
   
   ##### -- DE -- ##### 
   Idents(singlet)<-"Condition"
-  singlet[["SCT"]]@counts <- as.matrix(singlet[["SCT"]]@counts)+1
-  singlet@tools$DE_RE <- FindMarkers(singlet, slot = "counts", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "DESeq2")
-  singlet@tools$DE_PE <- FindMarkers(singlet, slot = "counts", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "DESeq2")
-  singlet[["SCT"]]@counts <- as.matrix(singlet[["SCT"]]@counts)-1
+  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)+1
+  singlet@tools$DE_RE <- FindMarkers(singlet, assay = "RNA", slot = "counts", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "DESeq2")
+  singlet@tools$DE_PE <- FindMarkers(singlet, assay = "RNA", slot = "counts", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "DESeq2")
+  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)-1
   Idents(singlet)<-"seurat_clusters"
   
   

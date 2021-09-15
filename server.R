@@ -289,17 +289,17 @@ shinyServer(function(input, output, session) {
   output$DE_Heatmap_RE <- renderPlot({
     sortie()
     Seurat::Idents(singlet)<-"Condition"
-    Seurat::DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3)
+    Seurat::DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","RCHOP"))], features = rownames(singlet@tools$DE_RE)[1:50], size = 3, assay = 'SCT', slot = "scale.data")
   })
   output$DE_RidgePlot_RE <- renderPlot({
     sortie()
     Seurat::Idents(singlet)<-"Condition"
-    Seurat::RidgePlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+    Seurat::RidgePlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], ncol = 3, assay = 'RNA', slot = "data") & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
   })
   output$DE_VlnPlot_RE <- renderPlot({
     sortie()
     Seurat::Idents(singlet)<-"Condition"
-    Seurat::VlnPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+    Seurat::VlnPlot(singlet, idents = c("Excipient","RCHOP"), features = rownames(singlet@tools$DE_RE)[1:12], sort = T, ncol = 3, assay = 'RNA', slot = "data") & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
   output$Linear_RE <- renderPlot({
     sortie()
@@ -318,17 +318,17 @@ shinyServer(function(input, output, session) {
   output$DE_Heatmap_PE <- renderPlot({
     sortie()
     Seurat::Idents(singlet)<-"Condition"
-    Seurat::DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","Pré-greffe"))], features = rownames(singlet@tools$DE_PE)[1:50], size = 3)
+    Seurat::DoHeatmap(singlet, cells = rownames(singlet@meta.data)[which(singlet@meta.data$Condition==c("Excipient","Pré-greffe"))], features = rownames(singlet@tools$DE_PE)[1:50], size = 3, assay = 'SCT', slot = "scale.data")
   })
   output$DE_RidgePlot_PE <- renderPlot({
     sortie()
     Seurat::Idents(singlet)<-"Condition"
-    Seurat::RidgePlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], ncol = 3) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+    Seurat::RidgePlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], ncol = 3, assay = 'RNA', slot = "data") & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
   })
   output$DE_VlnPlot_PE <- renderPlot({
     sortie()
     Seurat::Idents(singlet)<-"Condition"
-    Seurat::VlnPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], sort = T, ncol = 3) & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
+    Seurat::VlnPlot(singlet, idents = c("Excipient","Pré-greffe"), features = rownames(singlet@tools$DE_PE)[1:12], sort = T, ncol = 3, assay = 'RNA', slot = "data") & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.title.y = element_blank(), legend.position = "bottom")
   })
   output$Linear_PE <- renderPlot({
     sortie()

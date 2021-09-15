@@ -17,14 +17,25 @@ patient <- siege[2]
 
 
 ## -- Workflow -- ##
-for (patient in siege) {
-  singlet <- processing(patient) ; diet(singlet)
-  save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-  rm(singlet)
-  gc() ; gc() ; gc()
-}
-#save(all, file = paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/singlet_", patient,".RData"))
+singlet <- processing(patient) ; diet(singlet)
+save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+#save(singlet, file = paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/singlet_", patient,".RData"))
+#rm(singlet) ; gc() ; gc() ; gc()
 
+load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+
+for (patient in siege) {
+  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+  Idents(singlet)<-"Condition"
+  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)+1
+  singlet@tools$DE_RE <- FindMarkers(singlet, assay = "RNA", slot = "counts", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "DESeq2")
+  singlet@tools$DE_PE <- FindMarkers(singlet, assay = "RNA", slot = "counts", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "DESeq2")
+  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)-1
+  Idents(singlet)<-"seurat_clusters"
+  save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+  diet(singlet)
+  rm(singlet) ; gc() ; gc() ; gc()
+}
 
 
 ## -- Sub sample -- ##
@@ -160,8 +171,10 @@ DEenrichRPlot(all, slot = "counts", ident.1 = "Excipient", ident.2 = "RCHOP", te
 ## -- TEST : DE RCHOP : apop+ / apop- -- ##
 patient <- "FL05G0330"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS<0.13 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
-liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>0.13 & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
-sub_all <- subset(all, cells = c(liste,liste2))
+seuil = 0.13
+liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS<seuil & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
+liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>seuil & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
+singlet@meta.data[singlet@meta.data$Condition == "RCHOP", "Apop" ] <- "+"
+singlet@meta.data[singlet@meta.data$Condition == "RCHOP", "Apop" ] <- "-"
 
 
