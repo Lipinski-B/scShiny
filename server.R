@@ -36,12 +36,12 @@ shinyServer(function(input, output, session) {
     shinyWidgets::sendSweetAlert(session = session,title = "Done !",text = "Le subsample a bien été créé !",type = "success")
     shinybusy::remove_modal_spinner()
   })
-
+  
   observeEvent(input$resetPatient,{
     singlet <<- singlet
     shinyWidgets::sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
   })
-
+  
   heatmap <- reactive({
     top10 <- sortie()@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
@@ -143,24 +143,24 @@ shinyServer(function(input, output, session) {
   output$nb_clonotype_cell2 <- renderText({
     sortie()
     return(paste0("Numbre total de cellule détectée : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype)))),
-        "\n\nB cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
-        "\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
-        
-        "\n\nControle : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Pré-greffe"])),
-        "\nExcipient : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Excipient"])),
-        "\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"])),
-        
-        "\n\nClonotype majoritaire :", 
-             "\n Proportion : \t", round(singlet@tools$vloupe$proportion[1],3)*100,"% \n Type : \t", singlet@tools$vloupe$type[1],"\n Isotype : \t", singlet@tools$vloupe$igh_c_genes[1], 
-             "\n Heavy : \t", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1], 
-             "\n Light : \t", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1], "\n"))
+                  "\n\nB cells : \t", as.character(as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
+                  "\nOther cells : \t", as.character(as.numeric(sum(table(singlet@meta.data$Phénotype))) - as.numeric(table(singlet@meta.data$Phénotype)["B-cells"])),
+                  
+                  "\n\nControle : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Pré-greffe"])),
+                  "\nExcipient : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["Excipient"])),
+                  "\nRCHOP : \t", as.character(as.numeric(table(singlet@meta.data$Condition)["RCHOP"])),
+                  
+                  "\n\nClonotype majoritaire :", 
+                  "\n Proportion : \t", round(singlet@tools$vloupe$proportion[1],3)*100,"% \n Type : \t", singlet@tools$vloupe$type[1],"\n Isotype : \t", singlet@tools$vloupe$igh_c_genes[1], 
+                  "\n Heavy : \t", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1], 
+                  "\n Light : \t", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1], "\n"))
   })
   output$nb_clonotype_cell <- renderText({
     sortie()
     return(paste0("Clonotype majoritaire :", 
-             "\n Proportion : ", round(singlet@tools$vloupe$proportion[1],3)*100,"% \n Type : ", singlet@tools$vloupe$type[1],"\n Isotype : ", singlet@tools$vloupe$igh_c_genes[1], 
-             "\n Heavy : ", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1], 
-             "\n Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1]))
+                  "\n Proportion : ", round(singlet@tools$vloupe$proportion[1],3)*100,"% \n Type : ", singlet@tools$vloupe$type[1],"\n Isotype : ", singlet@tools$vloupe$igh_c_genes[1], 
+                  "\n Heavy : ", singlet@tools$vloupe$V_lourde[1], "/", singlet@tools$vloupe$D_lourde[1], "/", singlet@tools$vloupe$J_lourde[1], 
+                  "\n Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1]))
   })
   output$H_clonotype_cell <- renderText({
     sortie()
@@ -217,18 +217,15 @@ shinyServer(function(input, output, session) {
   
   output$DFeaturePlot_PCA <- renderPlotly({
     plot_ly(data = D3feature(), x = ~PC_1, y = ~PC_2, z = ~PC_3,color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers",
-            marker = list(size = 3, width=2),text=~label, hoverinfo="text")# %>% layout(title=gene_feature)
+            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers", marker = list(size = 3, width=2),text=~label, hoverinfo="text")# %>% layout(title=gene_feature)
   })
   output$DFeaturePlot_UMAP<- renderPlotly({
     plot_ly(data = D3feature(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers",
-            marker = list(size = 3, width=2),text=~label, hoverinfo="text")# %>% layout(title=gene_feature)
+            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers", marker = list(size = 3, width=2),text=~label, hoverinfo="text")# %>% layout(title=gene_feature)
   })
   output$DFeaturePlot_TSNE<- renderPlotly({
     plot_ly(data = D3feature(), x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3,color = ~changed, # you can just run this against the column for the gene as well using ~ACTB, the algorith will automatically scale in that case based on maximal and minimal values
-            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers",
-            marker = list(size = 3, width=2),text=~label, hoverinfo="text") #%>% layout(title=gene_feature)
+            colors = c('darkgreen', 'red'), opacity = .5,type = "scatter3d", mode = "markers", marker = list(size = 3, width=2),text=~label, hoverinfo="text") #%>% layout(title=gene_feature)
   })
   
   updateSelectizeInput(session, 'Svariables', choices = feature, server = TRUE)
@@ -251,38 +248,21 @@ shinyServer(function(input, output, session) {
   
   ## -- PCA -- ##
   output$PCA <- renderPlot({
-    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'pca')
-    plots & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)
+    Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'pca') & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)
     ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Seurat::Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Seurat::Stdev(singlet[["pca"]])[2],2), " %"))
   })
   output$D_PCA <- renderPlotly({
-    plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3,color = singlet@meta.data[[input$metadata]], 
-            type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
+    plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3,color = singlet@meta.data[[input$metadata]],type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
             text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>%layout(title=input$metadata,scene = list(xaxis = list(title = paste0("PCA 1 : ", round(Seurat::Stdev(singlet[["pca"]])[1],2), " %")),yaxis = list(title = paste0("PCA 2 : ", round(Seurat::Stdev(singlet[["pca"]])[2],2), " %")),zaxis = list(title = paste0("PCA 3 : ", round(Seurat::Stdev(singlet[["pca"]])[3],2), " %"))))
   })
   
   ## -- UMAP -- ##
-  output$UMAP <- renderPlot({
-    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'umap')
-    plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4))) 
-  })
-  output$D_UMAP <- renderPlotly({
-    plot_ly(data = D3plot(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,color = singlet@meta.data[[input$metadata]],
-            type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
-            text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata) 
-  })
+  output$UMAP <- renderPlot({Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'umap') & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4)))})
+  output$D_UMAP <- renderPlotly({plot_ly(data = D3plot(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,color = singlet@meta.data[[input$metadata]],type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata)})
   
   ## -- TSNE -- ##
-  output$TSNE <- renderPlot({
-    plots <- Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'tsne')
-    plots & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4)))
-  })
-  output$D_TSNE <- renderPlotly({
-    data2 <- D3plot()
-    plot_ly(data = data2, x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3,color = singlet@meta.data[[input$metadata]], 
-            type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
-            text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata)
-  })
+  output$TSNE <- renderPlot({Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'tsne') & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4)))})
+  output$D_TSNE <- renderPlotly({plot_ly(data = D3plot(), x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3,color = singlet@meta.data[[input$metadata]],type =  "scatter3d", mode = "markers",marker = list(size = 3, width=2),text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata)})
   
   ## -- Expression différentielle -- ##
   # RCHOP / Excipient
@@ -343,26 +323,21 @@ shinyServer(function(input, output, session) {
   })
   output$DE_info_PE <- renderPrint({print(sortie()@tools$DE_PE)})
   
+  ## -- Enrichissement -- ##
+  #output$Enrichissement <- renderPlot({sortie()@tools$enrichissement_RE})
+  output$KEGG <- renderPlot({sortie()@tools$KEGG})
+  output$GO_Biological <- renderPlot({sortie()@tools$GO_Biological})
+  output$GO_Cellular <- renderPlot({sortie()@tools$GO_Cellular})
+  output$GO_Molecular <- renderPlot({sortie()@tools$GO_Molecular})
+  
   ## -- Heatmap -- ##
-  output$Heatmap <- renderPlot({
-    sortie()
-    Seurat::DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()
-  })
+  output$Heatmap <- renderPlot({sortie() ; Seurat::DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()})
   output$Heatmap_feature <- renderPrint({print(sortie()@commands[["FindAllMarkers"]])})
   
   ## -- Mitochondrie Figure -- ##
-  output$MT_VlnPlot <- renderPlot({
-    sortie()
-    singlet@tools$mitochondrie_all + Seurat::VlnPlot(singlet, features = "nFeature_RNA", group.by = "Condition") +  Seurat::VlnPlot(singlet, features = "nCount_RNA", group.by = "Condition") + Seurat::VlnPlot(singlet, features = "percent.mt", group.by = "Condition")
-  })
-  output$MT_FeatureScatter <- renderPlot({
-    sortie()
-    Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-  })
-  output$MT_FeatureScatter2 <- renderPlot({
-    sortie()
-    Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")
-  })
+  output$MT_VlnPlot <- renderPlot({sortie() ; singlet@tools$mitochondrie_all + Seurat::VlnPlot(singlet, features = "nFeature_RNA", group.by = "Condition") +  Seurat::VlnPlot(singlet, features = "nCount_RNA", group.by = "Condition") + Seurat::VlnPlot(singlet, features = "percent.mt", group.by = "Condition")})
+  output$MT_FeatureScatter <- renderPlot({sortie() ; Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")})
+  output$MT_FeatureScatter2 <- renderPlot({sortie() ; Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")})
   
   ## -- The 50 most highly variable genes -- ##
   output$top50 <- renderPlot({
@@ -398,10 +373,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$hallmark_VlnPlot <- renderPlot({dittoSeq::dittoPlot(sortie() , input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
-  output$hallmark_HD <- renderPlot({
-    dittoSeq::dittoScatterHex(sortie(),x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + 
-      theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)  
-  })
+  output$hallmark_HD <- renderPlot({dittoSeq::dittoScatterHex(sortie(),x.var = input$hallmark_order_X, y.var = input$hallmark_order_Y, do.contour = TRUE, split.by =  input$metadata_order_density) + theme_classic() + scale_fill_gradientn(colors = rev(colorblind_vector(11))) + geom_vline(xintercept = 0, lty=2) + geom_hline(yintercept = 0, lty=2)})
   output$hallmark_RP <- renderPlot({
     sortie()
     ES2 <- data.frame(singlet[[]], Seurat::Idents(singlet))
@@ -433,9 +405,8 @@ shinyServer(function(input, output, session) {
   ## -- Clonotype -- ##
   output$VDJ_Clonotype = renderPlotly({
     plot_ly(x = sortie()@tools$Clonotype[[1]], y = sortie()@tools$Clonotype[[2]], name = "Info", type = "bar", 
-            hovertemplate = paste0('Clonotype : %{x}\n', "Proportion : ", round(singlet@tools$vloupe$proportion[1:5],3)*100,"% \nType : ", singlet@tools$vloupe$type[1:5],"\nIsotype : ", singlet@tools$vloupe$igh_c_genes[1:5], 
-                                   "\nHeavy : ", singlet@tools$vloupe$V_lourde[1:5], " / ", singlet@tools$vloupe$D_lourde[1:5], " / ", singlet@tools$vloupe$J_lourde[1:5], 
-                                   "\nLight : ", singlet@tools$vloupe$V_legere[1:5], " / ", singlet@tools$vloupe$J_legere[1:5])
+            hovertemplate = paste0('Clonotype : %{x}\n', "Proportion : ", round(singlet@tools$vloupe$proportion[1:5],3)*100,"% \nType : ", singlet@tools$vloupe$type[1:5], "\nIsotype : ", singlet@tools$vloupe$igh_c_genes[1:5], 
+                                   "\nHeavy : ", singlet@tools$vloupe$V_lourde[1:5], " / ", singlet@tools$vloupe$D_lourde[1:5], " / ", singlet@tools$vloupe$J_lourde[1:5], "\nLight : ", singlet@tools$vloupe$V_legere[1:5], " / ", singlet@tools$vloupe$J_legere[1:5])
     ) %>% layout(title='Frequencies of the mains clonotypes', yaxis =list(title="Number of cells"))
   })
   
@@ -445,28 +416,12 @@ shinyServer(function(input, output, session) {
   output$J = renderPlotly({plot_ly(x = sortie()@tools$J[[1]], y = sortie()@tools$J[[2]], name = "Clonotype", type = "bar") %>% layout(title='Frequencies J genes : Heavy and Lights chains',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))})
   
   ## -- Heavy chain -- ##
-  output$VDJ_Heavy = renderPlotly({
-    plot_ly(x = sortie()@tools$Heavy[[1]], y = sortie()@tools$Heavy[[2]], name = "Heavy Chain", type = "bar",
-            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Heavy[[2]]/sum(singlet@tools$Heavy[[2]]),3)*100,"%")) %>%  
-      layout(title='Frequencies Heavy Chain' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
-  })
-  output$VDJ_DHeavy = renderPlotly({
-    plot_ly(x = sortie()@tools$Isotype[[1]], y = sortie()@tools$Isotype[[2]], name = "Heavy Chain", type = "bar",
-            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Isotype[[2]]/sum(singlet@tools$Isotype[[2]]),3)*100,"%")) %>%  
-      layout(title='Frequencies Heavy Chain with details' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
-  })
+  output$VDJ_Heavy = renderPlotly({plot_ly(x = sortie()@tools$Heavy[[1]], y = sortie()@tools$Heavy[[2]], name = "Heavy Chain", type = "bar", hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Heavy[[2]]/sum(singlet@tools$Heavy[[2]]),3)*100,"%")) %>% layout(title='Frequencies Heavy Chain' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))})
+  output$VDJ_DHeavy = renderPlotly({plot_ly(x = sortie()@tools$Isotype[[1]], y = sortie()@tools$Isotype[[2]], name = "Heavy Chain", type = "bar", hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Isotype[[2]]/sum(singlet@tools$Isotype[[2]]),3)*100,"%")) %>%layout(title='Frequencies Heavy Chain with details' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))  })
   
   ## -- Light chain -- ##
-  output$VDJ_Light = renderPlotly({
-    plot_ly(x = sortie()@tools$Light[[1]], y = sortie()@tools$Light[[2]], name = "Light Chain", type = "bar",
-            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Light[[2]]/sum(singlet@tools$Light[[2]]),3)*100,"%")) %>% 
-      layout(title='Frequencies Light Chain',yaxis =list(title="Number of cells"))
-  })
-  output$VDJ_DLight = renderPlotly({
-    plot_ly(x = sortie()@tools$Type[[1]], y = sortie()@tools$Type[[2]], name = "Clonotype", type = "bar",
-            hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Type[[2]]/sum(singlet@tools$Type[[2]]),3)*100,"%")) %>% 
-      layout(title='Frequencies Light Chain with details', yaxis =list(title="Number of cells"))
-  })
+  output$VDJ_Light = renderPlotly({plot_ly(x = sortie()@tools$Light[[1]], y = sortie()@tools$Light[[2]], name = "Light Chain", type = "bar", hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Light[[2]]/sum(singlet@tools$Light[[2]]),3)*100,"%")) %>% layout(title='Frequencies Light Chain',yaxis =list(title="Number of cells"))})
+  output$VDJ_DLight = renderPlotly({plot_ly(x = sortie()@tools$Type[[1]], y = sortie()@tools$Type[[2]], name = "Clonotype", type = "bar", hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Type[[2]]/sum(singlet@tools$Type[[2]]),3)*100,"%")) %>% layout(title='Frequencies Light Chain with details', yaxis =list(title="Number of cells"))})
   
   ## -- Méta-VDJ -- ##
   output$FL08_VDJ = renderPlotly({load(file = "www/FL08G0293/FL08G0293_VDJ.RData") ; e})

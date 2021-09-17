@@ -4,7 +4,6 @@ library(shiny)
 library(shinyWidgets)
 library(shinydashboard)
 
-
 ## -- Worflow -- ##
 metadata <- function(singlet){  
   ##### -- Identification des cellules -- #####
@@ -16,11 +15,11 @@ metadata <- function(singlet){
   
   
   ##### -- Enrichissement des gènes -- ##### 
-  GS <- getGeneSets(library = "H")
-  ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
-  names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
-  singlet <- AddMetaData(singlet, ES)
-  singlet@tools$hallmarks <- names(ES)
+  #GS <- getGeneSets(library = "H")
+  #ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
+  #names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
+  #singlet <- AddMetaData(singlet, ES)
+  #singlet@tools$hallmarks <- names(ES)
   
   
   ##### -- GoT  -- ##### 
@@ -130,39 +129,44 @@ metadata <- function(singlet){
   
   ##### -- DE -- ##### 
   Idents(singlet)<-"Condition"
-  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)+1
-  singlet@tools$DE_RE <- FindMarkers(singlet, assay = "RNA", slot = "counts", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "DESeq2")
-  singlet@tools$DE_PE <- FindMarkers(singlet, assay = "RNA", slot = "counts", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "DESeq2")
-  singlet[["RNA"]]@counts <- as.matrix(singlet[["RNA"]]@counts)-1
+  
+  singlet@tools$DE_RE <- FindMarkers(singlet, assay = "RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", logfc.threshold = 0.1)
+  singlet@tools$DE_PE <- FindMarkers(singlet, assay = "RNA", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "negbinom")
+  
+  singlet@tools$KEGG <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom" ,max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "KEGG_2021_Human", max.genes = Inf, logfc.threshold = 0.1)
+  singlet@tools$GO_Biological <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Biological_Process_2021", max.genes = Inf, logfc.threshold = 0.1)
+  singlet@tools$GO_Cellular <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Cellular_Component_2021", max.genes = Inf, logfc.threshold = 0.1)
+  singlet@tools$GO_Molecular <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Molecular_Function_2021", max.genes = Inf, logfc.threshold = 0.1)
+  
   Idents(singlet)<-"seurat_clusters"
   
   
   ##### -- Linear correlation -- ##### 
-  linear_correlation <- function(ctrl, stim){
-    ctrl$stim <- "CTRL" ; stim$stim <- "STIM"
-    immune.anchors <- FindIntegrationAnchors(object.list = list(ctrl, stim), dims = 1:20, k.filter=80)
-    immune.combined <- IntegrateData(anchorset = immune.anchors, dims = 1:20, k.weight=80)
-    DefaultAssay(immune.combined) <- "integrated"
-    immune.combined <- ScaleData(immune.combined, verbose = FALSE)
-    immune.combined <- RunPCA(immune.combined, npcs = 30, verbose = FALSE)
-    immune.combined <- RunUMAP(immune.combined, reduction = "pca", dims = 1:20)
-    immune.combined <- FindNeighbors(immune.combined, reduction = "pca", dims = 1:20)
-    immune.combined <- FindClusters(immune.combined, resolution = 0.5)
+  #linear_correlation <- function(ctrl, stim){
+  #  ctrl$stim <- "CTRL" ; stim$stim <- "STIM"
+  #  immune.anchors <- FindIntegrationAnchors(object.list = list(ctrl, stim), dims = 1:20, k.filter=80)
+  #  immune.combined <- IntegrateData(anchorset = immune.anchors, dims = 1:20, k.weight=80)
+  #  DefaultAssay(immune.combined) <- "integrated"
+  #  immune.combined <- ScaleData(immune.combined, verbose = FALSE)
+  #  immune.combined <- RunPCA(immune.combined, npcs = 30, verbose = FALSE)
+  #  immune.combined <- RunUMAP(immune.combined, reduction = "pca", dims = 1:20)
+  #  immune.combined <- FindNeighbors(immune.combined, reduction = "pca", dims = 1:20)
+  #  immune.combined <- FindClusters(immune.combined, resolution = 0.5)
     
-    Idents(immune.combined)<-"Phénotype" ; DefaultAssay(immune.combined) <- "RNA"
-    nk.markers <- FindConservedMarkers(immune.combined, ident.1 = "B-cells", grouping.var = "stim", verbose = FALSE)
+  #  Idents(immune.combined)<-"Phénotype" ; DefaultAssay(immune.combined) <- "RNA"
+  #  nk.markers <- FindConservedMarkers(immune.combined, ident.1 = "B-cells", grouping.var = "stim", verbose = FALSE)
     
-    b.cells <- subset(immune.combined, idents = "B-cells") ; Idents(b.cells) <- "stim"
-    return(as.data.frame(log1p(AverageExpression(b.cells, verbose = FALSE)$RNA)))
-  }
-  Excipient <- seurat_subset(singlet, "Condition", "Excipient")
-  RCHOP <- seurat_subset(singlet, "Condition", "RCHOP")
-  Pregreffe <- seurat_subset(singlet, "Condition", "Pré-greffe")
+  #  b.cells <- subset(immune.combined, idents = "B-cells") ; Idents(b.cells) <- "stim"
+  #  return(as.data.frame(log1p(AverageExpression(b.cells, verbose = FALSE)$RNA)))
+  #}
+  #Excipient <- seurat_subset(singlet, "Condition", "Excipient")
+  #RCHOP <- seurat_subset(singlet, "Condition", "RCHOP")
+  #Pregreffe <- seurat_subset(singlet, "Condition", "Pré-greffe")
+    
+  #singlet@tools$avg.b.cells_RE <- linear_correlation(Excipient, RCHOP)
+  #singlet@tools$avg.b.cells_PE <- linear_correlation(Pregreffe, Excipient)
   
-  singlet@tools$avg.b.cells_RE <- linear_correlation(Excipient, RCHOP)
-  singlet@tools$avg.b.cells_PE <- linear_correlation(Pregreffe, Excipient)
-  
-  save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+  #save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
   
   return(singlet)
 }
@@ -201,6 +205,7 @@ seurat_object <- function(patient){
   return(singlet)
 }
 visualisation <- function(singlet){
+  singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 ) #& nCount_RNA > 2100
   singlet <- PercentageFeatureSet(singlet, pattern = "^MT-", col.name = "percent.mt")
   singlet <- SCTransform(singlet, method = "glmGamPoi", verbose = F)
   singlet <- RunPCA(singlet, verbose = F)
@@ -218,8 +223,11 @@ processing <- function(patient){
 }
 diet <- function(singlet){
   singlet@assays[["SCT"]]@scale.data <- subset(singlet@assays[["SCT"]]@scale.data, rownames(singlet@assays[["SCT"]]@scale.data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
+  singlet@assays[["RNA"]]@data <-subset(as.matrix(singlet@assays[["RNA"]]@data), rownames(singlet@assays[["RNA"]]@data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
   singlet <- DietSeurat(singlet, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
-  singlet@assays[["HTO"]] <- list() ; singlet@assays[["RNA"]] <- list()
+  singlet@assays[["HTO"]] <- list() ; 
+  singlet@assays[["RNA"]]@counts <- as.matrix(0)
+  singlet@assays[["RNA"]]@scale.data <- as.matrix(0)
   save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
 }
 

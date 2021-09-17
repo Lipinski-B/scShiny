@@ -280,6 +280,14 @@ shinyUI(dashboardPage(
                          ),
                          tabPanel("Enrichissement Fonctionnel",
                                   tabsetPanel(
+                                    tabPanel("KEGG", plotOutput("KEGG", width = "100%",  height = "1200px")),
+                                    tabPanel("GO : Biological Process", plotOutput("GO_Biological", width = "100%",  height = "1200px")),
+                                    tabPanel("GO : Cellular Component", plotOutput("GO_Cellular", width = "100%",  height = "1200px")),
+                                    tabPanel("GO : Molecular Function", plotOutput("GO_Molecular", width = "100%",  height = "1200px"))
+                                  )
+                         ),
+                         tabPanel("Hallmark enrichissement",
+                                  tabsetPanel(
                                   tabPanel("Heatmap",
                                             plotOutput("hallmark_Heatmap", width = "100%",  height = "1200px"),
                                             fluidRow(),
