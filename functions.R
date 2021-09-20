@@ -1,4 +1,3 @@
-#.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
 library(plotly)
 library(shiny)
 library(shinyWidgets)
@@ -273,7 +272,8 @@ QC_subset <- function(singlet, maximum_sub, percent_mt_sub){
   return(sub_singlet)
 }
 
-## -- Other -- ## 
+## -- Other -- ##
+#.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
 #library(dplyr)
 #library(SingleR)
 #library(stringr)
