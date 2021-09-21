@@ -1,4 +1,15 @@
 source(file = "/home/boris/Bureau/scShiny/functions.R")
+library(celldex)
+library(SingleR)
+library(escape)
+library(stringr)
+library(dplyr)
+library(future)
+library(DESeq2)
+library(cowplot)
+library(Seurat)
+library(dittoSeq)
+library(DT)
 library(stringr)
 singlet_namanm <- function(path, patient){
   rwa.mRNA <- Read10X(data.dir = path) 
@@ -133,12 +144,12 @@ count <- function(column){
 }
 
 
-setwd(dir = "/home/boris/Documents/lipinskib/narimene/FL1085/")
-patient <- "FL1085"
+setwd(dir = "/home/boris/Documents/lipinskib/narimene/FL120316/Results/")
+siege <- c("FL1085",  "FL120316",  "FL1214",  "FL1481")
+patient <- siege[2]
 
-singlet <- singlet_namanm(paste0(patient,"/result/FL1085_CellrangerCount/outs/filtered_feature_bc_matrix/"), patient)
+singlet <- singlet_namanm(paste0(patient,"/Results/",patient,"_CellrangerCount/outs/filtered_feature_bc_matrix/"), patient)
 singlet <- visualisation(singlet)
-singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
 singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 
 vloupe <- as.data.frame(read.table(paste0("/home/boris/Téléchargements/",patient,"_vloupe-clonotypes.csv"), sep = ",", header = T))
@@ -170,22 +181,21 @@ J <- count(c("J_lourde","J_legere"))
 Light <- count("legere")
 Heavy <- count("heavy")
 
-singlet <- metadata_namnam(singlet, paste0(patient,"/result/",patient,"_CellrangerVDJ/outs/"))
+singlet <- metadata_namnam(singlet, paste0(patient,"/Results/",patient,"_CellrangerVDJ/outs/"))
 
 save(singlet, file=paste0("/home/boris/Documents/analyse/namnam/",patient,".RData"))
 #load(file = paste0("/home/boris/Documents/analyse/namnam/FL1085.RData"))
 
-singlet@assays[["RNA"]]@data <-subset(as.matrix(singlet@assays[["RNA"]]@data), rownames(singlet@assays[["RNA"]]@data) %in% VariableFeatures(singlet))
-singlet <- DietSeurat(singlet, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
+singlet <- DietSeurat(singlet, counts = F, data = T, scale.data = F,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
 singlet@assays[["RNA"]]@counts <- as.matrix(0)
 singlet@assays[["RNA"]]@scale.data <- as.matrix(0)
-singlet@assays$SCT@data<- as.matrix(0)
+singlet@assays[["RNA"]]<- list()
 
-save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/FL1085/FL1085.RData"))
+singlet@assays[["SCT"]]@data <-subset(as.matrix(singlet@assays[["SCT"]]@data), rownames(singlet@assays[["SCT"]]@data) %in% VariableFeatures(singlet)[1:100])
+#singlet@assays$SCT@data<- as.matrix(0)
 
-
+save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/",patient,"/",patient,".RData"))
 
 Seurat::DimPlot(object = singlet, label.size = 0.0, pt.size = 2, reduction = 'pca') & 
   theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
   guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) 
-

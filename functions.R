@@ -204,7 +204,8 @@ seurat_object <- function(patient){
   return(singlet)
 }
 visualisation <- function(singlet){
-  singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 ) #& nCount_RNA > 2100
+  singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
+  singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5 ) #& nCount_RNA > 2100 & mt.percent < 5
   singlet <- PercentageFeatureSet(singlet, pattern = "^MT-", col.name = "percent.mt")
   singlet <- SCTransform(singlet, method = "glmGamPoi", verbose = F)
   singlet <- RunPCA(singlet, verbose = F)
@@ -271,4 +272,3 @@ QC_subset <- function(singlet, maximum_sub, percent_mt_sub){
   
   return(sub_singlet)
 }
-
