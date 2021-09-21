@@ -1,5 +1,6 @@
 ## -- TEST : DEenrichRPlot -- ##
 ER <- list()
+
 for (patient in siege) {
   load(file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
   ER[[patient]]$KEGG$pos <- singlet@tools$KEGG$pos[1]

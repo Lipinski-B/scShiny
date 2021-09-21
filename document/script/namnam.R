@@ -1,5 +1,5 @@
 source(file = "/home/boris/Bureau/scShiny/functions.R")
-
+library(stringr)
 singlet_namanm <- function(path, patient){
   rwa.mRNA <- Read10X(data.dir = path) 
   cso <- CreateSeuratObject(counts = rwa.mRNA, project = patient, min.cells = 3, min.features = 200)
@@ -7,19 +7,6 @@ singlet_namanm <- function(path, patient){
   singlet <- CreateSeuratObject(counts = umis, assay = "RNA", project = patient)
   return(singlet)
 }
-
-setwd(dir = "/home/boris/Documents/lipinskib/narimene/")
-patient <- "FL1085"
-singlet <- singlet_namanm("FL1085/result/FL1085_CellrangerCount/outs/filtered_feature_bc_matrix", patient)
-
-singlet <- visualisation(singlet)
-singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
-singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-save(singlet, file=paste0("/home/boris/Documents/analyse/namnam/",patient,".RData"))
-
-
-
-
 metadata_namnam <- function(singlet, path){  
   ##### -- Identification des cellules -- #####
   BD <- celldex::BlueprintEncodeData()
@@ -30,11 +17,11 @@ metadata_namnam <- function(singlet, path){
   
   
   ##### -- Enrichissement des gènes -- ##### 
-  GS <- getGeneSets(library = "H")
-  ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
-  names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
-  singlet <- AddMetaData(singlet, ES)
-  singlet@tools$hallmarks <- names(ES)
+  #GS <- getGeneSets(library = "H")
+  #ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
+  #names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
+  #singlet <- AddMetaData(singlet, ES)
+  #singlet@tools$hallmarks <- names(ES)
   
   
   ##### -- Phase cycle -- #### 
@@ -47,10 +34,10 @@ metadata_namnam <- function(singlet, path){
   
   ##### -- VDJ -- ##### 
   # Cellranger
-  bcr <- read.csv(path)  # bcr$barcode <- gsub("-1", "", bcr$barcode)                                   # Remove the -1 at the end of each barcode: VERIFIER SI IL Y A LES TIRETS DANS OBJECT SINGLET!!!
+  bcr <- read.csv(paste0(path, "filtered_contig_annotations.csv"))  # bcr$barcode <- gsub("-1", "", bcr$barcode)                                   # Remove the -1 at the end of each barcode: VERIFIER SI IL Y A LES TIRETS DANS OBJECT SINGLET!!!
   bcr <- bcr[!duplicated(bcr$barcode), ]                                                                  # Subsets so only the first line of each barcode is kept,as each entry for given barcode will have same clonotype.
   bcr <- bcr[,c("barcode", "raw_clonotype_id","chain","v_gene","d_gene","j_gene","c_gene","cdr3")] ; names(bcr)[names(bcr) == "raw_clonotype_id"] <- "clonotype_id"
-  clonotype <- read.csv(paste0(patient,"/VDJ/CellrangerVDJ/outs/clonotypes.csv"))             # Clonotypes
+  clonotype <- read.csv(paste0(path,"clonotypes.csv"))              # Clonotypes
   bcr <- merge(bcr, clonotype[, c("clonotype_id", "cdr3s_aa")])                 # Selection de ceux pour lesquels on a une séquence cdr3
   bcr <- bcr[, c(2,1,3,4,5,6,7,8,9)]                                            # Mettre les codes barres comme nom de la première colonne
   rownames(bcr) <- bcr[,1]
@@ -59,7 +46,7 @@ metadata_namnam <- function(singlet, path){
   singlet <- AddMetaData(object=singlet, metadata = bcr)                        #, col.name = colnames(as.data.frame(bcr)))   # Add to the Seurat object's metadata.
   
   # Figure
-  load(file=paste0("/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/",patient,"/R/VDJ.RData"))
+  #load(file=path)
   singlet@tools$Clonotype <- Clonotype
   singlet@tools$Type <- Type
   singlet@tools$Isotype <- Isotype
@@ -78,7 +65,7 @@ metadata_namnam <- function(singlet, path){
   singlet@meta.data$HTO_classification <- NULL
   singlet@meta.data$RNA_snn_res.0.5 <- NULL
   singlet@meta.data$hash.ID <- NULL
-
+  
   #colnames(singlet@meta.data)[which(colnames(singlet@meta.data)=="SingleR.calls")] <- "Phénotype"
   
   
@@ -131,16 +118,30 @@ metadata_namnam <- function(singlet, path){
   
   return(singlet)
 }
+count <- function(column){
+  names<-c();number<-c()
+  for (k in 1:length(column)) {
+    for (i in 1:length(names(table(vloupe[column[k]])))) {
+      if(names(table(vloupe[column[k]]))[i]!="NA"){
+        names <- c(names, names(table(vloupe[column[k]]))[i])
+        cell <- subset(vloupe, vloupe[column[k]] == names(table(vloupe[column[k]]))[i])
+        number <- c(number, sum(cell$frequency))
+      }
+    }
+  }
+  return(c(list(names), list(number)))
+}
 
 
+setwd(dir = "/home/boris/Documents/lipinskib/narimene/FL1085/")
+patient <- "FL1085"
 
-singlet <- metadata_namanm(inglet, "FL1085/result/FL1085_CellrangerVDJ/outsfiltered_contig_annotations.csv")
+singlet <- singlet_namanm(paste0(patient,"/result/FL1085_CellrangerCount/outs/filtered_feature_bc_matrix/"), patient)
+singlet <- visualisation(singlet)
+singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
+singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 
-
-
-
-
-vloupe <- as.data.frame(read.table( paste0("/home/bobo/Documents/lipinskib/flinovo/data/",patient,"/BCR/", patient,"_vloupe-clonotypes.csv"), sep = ",", header = T))
+vloupe <- as.data.frame(read.table(paste0("/home/boris/Téléchargements/",patient,"_vloupe-clonotypes.csv"), sep = ",", header = T))
 vloupe$clonotype_id <- as.numeric(str_replace(vloupe$clonotype_id,"clonotype",""))
 
 vloupe$lourde <- ifelse(vloupe$igh_c_genes!="", "IGH", "NA")
@@ -169,11 +170,22 @@ J <- count(c("J_lourde","J_legere"))
 Light <- count("legere")
 Heavy <- count("heavy")
 
+singlet <- metadata_namnam(singlet, paste0(patient,"/result/",patient,"_CellrangerVDJ/outs/"))
 
+save(singlet, file=paste0("/home/boris/Documents/analyse/namnam/",patient,".RData"))
+#load(file = paste0("/home/boris/Documents/analyse/namnam/FL1085.RData"))
 
-singlet@assays[["SCT"]]@scale.data <- subset(singlet@assays[["SCT"]]@scale.data, rownames(singlet@assays[["SCT"]]@scale.data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
-singlet@assays[["RNA"]]@data <-subset(as.matrix(singlet@assays[["RNA"]]@data), rownames(singlet@assays[["RNA"]]@data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
+singlet@assays[["RNA"]]@data <-subset(as.matrix(singlet@assays[["RNA"]]@data), rownames(singlet@assays[["RNA"]]@data) %in% VariableFeatures(singlet))
 singlet <- DietSeurat(singlet, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
 singlet@assays[["RNA"]]@counts <- as.matrix(0)
 singlet@assays[["RNA"]]@scale.data <- as.matrix(0)
-save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,".RData"))
+singlet@assays$SCT@data<- as.matrix(0)
+
+save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/FL1085/FL1085.RData"))
+
+
+
+Seurat::DimPlot(object = singlet, label.size = 0.0, pt.size = 2, reduction = 'pca') & 
+  theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
+  guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) 
+

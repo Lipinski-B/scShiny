@@ -25,6 +25,10 @@ siege <- c("FL09C1164","FL02G095","FL05G0330","FL140304", "FL08G0293", "FL12C188
 patient <- siege[5]
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
+
+singlet@assays$RNA@meta.features <- data.frame()
+save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
+
 ################################################################################################################################################################################################################################################################################################################################################
 ## -- Workflow -- ##
 singlet <- processing(patient) ; diet(singlet)
