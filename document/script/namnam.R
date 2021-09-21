@@ -144,57 +144,62 @@ count <- function(column){
 }
 
 
-setwd(dir = "/home/boris/Documents/lipinskib/narimene/FL120316/Results/")
+setwd(dir = "/home/boris/Documents/lipinskib/narimene/")
 siege <- c("FL1085",  "FL120316",  "FL1214",  "FL1481")
-patient <- siege[2]
+patient <- siege[4]
 
-singlet <- singlet_namanm(paste0(patient,"/Results/",patient,"_CellrangerCount/outs/filtered_feature_bc_matrix/"), patient)
-singlet <- visualisation(singlet)
-singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 
-vloupe <- as.data.frame(read.table(paste0("/home/boris/Téléchargements/",patient,"_vloupe-clonotypes.csv"), sep = ",", header = T))
-vloupe$clonotype_id <- as.numeric(str_replace(vloupe$clonotype_id,"clonotype",""))
+for (patient in siege) {
+  singlet <- singlet_namanm(paste0(patient,"/Results/",patient,"_CellrangerCount/outs/filtered_feature_bc_matrix/"), patient)
+  singlet <- visualisation(singlet)
+  singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+  
+  vloupe <- as.data.frame(read.table(paste0("/home/boris/Téléchargements/",patient,"_vloupe-clonotypes.csv"), sep = ",", header = T))
+  vloupe$clonotype_id <- as.numeric(str_replace(vloupe$clonotype_id,"clonotype",""))
+  
+  vloupe$lourde <- ifelse(vloupe$igh_c_genes!="", "IGH", "NA")
+  vloupe$legere[vloupe$igl_c_genes=="" & vloupe$igk_c_genes==""] <- "NA"
+  vloupe$legere[vloupe$igl_c_genes=="" & vloupe$igk_c_genes!=""] <- "IGK"
+  vloupe$legere[vloupe$igl_c_genes!="" & vloupe$igk_c_genes==""] <- "IGL"
+  vloupe$legere[vloupe$igl_c_genes!="" & vloupe$igk_c_genes!=""] <- "IGK-IGL"
+  vloupe$type <- paste0(vloupe$lourde,"-",vloupe$legere)
+  
+  vloupe$igh_c_genes <- ifelse(vloupe$igh_c_genes!="", vloupe$igh_c_genes, "NA")
+  vloupe$V_lourde <- ifelse(vloupe$igh_v_genes!="", vloupe$igh_v_genes, "NA")
+  vloupe$D_lourde <- ifelse(vloupe$igh_d_genes!="", vloupe$igh_d_genes, "NA")
+  vloupe$J_lourde <- ifelse(vloupe$igh_j_genes!="", vloupe$igh_j_genes, "NA")
+  
+  vloupe$V_legere <- ifelse(vloupe$igk_v_genes!="", vloupe$igk_v_genes, ifelse(vloupe$igl_v_genes!="", vloupe$igl_v_genes, "NA"))
+  vloupe$J_legere <- ifelse(vloupe$igk_j_genes!="", vloupe$igk_j_genes, ifelse(vloupe$igl_j_genes!="", vloupe$igl_j_genes, "NA"))
+  vloupe$heavy <-str_sub(vloupe$igh_c_genes, 1, 4)
+  
+  ### sauvegarde des objets
+  Clonotype <- c(list(vloupe$clonotype_id[1:5]), list(vloupe$frequency[1:5]))
+  Isotype <- count("igh_c_genes")
+  Type <- count("type")
+  V <- count(c("V_lourde","V_legere"))
+  D <- count("D_lourde")
+  J <- count(c("J_lourde","J_legere"))
+  Light <- count("legere")
+  Heavy <- count("heavy")
+  
+  singlet <- metadata_namnam(singlet, paste0(patient,"/Results/",patient,"_CellrangerVDJ/outs/"))
+  
+  save(singlet, file=paste0("/home/boris/Documents/analyse/namnam/",patient,".RData"))
+  #load(file = paste0("/home/boris/Documents/analyse/namnam/FL1085.RData"))
+  
+  singlet <- DietSeurat(singlet, counts = F, data = T, scale.data = F,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
+  singlet@assays[["RNA"]]@counts <- as.matrix(0)
+  singlet@assays[["RNA"]]@scale.data <- as.matrix(0)
+  singlet@assays[["RNA"]]<- list()
+  
+  singlet@assays[["SCT"]]@data <-subset(as.matrix(singlet@assays[["SCT"]]@data), rownames(singlet@assays[["SCT"]]@data) %in% VariableFeatures(singlet)[1:100])
+  #singlet@assays$SCT@data<- as.matrix(0)
+  
+  save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/",patient,"/",patient,".RData"))
 
-vloupe$lourde <- ifelse(vloupe$igh_c_genes!="", "IGH", "NA")
-vloupe$legere[vloupe$igl_c_genes=="" & vloupe$igk_c_genes==""] <- "NA"
-vloupe$legere[vloupe$igl_c_genes=="" & vloupe$igk_c_genes!=""] <- "IGK"
-vloupe$legere[vloupe$igl_c_genes!="" & vloupe$igk_c_genes==""] <- "IGL"
-vloupe$legere[vloupe$igl_c_genes!="" & vloupe$igk_c_genes!=""] <- "IGK-IGL"
-vloupe$type <- paste0(vloupe$lourde,"-",vloupe$legere)
+}
 
-vloupe$igh_c_genes <- ifelse(vloupe$igh_c_genes!="", vloupe$igh_c_genes, "NA")
-vloupe$V_lourde <- ifelse(vloupe$igh_v_genes!="", vloupe$igh_v_genes, "NA")
-vloupe$D_lourde <- ifelse(vloupe$igh_d_genes!="", vloupe$igh_d_genes, "NA")
-vloupe$J_lourde <- ifelse(vloupe$igh_j_genes!="", vloupe$igh_j_genes, "NA")
-
-vloupe$V_legere <- ifelse(vloupe$igk_v_genes!="", vloupe$igk_v_genes, ifelse(vloupe$igl_v_genes!="", vloupe$igl_v_genes, "NA"))
-vloupe$J_legere <- ifelse(vloupe$igk_j_genes!="", vloupe$igk_j_genes, ifelse(vloupe$igl_j_genes!="", vloupe$igl_j_genes, "NA"))
-vloupe$heavy <-str_sub(vloupe$igh_c_genes, 1, 4)
-
-### sauvegarde des objets
-Clonotype <- c(list(vloupe$clonotype_id[1:5]), list(vloupe$frequency[1:5]))
-Isotype <- count("igh_c_genes")
-Type <- count("type")
-V <- count(c("V_lourde","V_legere"))
-D <- count("D_lourde")
-J <- count(c("J_lourde","J_legere"))
-Light <- count("legere")
-Heavy <- count("heavy")
-
-singlet <- metadata_namnam(singlet, paste0(patient,"/Results/",patient,"_CellrangerVDJ/outs/"))
-
-save(singlet, file=paste0("/home/boris/Documents/analyse/namnam/",patient,".RData"))
-#load(file = paste0("/home/boris/Documents/analyse/namnam/FL1085.RData"))
-
-singlet <- DietSeurat(singlet, counts = F, data = T, scale.data = F,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
-singlet@assays[["RNA"]]@counts <- as.matrix(0)
-singlet@assays[["RNA"]]@scale.data <- as.matrix(0)
-singlet@assays[["RNA"]]<- list()
-
-singlet@assays[["SCT"]]@data <-subset(as.matrix(singlet@assays[["SCT"]]@data), rownames(singlet@assays[["SCT"]]@data) %in% VariableFeatures(singlet)[1:100])
-#singlet@assays$SCT@data<- as.matrix(0)
-
-save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/",patient,"/",patient,".RData"))
 
 Seurat::DimPlot(object = singlet, label.size = 0.0, pt.size = 2, reduction = 'pca') & 
   theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 

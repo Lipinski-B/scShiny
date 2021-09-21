@@ -7,7 +7,7 @@ shinyUI(dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       br(),
-      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164","FL02G095","FL05G0330", "FL1085","all"), selected = "FL08G0293", selectize = T),
+      selectInput("patient", h4("Sélectionnez le patient : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164","FL02G095","FL05G0330", "FL1085","FL120316",  "FL1214",  "FL1481","all"), selected = "FL08G0293", selectize = T),
       actionButton(inputId = "actBtnPatient1", label = "Submit",icon = icon("play"), width ='87%'),
       #submitButton("Submit", width = 230),
       br(),
