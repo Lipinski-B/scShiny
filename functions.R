@@ -199,7 +199,7 @@ seurat_object <- function(patient){
   
   # VlnPlot 1
   singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
-  singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, group.by = "Condition")
+  singlet@tools$mitochondrie_all <- VlnPlot(singlet, features = c("percent.mt"), ncol = 3, group.by = "Condition")
   
   return(singlet)
 }
