@@ -116,7 +116,7 @@ write.table(DE_PE_candidat_FC, "/home/boris/Bureau/DE_PE_FC.txt")
 patient <- "FL05G0330"
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 seuil = 0.13
-liste = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS<seuil & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
-liste2 = as.matrix(rownames(all@meta.data)[which(all@meta.data$APOPTOSIS>seuil & all@meta.data$Phénotype=="B-cells" & all@meta.data$Condition =="RCHOP")])
-singlet@meta.data[singlet@meta.data$Condition == "RCHOP", "Apop" ] <- "+"
-singlet@meta.data[singlet@meta.data$Condition == "RCHOP", "Apop" ] <- "-"
+liste = as.matrix(rownames(singlet@meta.data)[which(singlet@meta.data$APOPTOSIS<seuil & singlet@meta.data$Phénotype=="B-cells" & singlet@meta.data$Condition =="RCHOP")])
+liste2 = as.matrix(rownames(singlet@meta.data)[which(singlet@meta.data$APOPTOSIS>seuil & singlet@meta.data$Phénotype=="B-cells" & singlet@meta.data$Condition =="RCHOP")])
+singlet@meta.data[singlet@meta.data$Condition == "RCHOP" & singlet@meta.data$orig.ident %in% liste, "Apop" ] <- "+"
+singlet@meta.data[singlet@meta.data$Condition == "RCHOP" & singlet@meta.data$orig.ident %in% liste2, "Apop" ] <- "-"

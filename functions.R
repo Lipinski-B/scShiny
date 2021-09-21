@@ -272,35 +272,3 @@ QC_subset <- function(singlet, maximum_sub, percent_mt_sub){
   return(sub_singlet)
 }
 
-## -- Other -- ##
-#.libPaths( c( .libPaths(), '/home/boris/R/x86_64-pc-linux-gnu-library/4.1/') )
-#library(dplyr)
-#library(SingleR)
-#library(stringr)
-#library(celldex)
-#library(monocle)
-#library(escape)
-
-#library(dashboardthemes)
-#library(shinyjs)
-#library(ggplot2)
-#library(shinybusy)
-#library(Seurat)
-#library(dittoSeq)
-
-visualisation2 <- function(singlet){
-  ## -- Pre-processing  -- ##
-  singlet <- NormalizeData(singlet, normalization.method = "LogNormalize", scale.factor = 10000) 
-  singlet <- FindVariableFeatures(singlet, selection.method = "vst", nfeatures = 2000)
-  singlet <- ScaleData(singlet, features = rownames(singlet))                                               # Scale data :singlet@assays$RNA@scale.data, singlet[["RNA"]]@scale.data
-  singlet <- RunPCA(singlet, features = VariableFeatures(singlet), ndims.print = 1:10, nfeatures.print = 30)# Reduction dimension
-  singlet <- FindNeighbors(singlet, reduction = "pca", dims = 1:40, compute.SNN = T)
-  singlet <- FindClusters(singlet, resolution = 0.5)                                                        # head(Idents(singlet), 10) 
-  singlet <- RunUMAP(singlet, reduction = "pca", dims = 1:40)
-  singlet <- RunTSNE(singlet, reduction = "pca", dims = 1:40)
-  
-  ## -- FindAllMarkers -- ## 
-  #singlet@commands[["FindAllMarkers"]] <- FindAllMarkers(singlet, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
-  
-  return(singlet)
-}
