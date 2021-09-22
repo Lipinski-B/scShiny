@@ -28,11 +28,11 @@ metadata_namnam <- function(singlet, path){
   
   
   ##### -- Enrichissement des gènes -- ##### 
-  #GS <- getGeneSets(library = "H")
-  #ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
-  #names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
-  #singlet <- AddMetaData(singlet, ES)
-  #singlet@tools$hallmarks <- names(ES)
+  GS <- getGeneSets(library = "H")
+  ES <- enrichIt(obj = singlet, gene.sets = GS, groups = 1000, cores = 12)
+  names(ES) <- str_replace_all(names(ES), "HALLMARK_", "")
+  singlet <- AddMetaData(singlet, ES)
+  singlet@tools$hallmarks <- names(ES)
   
   
   ##### -- Phase cycle -- #### 
@@ -197,6 +197,8 @@ for (patient in siege) {
   #singlet@assays$SCT@data<- as.matrix(0)
   
   save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/",patient,"/",patient,".RData"))
+  
+  rm(singlet) ; gc() ; gc() ; gc()
 
 }
 
