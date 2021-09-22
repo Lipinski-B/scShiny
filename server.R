@@ -367,7 +367,7 @@ shinyServer(function(input, output, session) {
   output$hallmark_Heatmap <- renderPlot({
     sortie()
     singlet@meta.data$active.idents <- singlet@active.ident
-    singlet@tools$meta_variable <- c("seurat_clusters", "Condition", "Greffe", "Phénotype", "Phase", "orig.ident") # "clonotype_id",
+    singlet@tools$meta_variable <- c("seurat_clusters",  "Phénotype", "Phase", "orig.ident") # "clonotype_id","Condition", "Greffe",
     if(is.null(rv$order)){dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
     }else{dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)}  
   })

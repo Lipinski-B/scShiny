@@ -186,7 +186,6 @@ for (patient in siege) {
   singlet <- metadata_namnam(singlet, paste0(patient,"/Results/",patient,"_CellrangerVDJ/outs/"))
   
   save(singlet, file=paste0("/home/boris/Documents/analyse/namnam/",patient,".RData"))
-  #load(file = paste0("/home/boris/Documents/analyse/namnam/FL1085.RData"))
   
   singlet <- DietSeurat(singlet, counts = F, data = T, scale.data = F,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
   singlet@assays[["RNA"]]@counts <- as.matrix(0)
@@ -206,3 +205,7 @@ for (patient in siege) {
 Seurat::DimPlot(object = singlet, label.size = 0.0, pt.size = 2, reduction = 'pca') & 
   theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)) & 
   guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) 
+
+
+load(file = paste0("/home/boris/Documents/analyse/namnam/FL1085.RData"))
+load(file = paste0("/home/boris/Bureau/scShiny/www/FL1085/FL1085.RData"))
