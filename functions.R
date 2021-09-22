@@ -207,7 +207,7 @@ visualisation <- function(singlet){
   singlet[["percent.mt"]] <- PercentageFeatureSet(singlet, pattern = "^MT-")
   singlet <- subset(singlet, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5 ) #& nCount_RNA > 2100 & mt.percent < 5
   singlet <- PercentageFeatureSet(singlet, pattern = "^MT-", col.name = "percent.mt")
-  singlet <- SCTransform(singlet, method = "glmGamPoi", verbose = F)
+  singlet <- SCTransform(singlet, method = "glmGamPoi", verbose = F, ncells = 10000, conserve.memory = T)
   singlet <- RunPCA(singlet, verbose = F)
   singlet <- RunUMAP(singlet, dims = 1:40, verbose = F)
   singlet <- FindNeighbors(singlet, dims = 1:40, verbose = F)
@@ -228,6 +228,10 @@ diet <- function(singlet){
   singlet@assays[["HTO"]] <- list() ; 
   singlet@assays[["RNA"]]@counts <- as.matrix(0)
   singlet@assays[["RNA"]]@scale.data <- as.matrix(0)
+  
+  singlet@assays[["SCT"]]@data <- as.matrix(singlet@assays[["SCT"]]@data)
+  singlet@assays[["SCT"]]@data <- subset(singlet@assays[["SCT"]]@data, rownames(singlet@assays[["SCT"]]@data) %in% VariableFeatures(singlet)[1:50])
+  
   save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
 }
 

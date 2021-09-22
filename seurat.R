@@ -21,13 +21,27 @@ source(file = "/home/boris/Bureau/scShiny/functions.R")
 
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/")
-siege <- c("FL09C1164","FL02G095","FL05G0330","FL140304", "FL08G0293", "FL12C1888") #'all'
+siege <- c("FL09C1164","FL02G095","FL05G0330","FL140304", "FL12C1888") #'all' "FL08G0293", 
 patient <- siege[5]
-load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
 
+for (patient in siege) {
+  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+  Idents(singlet)<-"Condition"
+  
+  singlet@tools$DE_RE <- FindMarkers(singlet, assay = "RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", logfc.threshold = 0.1)
+  singlet@tools$DE_PE <- FindMarkers(singlet, assay = "RNA", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "negbinom")
+  
+  singlet@tools$KEGG <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom" ,max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "KEGG_2021_Human", max.genes = Inf, logfc.threshold = 0.1)
+  singlet@tools$GO_Biological <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Biological_Process_2021", max.genes = Inf, logfc.threshold = 0.1)
+  singlet@tools$GO_Cellular <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Cellular_Component_2021", max.genes = Inf, logfc.threshold = 0.1)
+  singlet@tools$GO_Molecular <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Molecular_Function_2021", max.genes = Inf, logfc.threshold = 0.1)
+  
+  Idents(singlet)<-"seurat_clusters"
+  
+  save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+  diet(singlet)
+}
 
-singlet@assays$RNA@meta.features <- data.frame()
-save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
 
 ################################################################################################################################################################################################################################################################################################################################################
 ## -- Workflow -- ##
