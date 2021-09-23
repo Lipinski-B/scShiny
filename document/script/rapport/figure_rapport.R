@@ -16,15 +16,15 @@ library(rmarkdown)
 Sys.setenv("PATH" = "/home/boris/Software/miniconda3/bin")
 
 setwd("/")
-siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293")
-siege <- c("FL02G095","FL05G0330")
-patient <- siege[2]
+siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293","FL02G095","FL05G0330")
+#siege <- c("FL1085",  "FL120316",  "FL1214",  "FL1481")
+patient <- siege[6]
+
 load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-singlet <- all
 
 # Métadonnées : 
 fig <- plot_ly(singlet@tools$sunburst, ids = ~ids ,labels = ~labels, parents = ~parents, values = ~values, marker = list(colors = c( "#BEBADA", "#8DD3C7", "#FB8072", "#80B1D3", "#FDB462")), type = 'sunburst', branchvalues = 'total', hoverinfo = "text", hovertext = paste(singlet@tools$sunburst$labels, ":", round((singlet@tools$sunburst$values/singlet@tools$sunburst$values[1])*100,2),"%", "\nTotal : " ,singlet@tools$sunburst$values))
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/metadata_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/metadata_", patient,".png"), more_args = c('--disable-gpu'))
 
 # Réduction de dimension :
 plots <- PCAPlot(object = singlet, group.by = "Phénotype", split.by = NULL, label.size = 0.0, pt.size = 1) & theme(title = element_text(size=20),
@@ -32,11 +32,11 @@ plots <- PCAPlot(object = singlet, group.by = "Phénotype", split.by = NULL, lab
               legend.title = element_text(size=10),
               legend.text = element_text(size=10)
 ) & guides(color = guide_legend(nrow = 2, byrow = TRUE, override.aes = list(size = 2))) & xlab(label = paste0("PCA 1 : ", round(Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Stdev(singlet[["pca"]])[2],2), " %"))
-orca(plots, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/ACP_", patient,".png"), more_args = c('--disable-gpu'))
+orca(plots, paste0("/home/boris/Bureau/scShiny/www/", patient, "/ACP_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 # VDJ : 
-load(file=paste0("/home/boris/Documents/lipinskib/flinovo/result/",patient,"/R/VDJ.RData"))
+load(file=paste0("/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/",patient,"/R/VDJ.RData"))
 e <- plot_ly(hole = 0.85 ,type = "pie",labels = vloupe$clonotype_id, values = vloupe$frequency, showlegend = FALSE,
              textposition = 'side',textinfo = 'percent',
              hovertemplate = paste0('Clonotype : ', vloupe$clonotype_id, "\nProportion : ", round(vloupe$proportion,3)*100, "% \nType : ", vloupe$type, "\nIsotype : ", vloupe$igh_c_genes,"\nHeavy : ", vloupe$V_lourde, " / ", vloupe$D_lourde, " / ", vloupe$J_lourde, "\nLight : ", vloupe$V_legere, " / ", vloupe$J_legere),
@@ -51,7 +51,7 @@ e <- plot_ly(hole = 0.85 ,type = "pie",labels = vloupe$clonotype_id, values = vl
           plot_ly(x = J[[1]], y = J[[2]], name = "J", type = "bar", showlegend = T) %>% layout(xaxis= list(showticklabels = FALSE))
   )
 
-orca(e, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/VDJ_", patient,".png"), more_args = c('--disable-gpu'))
+orca(e, paste0("/home/boris/Bureau/scShiny/www/", patient, "/VDJ_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 
@@ -66,7 +66,7 @@ fig <- plot_ly(x = singlet@tools$Clonotype[[1]], y = singlet@tools$Clonotype[[2]
                              "\n\nLight : \n", singlet@tools$vloupe$V_legere[1:5], " / \n", singlet@tools$vloupe$J_legere[1:5])) %>% layout(title='Frequencies of the mains clonotypes', yaxis =list(title="Number of cells"))
        
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/clonotype_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/clonotype_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 ## VDJ : 
@@ -74,19 +74,19 @@ orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/clonotype_"
 fig <- plot_ly(x = singlet@tools$V[[1]], y = singlet@tools$V[[2]], name = "Clonotype", type = "bar") %>% 
   layout(title='Frequencies V genes : Heavy and Lights chains', xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/V_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/V_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 fig <- plot_ly(x = singlet@tools$D[[1]], y = singlet@tools$D[[2]], name = "Clonotype", type = "bar") %>% 
   layout(title='Frequencies D genes : Heavy chain',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/D_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/D_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 fig <- plot_ly(x = singlet@tools$J[[1]], y = singlet@tools$J[[2]], name = "Clonotype", type = "bar") %>% 
   layout(title='Frequencies J genes : Heavy and Lights chains',xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/J_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/J_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 
@@ -96,14 +96,14 @@ fig <- plot_ly(x = singlet@tools$Heavy[[1]], y = singlet@tools$Heavy[[2]], name 
         hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Heavy[[2]]/sum(singlet@tools$Heavy[[2]]),3)*100,"%")) %>%  
   layout(title='Frequencies Heavy Chain' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/Heavy_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/Heavy_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 fig <- plot_ly(x = singlet@tools$Isotype[[1]], y = singlet@tools$Isotype[[2]], name = "Heavy Chain", type = "bar",
         hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Isotype[[2]]/sum(singlet@tools$Isotype[[2]]),3)*100,"%")) %>%  
   layout(title='Frequencies Heavy Chain with details' , xaxis = list(tickangle = 45), yaxis =list(title="Number of cells"))
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/Isotype_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/Isotype_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 
@@ -113,20 +113,18 @@ fig <- plot_ly(x = singlet@tools$Light[[1]], y = singlet@tools$Light[[2]], name 
         hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Light[[2]]/sum(singlet@tools$Light[[2]]),3)*100,"%")) %>% 
   layout(title='Frequencies Light Chain',yaxis =list(title="Number of cells"))
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/Light_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/Light_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 fig <- plot_ly(x = singlet@tools$Type[[1]], y = singlet@tools$Type[[2]], name = "Clonotype", type = "bar",
         hovertemplate = paste0("Locus : %{x}\nProportion : ", round(singlet@tools$Type[[2]]/sum(singlet@tools$Type[[2]]),3)*100,"%")) %>% 
   layout(title='Frequencies Light Chain with details', yaxis =list(title="Number of cells"))
 fig
-orca(fig, paste0("/home/boris/Bureau/scShiny/shiny/www/", patient, "/Type_", patient,".png"), more_args = c('--disable-gpu'))
+orca(fig, paste0("/home/boris/Bureau/scShiny/www/", patient, "/Type_", patient,".png"), more_args = c('--disable-gpu'))
 
 
 
-siege <- c("FL140304","FL12C1888","FL09C1164","FL08G0293")
-siege <- c("FL02G095","FL05G0330")
 for (patient in siege) {
-  output_dir <- paste0("/home/boris/Bureau/scShiny/shiny/www/",patient)
-  render("/home/boris/Bureau/scShiny/script/rapport/rapport.Rmd", output_file = c(paste0("rapport_", patient),paste0("rapport_", patient),paste0("rapport_", patient)), output_format=c("html_document","pdf_document","word_document"), output_dir = output_dir, params = list(output_dir = output_dir, patient = patient))
+  output_dir <- paste0("/home/boris/Bureau/scShiny/www/",patient)
+  render("/home/boris/Bureau/scShiny/document/script/rapport/rapport.Rmd", output_file = c(paste0("rapport_", patient),paste0("rapport_", patient),paste0("rapport_", patient)), output_format=c("html_document","pdf_document","word_document"), output_dir = output_dir, params = list(output_dir = output_dir, patient = patient))
 }

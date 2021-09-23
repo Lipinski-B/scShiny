@@ -1,3 +1,4 @@
+options(repos = BiocManager::repositories())
 source(file = "functions.R")
 load(file = "www/FL08G0293/FL08G0293.RData")
 #load(file = "/home/boris/Documents/analyse/FL08G0293.RData") 

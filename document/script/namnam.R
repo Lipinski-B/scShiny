@@ -148,7 +148,22 @@ setwd(dir = "/home/boris/Documents/lipinskib/narimene/")
 siege <- c("FL1085",  "FL120316",  "FL1214",  "FL1481")
 patient <- siege[4]
 
-
+for (patient in siege) {
+  load(file=paste0("/home/boris/Documents/analyse/namnam/",patient,".RData"))
+  
+  singlet@assays[["SCT"]]@scale.data <- subset(singlet@assays[["SCT"]]@scale.data, rownames(singlet@assays[["SCT"]]@scale.data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
+  singlet@assays[["RNA"]]@data <-subset(as.matrix(singlet@assays[["RNA"]]@data), rownames(singlet@assays[["RNA"]]@data) %in% c(rownames(singlet@tools$DE_PE)[1:50], rownames(singlet@tools$DE_RE)[1:50]))
+  singlet <- DietSeurat(singlet, counts = FALSE, data = T, scale.data = T,features = NULL, assays = NULL, dimreducs = c("pca","umap",'tsne'), graphs = NULL )
+  #singlet@assays[["HTO"]] <- list() ; 
+  singlet@assays[["RNA"]]@counts <- as.matrix(0)
+  singlet@assays[["RNA"]]@scale.data <- as.matrix(0)
+  
+  singlet@assays[["SCT"]]@data <- as.matrix(singlet@assays[["SCT"]]@data)
+  singlet@assays[["SCT"]]@data <- subset(singlet@assays[["SCT"]]@data, rownames(singlet@assays[["SCT"]]@data) %in% VariableFeatures(singlet)[1:50])
+  
+  save(singlet, file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
+  
+}
 for (patient in siege) {
   singlet <- singlet_namanm(paste0(patient,"/Results/",patient,"_CellrangerCount/outs/filtered_feature_bc_matrix/"), patient)
   singlet <- visualisation(singlet)

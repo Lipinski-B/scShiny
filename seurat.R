@@ -21,26 +21,9 @@ source(file = "/home/boris/Bureau/scShiny/functions.R")
 
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/")
-siege <- c("FL09C1164","FL02G095","FL05G0330","FL140304", "FL12C1888") #'all' "FL08G0293", 
+siege <- c("FL09C1164","FL02G095","FL05G0330","FL140304", "FL08G0293", "FL12C1888") #'all'  siege <- c("FL1085",  "FL120316",  "FL1214",  "FL1481")
 patient <- siege[5]
 
-for (patient in siege) {
-  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-  Idents(singlet)<-"Condition"
-  
-  singlet@tools$DE_RE <- FindMarkers(singlet, assay = "RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", logfc.threshold = 0.1)
-  singlet@tools$DE_PE <- FindMarkers(singlet, assay = "RNA", ident.1 = "Pré-greffe", ident.2 = "Excipient", test.use = "negbinom")
-  
-  singlet@tools$KEGG <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom" ,max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "KEGG_2021_Human", max.genes = Inf, logfc.threshold = 0.1)
-  singlet@tools$GO_Biological <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Biological_Process_2021", max.genes = Inf, logfc.threshold = 0.1)
-  singlet@tools$GO_Cellular <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Cellular_Component_2021", max.genes = Inf, logfc.threshold = 0.1)
-  singlet@tools$GO_Molecular <- DEenrichRPlot(singlet, assay ="RNA", ident.1 = "RCHOP", ident.2 = "Excipient", test.use = "negbinom", max.cells.per.ident = Inf, balanced=T, p.val.cutoff=0.05, return.gene.list=T, num.pathway = 15, enrich.database = "GO_Molecular_Function_2021", max.genes = Inf, logfc.threshold = 0.1)
-  
-  Idents(singlet)<-"seurat_clusters"
-  
-  save(singlet, file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
-  diet(singlet)
-}
 
 
 ################################################################################################################################################################################################################################################################################################################################################
@@ -105,15 +88,44 @@ save(all, file = "/home/boris/Documents/analyse/singlet_all_PG.RData")
 liste = read.table("/home/boris/Bureau/dissoc.txt", header = T) ; liste <- liste$x
 DE <- list()
 for (patient in siege) {
-  load(file = paste0("/home/boris/Documents/analyse/singlet_", patient,".RData"))
+  load(file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
   DE[[patient]]$DE_RE <- singlet@tools$DE_RE[which(singlet@tools$DE_RE$p_val_adj < 0.05),]
-  #DE[[patient]]$DE_PE <- all@tools$DE_PE[which(all@tools$DE_PE$p_val_adj < 0.05),]
 }
-X <- 500
-DE_RE <- Reduce(intersect, list(rownames(DE[["FL140304"]]$DE_RE)[1:X],rownames(DE[["FL12C1888"]]$DE_RE)[1:X],rownames(DE[["FL08G0293"]]$DE_RE)[1:X]))
-DE_PE <- Reduce(intersect, list(rownames(DE[["FL140304"]]$DE_PE)[1:X],rownames(DE[["FL12C1888"]]$DE_PE)[1:X],rownames(DE[["FL09C1164"]]$DE_PE)[1:X],rownames(DE[["FL08G0293"]]$DE_PE)[1:X],rownames(DE[["FL02G095"]]$DE_PE)[1:X],rownames(DE[["FL05G0330"]]$DE_PE)[1:X]))
+partiel  <- Reduce(intersect, list(rownames(DE[["FL140304"]]$DE_RE),rownames(DE[["FL12C1888"]]$DE_RE),rownames(DE[["FL08G0293"]]$DE_RE))) ##Partielle
+complete <- Reduce(intersect, list(rownames(DE[["FL02G095"]]$DE_RE),rownames(DE[["FL05G0330"]]$DE_RE),rownames(DE[["FL09C1164"]]$DE_RE))) #
 
-DE_RE <- Reduce(intersect, list(rownames(DE[["FL05G0330"]]$DE_RE)[1:X],rownames(DE[["FL02G095"]]$DE_RE)[1:X],rownames(DE[["FL09C1164"]]$DE_RE)[1:X]))
+
+vector <- list()
+for (patient in siege) {
+  load(file = paste0("/home/boris/Bureau/scShiny/www/", patient,"/", patient,".RData"))
+  DE[[patient]]$DE_RE <- singlet@tools$DE_RE[which(singlet@tools$DE_RE$p_val_adj < 0.05),]
+  for (gene in complete) {
+    finale <- as.matrix(DE[[patient]]$DE_RE[gene,])
+    if (!is.na(finale)) {
+      rownames(finale) <- patient
+      vector[[gene]] <- rbind(vector[[gene]],finale)
+    }
+  }
+
+  for (gene in partiel) {
+    finale <- as.matrix(DE[[patient]]$DE_RE[gene,])
+    if (!is.na(finale)) {
+      rownames(finale) <- patient
+      vector[[gene]] <- rbind(vector[[gene]],finale)
+    }
+  }
+}
+
+df <- data.frame(
+  p_val_adj = vector[[1]][,1],
+  patient = rep('Partielle',3),
+  gene = rep('GAPDH',3)
+)
+ggplot(df, aes(x=gene,y=p_val_adj)) + 
+  geom_dotplot(binaxis='y', stackdir='center')
+
+vector[[1]] %>% datatable(rownames = FALSE)
+
 
 DE_RE_candidat <- setdiff(DE_RE,liste)
 DE_PE_candidat <- setdiff(DE_PE,liste)
@@ -127,7 +139,7 @@ write.table(DE_PE_candidat_FC, "/home/boris/Bureau/DE_PE_FC.txt")
 
 
 
-
+DE_PE <- Reduce(intersect, list(rownames(DE[["FL140304"]]$DE_PE),rownames(DE[["FL12C1888"]]$DE_PE)[1:X],rownames(DE[["FL09C1164"]]$DE_PE)[1:X],rownames(DE[["FL08G0293"]]$DE_PE)[1:X],rownames(DE[["FL02G095"]]$DE_PE)[1:X],rownames(DE[["FL05G0330"]]$DE_PE)[1:X]))
 
 ################################################################################################################################################################################################################################################################################################################################################
 ## -- TEST : DE RCHOP : apop+ / apop- -- ##

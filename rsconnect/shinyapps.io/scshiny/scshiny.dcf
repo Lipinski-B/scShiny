@@ -1,0 +1,14 @@
+name: scshiny
+title:
+username:
+account: scshiny
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4706146
+bundleId: 5063232
+url: https://borislipinski.shinyapps.io/scshiny/
+when: 1632385850.27815
+lastSyncTime: 1632385850.27816
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .README.md|functions.R|global.R|heroku.yml|init.R|run.R|server.R|seurat.R|ui.R|document
