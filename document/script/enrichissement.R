@@ -56,11 +56,13 @@ df$Nombre[15] <- length(unlist(Reduce(intersect, list(ER[["FL09C1164"]]$KEGG$pos
 df$Nombre[16] <--length(unlist(Reduce(intersect, list(ER[["FL09C1164"]]$KEGG$neg[1], ER[["FL02G095"]]$KEGG$neg[1], ER[["FL05G0330"]]$KEGG$neg[1])) ))
 
 
-plot_ly(df, x = df$Enrichissement[1:8], y = df$Nombre[1:8], name = "Complete", type = "bar", hovertemplate = paste("Groupe :", df$Groupe[1:8],"\nLevel :", df$Level[1:8],"\nEnrichissement :", df$Enrichissement[1:8],"\nNombre :", df$Nombre[1:8],"\nFonction :\n", df$Fonction[1:8] )) %>% 
-  add_trace(df, x = df$Enrichissement[9:16], y = df$Nombre[9:16], name = 'Partiel',hovertemplate = paste("Groupe :", df$Groupe[9:16],"\nLevel :", df$Level[9:16],"\nEnrichissement :", df$Enrichissement[9:16],"\nNombre :", df$Nombre[9:16],"\nFonction :\n", df$Fonction[9:16] ))
+hist<-plot_ly(df, x = df$Enrichissement[1:8], y = df$Nombre[1:8], name = "Complete", type = "bar", hovertemplate = paste("Groupe :", df$Groupe[1:8],"\nLevel :", df$Level[1:8],"\nEnrichissement :", df$Enrichissement[1:8],"\nNombre :", df$Nombre[1:8],"\nFonction :\n", df$Fonction[1:8] )) %>% 
+  add_trace(df, x = df$Enrichissement[9:16], y = df$Nombre[9:16], name = 'Partiel',hovertemplate = paste("Groupe :", df$Groupe[9:16],"\nLevel :", df$Level[9:16],"\nEnrichissement :", df$Enrichissement[9:16],"\nNombre :", df$Nombre[9:16],"\nFonction :\n", df$Fonction[9:16] )) %>% 
+  layout(annotations = list(x = 1.5,y = 5,text = "UP regulated", showarrow = FALSE, xanchor = "center")) %>% layout(annotations = list(x = 1.5,y = -7,text = "DOWN regulated", showarrow = FALSE, xanchor = "center"), yaxis = list(title = "Number"), title = 'Gene enrichment for groups of patients with complete and partial response to RCHOP')
 
 df2 <- tibble(Groupe = c("Complete", "Complete", "Complete", "Complete", "Partiel", "Partiel", "Partiel", "Partiel"), Enrichissement = c("GO : Biological Process", "GO : Molecular Function", "GO : Cellular Component", "KEGG", "GO : Biological Process", "GO : Molecular Function", "GO : Cellular Component", "KEGG"),
              UP = c(df$Fonction[1], df$Fonction[3],df$Fonction[5],df$Fonction[7],df$Fonction[9],df$Fonction[11],df$Fonction[13],df$Fonction[15]), DOWN = c(df$Fonction[2], df$Fonction[4],df$Fonction[6],df$Fonction[8],df$Fonction[10],df$Fonction[12],df$Fonction[14],df$Fonction[16]))
 
-df2 %>% datatable(rownames = FALSE)
+datatable <- df2 %>% datatable(rownames = FALSE)
 
+save(hist, datatable, file = "home/boris/Bureau/scShiny/www/enrichissement.Rdata")

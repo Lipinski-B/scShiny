@@ -1,14 +1,27 @@
 # server.R
+
+
+#' The application server-side
+#'
+#' @param input,output,session Internal parameters for {shiny}.
+#'     DO NOT REMOVE.
+#' @import shiny
+#' @import dplyr
+#' @noRd
+#' 
+#' 
 colorblind_vector <- colorRampPalette(c("#FF4B20", "#FFB433", "#C6FDEC", "#7AC5FF", "#0348A6"))
 jscode <- "shinyjs.refresh = function() { location.reload(); }"
 shinyServer(function(input, output, session) {
   #################################################################################################
   sortie <- eventReactive(c(input$actBtnPatient1,input$actBtnPatient, input$resetPatient) ,{singlet})
+
+  
   
   observeEvent(input$actBtnPatient1,{    
     shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     if(nchar(as.character(input$patient))>0){
-      load(file = paste0("www/",input$patient,"/",input$patient,".RData"))
+      load(file = paste0("datasets/",input$patient,".RData"))
       singlet <<- singlet
     }
     shinyWidgets::sendSweetAlert(session = session,title = "Done !",type = "success")
@@ -19,7 +32,7 @@ shinyServer(function(input, output, session) {
     shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     
     if(nchar(as.character(input$patient))>0){
-      load(file = paste0("www/",input$patient,"/",input$patient,".RData"))
+      load(file = paste0("datasets/",input$patient,".RData"))
       singlet <<- singlet
     }
     sortie()
@@ -29,7 +42,7 @@ shinyServer(function(input, output, session) {
     if(nchar(as.character(input$maximum))>0 || nchar(as.character(input$percent_mt))>0){singlet <<- QC_subset(singlet, maximum_sub=input$maximum, percent_mt_sub=input$percent_mt)}
     
     if(length(input$combo)>0){
-      load(file = paste0("www/singlet_",input$patient,"_",input$combo,".RData"))
+      load(file = paste0("datasets/",input$patient,".RData"))
       singlet <<- singlet
     }
     
@@ -42,6 +55,37 @@ shinyServer(function(input, output, session) {
     shinyWidgets::sendSweetAlert(session = session,title = "Done !",text = "Tous les subsamples ont été supprimé !",type = "success")
   })
   
+  
+  
+  r <- reactiveValues(
+    test = reactiveValues()
+  )
+  
+  data <- reactive(singlet)
+  
+
+  
+
+  observe({
+    r$test$data <- data()
+  })
+  
+  
+  callModule(mod_Chargement_server, "Chargement_ui_1")
+  callModule(mod_Metadata_server, "Metadata_ui_1")
+  callModule(mod_Read_server, "Read_ui_1")
+  callModule(mod_3D_server, "3D_ui_1")
+  callModule(mod_PCA_server, "PCA_ui_1")
+  callModule(mod_Mitochondrie_server, "Mitochondrie_ui_1", r = r)
+  callModule(mod_Monocle_server, "Monocle_ui_1")
+  callModule(mod_Hallmark_server, "Hallmark_ui_1")
+  callModule(mod_VDJ_server, "VDJ_ui_1")
+  callModule(mod_meta_VDJ_server, "meta_VDJ_ui_1")
+  callModule(mod_meta_Cell_server, "meta_Cell_ui_1")
+  callModule(mod_meta_scRepertoir_server, "meta_scRepertoir_ui_1")
+  callModule(mod_meta_Enrichissement_server, "meta_Enrichissement_ui_1")
+  
+
   heatmap <- reactive({
     top10 <- sortie()@commands[["FindAllMarkers"]] %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
     return(top10)
@@ -171,6 +215,7 @@ shinyServer(function(input, output, session) {
     return(paste0("Light : ", singlet@tools$vloupe$V_legere[1], "/", singlet@tools$vloupe$J_legere[1]))
   })
   
+
   output$Dynamic_Sub_Spe <- renderUI({
     choice <- list()
     for(i in 1:length(metadata)){
@@ -247,21 +292,15 @@ shinyServer(function(input, output, session) {
   output$feature_other <- renderPlotly({FeaturePlot(singlet, features = "CD19", interactive = T)})
   
   ## -- PCA -- ##
-  output$PCA <- renderPlot({
-    Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'pca') & theme(title = element_text(size=20),legend.position = "top",legend.title = element_text(size=10),legend.text = element_text(size=10)
-    ) & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 6))) & xlab(label = paste0("PCA 1 : ", round(Seurat::Stdev(singlet[["pca"]])[1],2), " %")) & ylab(label = paste0("PCA 2 : ", round(Seurat::Stdev(singlet[["pca"]])[2],2), " %"))
-  })
   output$D_PCA <- renderPlotly({
     plot_ly(data = D3plot(), x = ~PC_1, y = ~PC_2, z = ~PC_3,color = singlet@meta.data[[input$metadata]],type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),
             text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>%layout(title=input$metadata,scene = list(xaxis = list(title = paste0("PCA 1 : ", round(Seurat::Stdev(singlet[["pca"]])[1],2), " %")),yaxis = list(title = paste0("PCA 2 : ", round(Seurat::Stdev(singlet[["pca"]])[2],2), " %")),zaxis = list(title = paste0("PCA 3 : ", round(Seurat::Stdev(singlet[["pca"]])[3],2), " %"))))
   })
   
   ## -- UMAP -- ##
-  output$UMAP <- renderPlot({Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'umap') & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4)))})
   output$D_UMAP <- renderPlotly({plot_ly(data = D3plot(), x = ~UMAP_1, y = ~UMAP_2, z = ~UMAP_3,color = singlet@meta.data[[input$metadata]],type = "scatter3d", mode = "markers",marker = list(size = 3, width=2),text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata)})
   
   ## -- TSNE -- ##
-  output$TSNE <- renderPlot({Seurat::DimPlot(object = tokeep(), group.by = group(), split.by = split(), label.size = 0.0, pt.size = 2, reduction = 'tsne') & theme(legend.position = "top") & guides(color = guide_legend(nrow = 1, byrow = TRUE, override.aes = list(size = 4)))})
   output$D_TSNE <- renderPlotly({plot_ly(data = D3plot(), x = ~tSNE_1, y = ~tSNE_2, z = ~tSNE_3,color = singlet@meta.data[[input$metadata]],type =  "scatter3d", mode = "markers",marker = list(size = 3, width=2),text=~singlet@meta.data[[input$metadata]], hoverinfo="text") %>% layout(title=input$metadata)})
   
   ## -- Expression différentielle -- ##
@@ -334,10 +373,6 @@ shinyServer(function(input, output, session) {
   output$Heatmap <- renderPlot({sortie() ; Seurat::DoHeatmap(singlet, features = heatmap()$gene, group.by = "Condition") + NoLegend()})
   output$Heatmap_feature <- renderPrint({print(sortie()@commands[["FindAllMarkers"]])})
   
-  ## -- Mitochondrie Figure -- ##
-  output$MT_VlnPlot <- renderPlot({sortie() ; singlet@tools$mitochondrie_all + Seurat::VlnPlot(singlet, features = "nFeature_RNA", group.by = "Condition") +  Seurat::VlnPlot(singlet, features = "nCount_RNA", group.by = "Condition") + Seurat::VlnPlot(singlet, features = "percent.mt", group.by = "Condition")})
-  output$MT_FeatureScatter <- renderPlot({sortie() ; Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")})
-  output$MT_FeatureScatter2 <- renderPlot({sortie() ; Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "percent.mt", group.by = "HTO_classification") + Seurat::FeatureScatter(singlet, feature1 = "nCount_RNA", feature2 = "nFeature_RNA", group.by = "HTO_classification")})
   
   ## -- The 50 most highly variable genes -- ##
   output$top50 <- renderPlot({
@@ -365,11 +400,12 @@ shinyServer(function(input, output, session) {
     rv$order <-NULL}, ignoreNULL = FALSE)
   
   output$hallmark_Heatmap <- renderPlot({
+    
     sortie()
     singlet@meta.data$active.idents <- singlet@active.ident
     singlet@tools$meta_variable <- c("seurat_clusters",  "Phénotype", "Phase", "orig.ident") # "clonotype_id","Condition", "Greffe",
-    if(is.null(rv$order)){dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
-    }else{dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)}  
+    if(is.null(rv$order)){gc() ; gc() ; gc() ; gc() ; dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = singlet@tools$hallmarks, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = T, fontsize = 12)
+    }else{gc() ; gc() ; gc() ; gc() ; dittoSeq::dittoHeatmap(singlet, genes = NULL, metas = rv$hallmark, heatmap.colors = rev(colorblind_vector(50)),annot.by = singlet@tools$meta_variable, cluster_cols = F, fontsize = 12, order.by = rv$order)}  
   })
   
   output$hallmark_VlnPlot <- renderPlot({dittoSeq::dittoPlot(sortie() , input$hallmark_order_vln, group.by = input$metadata_order_vln, legend.show = FALSE) + theme(title = element_text(size=20), axis.text = element_text(size=15)) +  ylab(label = "Score") })
@@ -438,6 +474,8 @@ shinyServer(function(input, output, session) {
   output$FL02_Meta = renderPlotly({load(file = "www/FL02G095/FL02G095_VDJ.RData") ; f})
   output$FL05_Meta = renderPlotly({load(file = "www/FL05G0330/FL05G0330_VDJ.RData") ; f})
   
+  output$hist_enrichissement = renderPlotly({load(file = "www/enrichissement.Rdata") ; hist})
+  output$df_enrichissement =  DT::renderDT({load(file = "www/enrichissement.Rdata") ; datatable})
   
   ## -- Rapport Patient -- ##
   output$PDF_report <- downloadHandler(

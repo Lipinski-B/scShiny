@@ -8,7 +8,7 @@ library(DESeq2)
 library(cowplot)
 library(Seurat)
 library(dittoSeq)
-library(DT)
+
 
 library(enrichR)
 listEnrichrSites()
@@ -22,7 +22,7 @@ source(file = "/home/boris/Bureau/scShiny/functions.R")
 ## -- Loading -- ## 
 setwd(dir = "/home/boris/Documents/lipinskib/Boris_Manon/flinovo/result/")
 siege <- c("FL09C1164","FL02G095","FL05G0330","FL140304", "FL08G0293", "FL12C1888") #'all'  siege <- c("FL1085",  "FL120316",  "FL1214",  "FL1481")
-patient <- siege[5]
+# patient <- siege[5]
 
 
 
