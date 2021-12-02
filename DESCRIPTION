@@ -1,13 +1,28 @@
-Package: scShiny
+Package: scShinytest
 Title: PKG_TITLE
 Version: 0.0.0.9000
 Authors@R: person('Boris', 'LIPINSKI', email = 'boris.lipinski@chu-lyon.fr', role = c('cre', 'aut'))
 Description: PKG_DESC.
 License: MIT + file LICENSE
 Imports: 
+    attempt,
     config (>= 0.3.1),
+    DT,
+    glue,
     golem (>= 0.3.1.9003),
-    shiny (>= 1.7.1)
+    htmltools,
+    shiny (>= 1.7.1),
+    thinkr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
+Suggests: 
+    rmarkdown,
+    knitr,
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Language: en-US
+VignetteBuilder: knitr
+URL: https://github.com/Lipinski-B/scShinytest
+BugReports: https://github.com/Lipinski-B/scShinytest/issues
