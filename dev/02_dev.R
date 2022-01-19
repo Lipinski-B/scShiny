@@ -15,12 +15,55 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
-usethis::use_package("thinkr")
+usethis::use_package("plotly")
+usethis::use_package("shinyWidgets")
+usethis::use_package("shinydashboard")
+usethis::use_package("Seurat")
+usethis::use_package("shinybusy")
+usethis::use_package("shinyjs")
+usethis::use_package("dashboardthemes")
+usethis::use_package("shinyBS")
+usethis::use_package("Matrix")
+usethis::use_package("scales")
+usethis::use_package("RColorBrewer")
+usethis::use_package("velocyto.R")
+usethis::use_package("ggVennDiagram")
+usethis::use_package("pheatmap")
+usethis::use_package("DT")
+usethis::use_package("ggplot2")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module(name = "name_of_module1", with_test = TRUE) # Name of the module
-golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the module
+## Présentation
+golem::add_module(name = "Presentation") 
+
+## Patient
+golem::add_module(name = "Patient_Expression") 
+golem::add_module(name = "Patient_Metadata")
+golem::add_module(name = "Patient_Mitochondrie")
+golem::add_module(name = "Patient_Reduction_Dimension")
+golem::add_module(name = "Patient_Subset")
+golem::add_module(name = "Patient_VDJ")
+golem::add_module(name = "Patient_Velocity")
+golem::add_module(name = "Patient_GOT")
+
+
+
+
+## All
+golem::add_module(name = "All_Cell")
+golem::add_module(name = "All_DE")
+golem::add_module(name = "All_Enrichissement")
+golem::add_module(name = "All_Reduction_Dimension")
+golem::add_module(name = "All_scRepertoir")
+golem::add_module(name = "All_VDJ")
+golem::add_module(name = "All_Velocity")
+
+## Other
+golem::add_module(name = "Contact")
+
+
+
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
@@ -45,7 +88,7 @@ usethis::use_test("app")
 # Documentation
 
 ## Vignette ----
-usethis::use_vignette("Flapp")
+usethis::use_vignette("scShiny")
 devtools::build_vignettes()
 
 ## Code Coverage----

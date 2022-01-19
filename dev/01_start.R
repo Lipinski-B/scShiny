@@ -20,12 +20,12 @@
 ##
 golem::fill_desc(
   pkg_name = "scShiny", # The Name of the package containing the App
-  pkg_title = "PKG_TITLE", # The Title of the package containing the App
-  pkg_description = "PKG_DESC.", # The Description of the package containing the App
+  pkg_title = "App for Flinovo", # The Title of the package containing the App
+  pkg_description = "Application to sumarise result from the Flinovop project", # The Description of the package containing the App
   author_first_name = "Boris", # Your First Name
   author_last_name = "LIPINSKI", # Your Last Name
   author_email = "boris.lipinski@chu-lyon.fr", # Your Email
-  repo_url = NULL # The URL of the GitHub Repo (optional)
+  repo_url = "https://github.com/Lipinski-B/scShiny" # The URL of the GitHub Repo (optional)
 )
 
 ## Set {golem} options ----
@@ -33,7 +33,7 @@ golem::set_golem_options()
 
 ## Create Common Files ----
 ## See ?usethis for more information
-usethis::use_mit_license("Golem User") # You can set another license here
+usethis::use_mit_license("Boris Lipinski") # You can set another license here
 usethis::use_readme_rmd(open = FALSE)
 usethis::use_code_of_conduct()
 usethis::use_lifecycle_badge("Experimental")

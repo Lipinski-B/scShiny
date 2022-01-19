@@ -1,21 +1,30 @@
-Package: scShinytest
+Package: scShiny
 Title: PKG_TITLE
 Version: 0.0.0.9000
 Authors@R: person('Boris', 'LIPINSKI', email = 'boris.lipinski@chu-lyon.fr', role = c('cre', 'aut'))
 Description: PKG_DESC.
 License: MIT + file LICENSE
 Imports: 
-    attempt,
     config (>= 0.3.1),
-    DT,
-    glue,
     golem (>= 0.3.1.9003),
-    htmltools,
+    ParetoTI,
+    dashboardthemes,
+    DT,
+    ggplot2,
+    Matrix,
+    plotly,
+    RColorBrewer,
+    Seurat,
     shiny (>= 1.7.1),
-    thinkr
+    shinybusy,
+    shinydashboard,
+    shinyWidgets,
+    velocyto.R,
+    shinyBS,
+    shinyjs
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: 
     rmarkdown,
     knitr,
@@ -24,5 +33,5 @@ Suggests:
 Config/testthat/edition: 3
 Language: en-US
 VignetteBuilder: knitr
-URL: https://github.com/Lipinski-B/scShinytest
-BugReports: https://github.com/Lipinski-B/scShinytest/issues
+URL: https://github.com/Lipinski-B/scShiny
+BugReports: https://github.com/Lipinski-B/scShiny/issues

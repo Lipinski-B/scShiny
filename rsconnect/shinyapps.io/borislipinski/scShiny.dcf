@@ -1,0 +1,13 @@
+name: scShiny
+title: scShiny
+username:
+account: borislipinski
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4716687
+bundleId: 5484434
+url: https://borislipinski.shinyapps.io/scShiny/
+when: 1642587907.41087
+lastSyncTime: 1642587907.41088
+asMultiple: FALSE
+asStatic: FALSE
