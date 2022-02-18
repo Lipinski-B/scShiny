@@ -25,9 +25,9 @@ mod_Patient_Reduction_Dimension_ui <- function(id) {
                   column(12,h5("Reduction :")),
                   column(12,pickerInput(inputId = ns("Reduction"),label = NULL , choices = c("umap","pca","tsne"), multiple = F, options = list(`actions-box` = TRUE))),fluidRow(),
                   column(12,h5("Group by : ")),
-                  column(12,pickerInput(ns("Groupes"), inline = FALSE, choices = c("Phénotype", "Phénotype.fine","Phase","Condition", "Clonotype","Chaine","V","D","J","C","CDR3","BCL2_L23L", "BCL2_K22K", "CD79B_Y196H", "EZH2_A682G", "EZH2_A692V","EZH2_Y646C","EZH2_Y646F","EZH2_Y646H","EZH2_Y646N","EZH2_Y646S"), multiple = TRUE, options = list(`actions-box` = TRUE))),fluidRow(),
+                  column(12,pickerInput(ns("Groupes"), inline = FALSE, choices = c("Phénotype", "Phénotype.fine","State","Phase","Condition", "Clonotype","Chaine_Light","V_Light","D_Light","J_Light","C_Light","CDR3_Light","CDR3_nt_Light","Chaine_Heavy", "V_Heavy","D_Heavy","J_Heavy","C_Heavy","CDR3_Heavy","CDR3_nt_Heavy","CDR3","BCL2_L23L", "BCL2_K22K", "CD79B_Y196H", "EZH2_A682G", "EZH2_A692V","EZH2_Y646C","EZH2_Y646F","EZH2_Y646H","EZH2_Y646N","EZH2_Y646S"), multiple = TRUE, options = list(`actions-box` = TRUE))),fluidRow(),
                   column(12,h5("Split by : ")),
-                  column(12,pickerInput(ns("Splites"), inline = FALSE, choices = c("seurat_clusters", "Phénotype", "Phénotype.fine","Phase","Condition", "Clonotype","Chaine","V","D","J","C","CDR3","BCL2_L23L", "BCL2_K22K", "CD79B_Y196H", "EZH2_A682G", "EZH2_A692V","EZH2_Y646C","EZH2_Y646F","EZH2_Y646H","EZH2_Y646N","EZH2_Y646S"), multiple = TRUE, options = list(`actions-box` = TRUE))),fluidRow(),
+                  column(12,pickerInput(ns("Splites"), inline = FALSE, choices = c("seurat_clusters", "Phénotype", "Phénotype.fine","State","Phase","Condition", "Clonotype","Chaine_Light","V_Light","D_Light","J_Light","C_Light","CDR3_Light","CDR3_nt_Light","Chaine_Heavy", "V_Heavy","D_Heavy","J_Heavy","C_Heavy","CDR3_Heavy","CDR3_nt_Heavy","CDR3","BCL2_L23L", "BCL2_K22K", "CD79B_Y196H", "EZH2_A682G", "EZH2_A692V","EZH2_Y646C","EZH2_Y646F","EZH2_Y646H","EZH2_Y646N","EZH2_Y646S"), multiple = TRUE, options = list(`actions-box` = TRUE))),fluidRow(),
                   
                   column(12,sliderTextInput(ns("Point_Size"),"Taille des points :",choices = seq(from = 0,to = 2,by = 0.2),grid = TRUE,selected = 0.8)),fluidRow(),
                   column(12,awesomeCheckbox(ns("Label_element"),"Show Label",TRUE)),fluidRow(),
@@ -43,7 +43,7 @@ mod_Patient_Reduction_Dimension_ui <- function(id) {
                   column(12,h5("Condition :")),
                   column(12,pickerInput(inputId = ns("Velo_condition"),label = NULL , choices = c("RCHOP","Excipient","Pré-greffe"), multiple = F, options = list(`actions-box` = TRUE))),fluidRow(),
                   column(12,h5("Group by : ")),
-                  column(12,pickerInput(inputId = ns("Groupes_Velo"),label = NULL , choices = c("seurat_clusters", "Phénotype", "Phénotype.fine","Phase","Condition", "Clonotype","Chaine","V","D","J","C","CDR3"), multiple = F, options = list(`actions-box` = TRUE))),fluidRow(),
+                  column(12,pickerInput(inputId = ns("Groupes_Velo"),label = NULL , choices = c("seurat_clusters", "Phénotype", "State", "Phénotype.fine","Phase","Condition", "Clonotype","Chaine_Light","V_Light","D_Light","J_Light","C_Light","CDR3_Light","CDR3_nt_Light","Chaine_Heavy", "V_Heavy","D_Heavy","J_Heavy","C_Heavy","CDR3_Heavy","CDR3_nt_Heavy","CDR3"), multiple = F, options = list(`actions-box` = TRUE))),fluidRow(),
                   
                   column(12,sliderTextInput(ns("nFeature_spliced_Velo"),"Subset :",choices = seq(from = 10,to = 200,by = 10),grid = TRUE,selected = 10)),fluidRow(),
                   

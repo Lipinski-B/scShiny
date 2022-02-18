@@ -12,7 +12,7 @@ app_server <- function( input, output, session ) {
   p <- reactiveValues(dataset = reactiveValues())
   
   data <- reactive({singlet})
-  feature <- reactive({rownames(singlet)})
+  feature <- reactive({rownames(singlet@assays$RNA)})
   patient <- reactive({input$patient})
 
   observe({
@@ -40,8 +40,8 @@ app_server <- function( input, output, session ) {
     shinybusy::show_modal_spinner(spin = "semipolar",color = "deepskyblue",text = "Please wait...")
     
     rm(list = ls());gc();gc();gc()
-    r$dataset <<- get(load(file = paste0("datasets/All/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
-    #r$dataset <<- get(load(file = paste0("/home/boris/Bureau/Flinovo/result/analyse_meta/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
+    #r$dataset <<- get(load(file = paste0("datasets/All/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
+    r$dataset <<- get(load(file = paste0("/home/boris/Bureau/Flinovo/result/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
     
     Seurat::Idents(r$dataset)<-'Sample'
     
