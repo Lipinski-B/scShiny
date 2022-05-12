@@ -29,7 +29,7 @@ app_ui <- function(request) {
           
           column(1,h4("Dataset :", style="color:white")),br(),br(),
           box(width = 12,awesomeRadio(inputId = "Dataset_Type", label = "Type : ", choices = c("All","BT", "B", "Other"), selected = "All", inline = F, checkbox = TRUE)),br(),br(), #"BT"
-          box(width = 12,awesomeRadio(inputId = "Dataset_Condition",label = "Condition : ",choices = c("All","Post-greffe","Pré-greffe-Excipient","Pré-greffe","Excipient","RCHOP"),selected = "All",inline = F,checkbox = TRUE)),br(),br(),br(),br(),br(),#br(),br(),br(),br(),br(),br(),br(),br(), #"All", "Pré-greffe", ,"RCHOP"
+          box(width = 12,awesomeRadio(inputId = "Dataset_Condition",label = "Condition : ",choices = c("All","Post-greffe","Pre-greffe-Excipient","Pre-greffe","Excipient","RCHOP"),selected = "All",inline = F,checkbox = TRUE)),br(),br(),br(),br(),br(),#br(),br(),br(),br(),br(),br(),br(),br(), #"All", "Pré-greffe", ,"RCHOP"
           actionButton(inputId = "actBtnLoadDataset", label = "Submit",icon = icon("play"), width ='87%'), br(),
           
           menuSubItem("Metadata",                     tabName = "All_Metadata", icon = icon("poll")),
@@ -42,7 +42,7 @@ app_ui <- function(request) {
         
         # Patient -------------------------------------------
         menuItem("Analyses by patient", startExpanded = F,
-                 selectInput("patient", h4("Patient selection : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164","FL02G095","FL05G0330","FL08G0431", "FL06G1206"), selected = "FL08G0293", selectize = T), #"FL1085","FL120316",  "FL1214",  "FL1481",
+                 selectInput("patient", h4("Patient selection : ", style="color:white"), choices = c("FL08G0293", "FL12C1888", "FL140304", "FL09C1164","FL02G095","FL05G0330","FL08G0431", "FL06G1206", "FL08G0404"), selected = "FL08G0293", selectize = T), #"FL1085","FL120316",  "FL1214",  "FL1481",
                  
                  box(width = 12,awesomeRadio(inputId = "Patient_Type", label = "Type : ", choices = c("All", "BT", "B"), selected = "All", inline = F, checkbox = TRUE)),br(),br(),
                  box(width = 12,awesomeRadio(inputId = "Patient_Condition",label = "Condition : ",choices = c("All","Pré-greffe-Excipient", "Post-greffe"),selected = "All",inline = F,checkbox = TRUE)), #"Pré-greffe"

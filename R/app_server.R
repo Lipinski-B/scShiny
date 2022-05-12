@@ -41,7 +41,7 @@ app_server <- function( input, output, session ) {
     
     rm(list = ls());gc();gc();gc()
     #r$dataset <<- get(load(file = paste0("datasets/All/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
-    r$dataset <<- get(load(file = paste0("/home/boris/Bureau/Flinovo/result/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
+    r$dataset <<- get(load(file = paste0("/home/boris/Bureau/Flinovo/result/analyse_meta/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
     
     Seurat::Idents(r$dataset)<-'Sample'
     

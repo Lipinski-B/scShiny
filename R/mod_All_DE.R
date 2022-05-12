@@ -14,6 +14,12 @@ mod_All_DE_ui <- function(id) {
                                                        "State","Condition","Phénotype","Phénotype.fine","Phase","Reponse","Greffe","Clonotype","Chaine_Light","V_Light","D_Light","J_Light","C_Light","CDR3_Light","CDR3_nt_Light","Chaine_Heavy", 
                                                                                                                                                               "V_Heavy","D_Heavy","J_Heavy","C_Heavy","CDR3_Heavy","CDR3_nt_Heavy",
                                                                                                                                           "BCL2_L23L","BCL2_K22K","CD79B_Y196H","EZH2_A682G","EZH2_A692V","EZH2_Y646C","EZH2_Y646F","EZH2_Y646H","EZH2_Y646N","EZH2_Y646S"), multiple = F, options = list(`actions-box` = TRUE))),
+                            column(12,pickerInput(inputId = ns("Vln_metadata_split"),label = "Métadata" , choices = c("Sample", "Heavy", "Light", "Phénotype_TRUST","V_Heavy_TRUST","D_Heavy_TRUST","J_Heavy_TRUST","Heavy_TRUST","CDR3_DNA_Heavy_TRUST","CDR3_AA_Heavy_TRUST",
+                                                                                                                "V_Light_TRUST","D_Light_TRUST","J_Light_TRUST","Light_TRUST","CDR3_DNA_Light_TRUST","CDR3_AA_Light_TRUST",
+                                                                                                                "State","Condition","Phénotype","Phénotype.fine","Phase","Reponse","Greffe","Clonotype","Chaine_Light","V_Light","D_Light","J_Light","C_Light","CDR3_Light","CDR3_nt_Light","Chaine_Heavy", 
+                                                                                                                "V_Heavy","D_Heavy","J_Heavy","C_Heavy","CDR3_Heavy","CDR3_nt_Heavy",
+                                                                                                                "BCL2_L23L","BCL2_K22K","CD79B_Y196H","EZH2_A682G","EZH2_A692V","EZH2_Y646C","EZH2_Y646F","EZH2_Y646H","EZH2_Y646N","EZH2_Y646S"), multiple = T, options = list(`actions-box` = TRUE))),
+                            
                             column(12,selectizeInput(inputId = ns('Vln_feature'), label= 'Feature : ', choices = NULL, multiple=TRUE)),
                             column(12,selectizeInput(inputId = ns('Vln_ident'), label= 'Ident : ', choices = NULL, multiple=TRUE)),
                             column(12,awesomeRadio(inputId = ns('Vln_assay'), label= 'Assay : ', choices = c('RNA','SCT','integrated'),inline = T)),
@@ -102,11 +108,13 @@ mod_All_DE_server <- function(input, output, session, r = r) {
   reactive({input$Vln_slot})
   reactive({input$Vln_feature})
   reactive({input$Vln_ident})
+  reactive({input$Vln_metadata_split})
+  
   observe({updateSelectizeInput(session, 'Vln_feature', choices = c("RCHOP_SCT_Score1", "RCHOP_RNA_Score1",  "RCHOP_i_Score1", "RCHOP_AUC_Score","percent.mt","percent.ig","percent.rb","percent.rb.meta","percent.ig.meta","percent.mt.meta","nCount_RNA","nFeature_RNA","nCount_SCT","nFeature_SCT","nCount_HTO","nFeature_HTO", r$feature), selected = "RCHOP_RNA_Score1", server = TRUE)})
   observe({updateSelectizeInput(session, 'Vln_ident', choices = names(table(r$dataset[[as.character(input$Vln_metadata)]])), server = TRUE)})
 
   output$Vln_plot = renderPlot({
-    Seurat::Idents(r$dataset) <- input$Vln_metadata ; Seurat::VlnPlot(r$dataset, idents = input$Vln_ident, features = input$Vln_feature, assay = input$Vln_assay, slot = input$Vln_slot) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
+    Seurat::Idents(r$dataset) <- input$Vln_metadata ; Seurat::VlnPlot(r$dataset, idents = input$Vln_ident, split.by= input$Vln_metadata_split, features = input$Vln_feature, assay = input$Vln_assay, slot = input$Vln_slot) & theme(axis.title.x = element_blank(), axis.title.y = element_blank(), legend.position = "none")
   })
   
   #load(file="inst/app/www/DE.RData")
