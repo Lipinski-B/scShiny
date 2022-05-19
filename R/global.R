@@ -7,11 +7,7 @@ library(plotly)
 library(shinyWidgets)
 library(shinydashboard)
 
-#load(file = "datasets/Patient/All_All_FL08G0293.RData")
-load(file = "/home/boris/Bureau/Flinovo/result/analyse_meta/All_Post-greffe_Other.RData")
-#load(file = "/home/boris/Bureau/Flinovo/result/analyse_patient/FL08G0293/All_All_FL08G0293.RData")
-#load(file = paste0("/home/boris/Bureau/Flinovo/result/analyse_meta/All_Post-greffe_All.RData"))
-
+load(file = "/media/boris/bae7e14e-21e5-48b8-80d6-f94583367b83/Flinovo/analyse_meta/All_Post-greffe_Other.RData")
 Seurat::Idents(singlet)<-'Phénotype.fine'
 singlet <- subset(singlet, idents = names(table(singlet@meta.data$Phénotype.fine)[which(table(singlet@meta.data$Phénotype.fine) > 10)]))
 Seurat::Idents(singlet)<-'Sample'

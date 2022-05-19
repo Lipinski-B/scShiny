@@ -6,7 +6,6 @@
 #' @noRd
 
 app_server <- function( input, output, session ) {
-#shinyServer(function(input, output, session) {
   #################################################################################################
   r <- reactiveValues(dataset = reactiveValues())
   p <- reactiveValues(dataset = reactiveValues())
@@ -25,7 +24,8 @@ app_server <- function( input, output, session ) {
     
     rm(list = ls());gc();gc();gc()
     
-    r$dataset <<- get(load(file = paste0("datasets/Patient/",input$Patient_Condition,"_",input$Patient_Type,"_",input$patient,".RData")))
+    r$dataset <<- get(load(file = paste0("/media/boris/bae7e14e-21e5-48b8-80d6-f94583367b83/Flinovo/datasets/Patient/",input$Patient_Condition,"_",input$Patient_Type,"_",input$patient,".RData")))
+    #r$dataset <<- get(load(file = paste0("datasets/Patient/",input$Patient_Condition,"_",input$Patient_Type,"_",input$patient,".RData")))
     #r$dataset <<- get(load(file = paste0("/home/boris/Bureau/Flinovo/result/analyse_patient/",input$patient,"/",input$Patient_Condition,"_",input$Patient_Type,"_",input$patient,".RData")))
     
     Seurat::Idents(r$dataset)<-'Phénotype.fine'
@@ -41,7 +41,7 @@ app_server <- function( input, output, session ) {
     
     rm(list = ls());gc();gc();gc()
     #r$dataset <<- get(load(file = paste0("datasets/All/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
-    r$dataset <<- get(load(file = paste0("/home/boris/Bureau/Flinovo/result/analyse_meta/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
+    r$dataset <<- get(load(file = paste0("/media/boris/bae7e14e-21e5-48b8-80d6-f94583367b83/Flinovo/analyse_meta/All_",input$Dataset_Condition,"_",input$Dataset_Type,".RData")))
     
     Seurat::Idents(r$dataset)<-'Sample'
     
